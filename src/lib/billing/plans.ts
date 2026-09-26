@@ -4,7 +4,7 @@ export const PRICING_PLANS: PricingPlan[] = [
   {
     id: 'FREE',
     name: 'आरम्भ',
-    englishSubtitle: 'Starter',
+    englishSubtitle: 'Free',
     tagline: 'For developers experimenting with open-weight autonomous agents.',
     monthlyPriceInr: 0,
     monthlyPriceUsd: 0,
@@ -25,8 +25,8 @@ export const PRICING_PLANS: PricingPlan[] = [
   },
   {
     id: 'BUILDER',
-    name: 'प्रगति',
-    englishSubtitle: 'Builder',
+    name: 'उत्कर्ष',
+    englishSubtitle: 'Pro',
     tagline: 'For engineers shipping features and squashing bugs autonomously.',
     monthlyPriceInr: 999,
     monthlyPriceUsd: 12,
@@ -49,8 +49,8 @@ export const PRICING_PLANS: PricingPlan[] = [
   },
   {
     id: 'PRO',
-    name: 'प्रवीण',
-    englishSubtitle: 'Professional',
+    name: 'शिखर',
+    englishSubtitle: 'Max',
     tagline: 'For senior engineers tackling complex multi-file architectural tasks.',
     monthlyPriceInr: 2499,
     monthlyPriceUsd: 29,

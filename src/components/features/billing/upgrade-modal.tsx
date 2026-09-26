@@ -60,12 +60,12 @@ export function UpgradeModal({
 
   // Plan & Billing Cycle selection
   const [selectedPlan, setSelectedPlan] = useState<PricingPlan>(
-    activeInitialPlan || PRICING_PLANS[1] // Default to प्रगति (Builder)
+    activeInitialPlan || PRICING_PLANS[1] // Default to उत्कर्ष (Pro)
   );
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>(defaultCycle);
 
   // Billing details form
-  const [fullName, setFullName] = useState(user?.name || 'Shivansh Pandey');
+  const [fullName, setFullName] = useState(user?.name || 'Developer');
   const [country, setCountry] = useState('India');
   const [address, setAddress] = useState('IIT Delhi Campus, Hauz Khas');
   const [businessName, setBusinessName] = useState('');
@@ -259,13 +259,13 @@ export function UpgradeModal({
 
             {/* 3-Card Developer Grid */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-5 items-stretch pt-1">
-              {/* 1. आरम्भ (Aarambh / Starter) */}
+              {/* 1. आरम्भ (Aarambh / Free) */}
               <div className="bg-[var(--bg-elevated)] border border-[var(--border-subtle)] rounded-2xl p-5 flex flex-col justify-between space-y-5 hover:border-[var(--border-medium)] transition-colors">
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
                       <h3 className="text-xl font-bold text-[var(--text-primary)]">आरम्भ</h3>
-                      <div className="text-[11px] font-mono text-[var(--text-muted)]">Starter / Free</div>
+                      <div className="text-[11px] font-mono text-[var(--text-muted)]">Free</div>
                     </div>
                     <span className="text-xs font-mono font-semibold px-2 py-0.5 rounded bg-[var(--bg-subtle)] text-[var(--text-secondary)] border border-[var(--border-subtle)]">
                       ₹0
@@ -285,7 +285,7 @@ export function UpgradeModal({
                     onClick={() => handleSelectPlan(PRICING_PLANS[0])}
                     className="w-full py-2 px-3 rounded-lg bg-[var(--bg-subtle)] hover:bg-[var(--bg-active)] border border-[var(--border-subtle)] text-[var(--text-primary)] font-semibold text-xs transition-colors cursor-pointer"
                   >
-                    {user?.plan === 'FREE' ? 'Current Plan' : 'Select Starter'}
+                    {user?.plan === 'FREE' ? 'Current Plan' : 'Select Free'}
                   </button>
 
                   <div className="pt-3 border-t border-[var(--border-subtle)] space-y-2 text-xs">
@@ -308,7 +308,7 @@ export function UpgradeModal({
                 </div>
               </div>
 
-              {/* 2. प्रगति (Pragati / Builder) — HERO CARD */}
+              {/* 2. उत्कर्ष (Utkarsh / Pro) — HERO CARD */}
               <div className="bg-[var(--bg-canvas)] border-2 border-[#ea580c] rounded-2xl p-5 flex flex-col justify-between space-y-5 shadow-xl relative ring-1 ring-[#ea580c]/20">
                 {/* Popular Pill */}
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-[#ea580c] text-white font-mono text-[10px] font-extrabold uppercase tracking-wider shadow-sm flex items-center gap-1">
@@ -319,8 +319,8 @@ export function UpgradeModal({
                 <div className="space-y-4 pt-1">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="text-xl font-bold text-[#ea580c]">प्रगति</h3>
-                      <div className="text-[11px] font-mono text-[var(--text-muted)]">Builder / Individual Pro</div>
+                      <h3 className="text-xl font-bold text-[#ea580c]">उत्कर्ष</h3>
+                      <div className="text-[11px] font-mono text-[var(--text-muted)]">Pro</div>
                     </div>
                     <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-[#ea580c]/15 text-[#ea580c] border border-[#ea580c]/30">
                       ₹{billingCycle === 'yearly' ? '799' : '999'}/mo
@@ -340,8 +340,8 @@ export function UpgradeModal({
                     </div>
                     <div className="text-[10px] text-[var(--text-muted)] font-mono">
                       {billingCycle === 'yearly'
-                        ? 'Billed annually at ₹9,588/yr (Save 20%)'
-                        : 'Billed monthly · Includes 18% GST'}
+                        ? 'Billed annually at ₹9,588/yr · Taxes included'
+                        : 'Billed monthly · Taxes included'}
                     </div>
                   </div>
 
@@ -349,7 +349,7 @@ export function UpgradeModal({
                     onClick={() => handleSelectPlan(PRICING_PLANS[1])}
                     className="w-full py-2.5 px-3 rounded-lg bg-[#ea580c] hover:bg-[#f97316] text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-98 cursor-pointer"
                   >
-                    <span>Upgrade to प्रगति</span>
+                    <span>Upgrade to उत्कर्ष</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </button>
                   <div className="text-[10px] text-center text-[var(--text-muted)] font-mono">
@@ -378,13 +378,13 @@ export function UpgradeModal({
                 </div>
               </div>
 
-              {/* 3. प्रवीण (Praveen / Professional) */}
+              {/* 3. शिखर (Shikhar / Max) */}
               <div className="bg-[var(--bg-elevated)] border border-[var(--border-subtle)] rounded-2xl p-5 flex flex-col justify-between space-y-5 hover:border-[var(--border-medium)] transition-colors">
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="text-xl font-bold text-[var(--text-primary)]">प्रवीण</h3>
-                      <div className="text-[11px] font-mono text-[var(--text-muted)]">Professional / Senior</div>
+                      <h3 className="text-xl font-bold text-[var(--text-primary)]">शिखर</h3>
+                      <div className="text-[11px] font-mono text-[var(--text-muted)]">Max</div>
                     </div>
                     <span className="text-xs font-mono font-semibold px-2 py-0.5 rounded bg-[var(--bg-subtle)] text-[var(--text-secondary)] border border-[var(--border-subtle)]">
                       ₹{billingCycle === 'yearly' ? '1,999' : '2,499'}/mo
@@ -404,8 +404,8 @@ export function UpgradeModal({
                     </div>
                     <div className="text-[10px] text-[var(--text-muted)] font-mono">
                       {billingCycle === 'yearly'
-                        ? 'Billed annually at ₹23,988/yr (Save 20%)'
-                        : 'Billed monthly · Includes 18% GST'}
+                        ? 'Billed annually at ₹23,988/yr · Taxes included'
+                        : 'Billed monthly · Taxes included'}
                     </div>
                   </div>
 
@@ -413,7 +413,7 @@ export function UpgradeModal({
                     onClick={() => handleSelectPlan(PRICING_PLANS[2])}
                     className="w-full py-2 px-3 rounded-lg bg-[var(--bg-subtle)] hover:bg-[var(--bg-active)] border border-[var(--border-subtle)] text-[var(--text-primary)] font-semibold text-xs transition-colors cursor-pointer"
                   >
-                    Upgrade to प्रवीण
+                    Upgrade to शिखर
                   </button>
                   <div className="text-[10px] text-center text-[var(--text-muted)] font-mono">
                     No commitment · Cancel anytime
@@ -421,7 +421,7 @@ export function UpgradeModal({
 
                   <div className="pt-3 border-t border-[var(--border-subtle)] space-y-2 text-xs">
                     <div className="text-[10px] uppercase tracking-wider font-mono font-semibold text-[var(--text-muted)]">
-                      Everything in प्रगति, plus:
+                      Everything in उत्कर्ष, plus:
                     </div>
                     {[
                       '500 verified runs per month',
@@ -449,7 +449,8 @@ export function UpgradeModal({
                 </div>
                 <div>
                   <div className="font-bold text-[var(--text-primary)] flex items-center gap-2">
-                    <span>दल (Team & Enterprise Swarms)</span>
+                    <span>दल</span>
+                    <span className="text-[11px] font-mono text-[var(--text-muted)] font-normal">Team</span>
                     <span className="text-[10px] bg-[#38bdf8]/15 text-[#38bdf8] px-1.5 py-0.2 rounded font-mono font-bold">
                       ₹4,999/mo
                     </span>
@@ -515,7 +516,7 @@ export function UpgradeModal({
                       ₹{monthlyTotal.toLocaleString('en-IN')}.00
                     </div>
                     <div className="text-[10px] text-[var(--text-muted)] font-mono mt-0.5">
-                      Billed monthly · Includes 18% GST
+                      Billed monthly · Taxes included
                     </div>
                   </button>
 
@@ -540,7 +541,7 @@ export function UpgradeModal({
                       ₹{yearlyTotal.toLocaleString('en-IN')}.00
                     </div>
                     <div className="text-[10px] text-[var(--text-muted)] font-mono mt-0.5">
-                      ₹{Math.round(yearlyTotal / 12).toLocaleString('en-IN')}/mo · Includes 18% GST
+                      ₹{Math.round(yearlyTotal / 12).toLocaleString('en-IN')}/mo · Taxes included
                     </div>
                   </button>
                 </div>
@@ -640,13 +641,11 @@ export function UpgradeModal({
                   {paymentMethodTab === 'upi' && (
                     <div className="p-3.5 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-subtle)] space-y-2">
                       <div className="flex items-center justify-between text-xs">
-                        <span className="text-[var(--text-secondary)]">Verified VPA Recipient:</span>
-                        <code className="text-[#ea580c] font-bold bg-[#ea580c]/10 px-2 py-0.5 rounded border border-[#ea580c]/20">
-                          shivansh.p@fam
-                        </code>
+                        <span className="text-[var(--text-secondary)]">Payment Channel:</span>
+                        <span className="text-[var(--text-primary)] font-bold">UPI AutoPay / QR</span>
                       </div>
                       <div className="text-[11px] text-[var(--text-muted)] leading-relaxed">
-                        Instant zero-charge UPI handoff. Supports Google Pay, PhonePe, Paytm, and FamPay.
+                        Instant zero-charge UPI handoff. Supports Google Pay, PhonePe, Paytm, and BHIM.
                       </div>
                     </div>
                   )}
@@ -680,21 +679,12 @@ export function UpgradeModal({
                   </div>
                 </div>
 
-                <div className="space-y-2 pt-2 border-t border-[var(--border-subtle)] text-xs">
-                  <div className="flex items-center justify-between text-[var(--text-secondary)]">
-                    <span>Subtotal</span>
-                    <span className="text-[var(--text-primary)]">₹{subtotal.toLocaleString('en-IN')}</span>
+                <div className="pt-3 pb-1 border-t border-[var(--border-subtle)] flex items-center justify-between">
+                  <div>
+                    <span className="text-[var(--text-primary)] font-bold text-sm block">Total due today</span>
+                    <span className="text-[10px] text-[var(--text-muted)] font-mono">Taxes included</span>
                   </div>
-
-                  <div className="flex items-center justify-between text-[var(--text-secondary)]">
-                    <span>Tax (18% GST)</span>
-                    <span className="text-[var(--text-primary)]">₹{gstTax.toLocaleString('en-IN')}</span>
-                  </div>
-
-                  <div className="pt-2 border-t border-[var(--border-subtle)] flex items-center justify-between font-bold text-sm">
-                    <span className="text-[var(--text-primary)]">Total due today</span>
-                    <span className="text-[#ea580c] text-base">₹{totalDue.toLocaleString('en-IN')}.00</span>
-                  </div>
+                  <span className="text-[#ea580c] font-black text-lg">₹{totalDue.toLocaleString('en-IN')}.00</span>
                 </div>
 
                 {/* Auto-renew notice */}
@@ -704,7 +694,7 @@ export function UpgradeModal({
                     <span>Auto-Renewal Notice</span>
                   </div>
                   <p className="leading-tight">
-                    Your subscription will renew automatically. You will be charged ₹{subtotal.toLocaleString('en-IN')} / {billingCycle === 'yearly' ? 'year' : 'month'} + applicable taxes. Cancel anytime from Account settings.
+                    Your subscription will renew automatically. You will be charged ₹{totalDue.toLocaleString('en-IN')} / {billingCycle === 'yearly' ? 'year' : 'month'} (taxes included). Cancel anytime from Account settings.
                   </p>
                 </div>
 
@@ -760,7 +750,7 @@ export function UpgradeModal({
               <Loader2 className="w-6 h-6 animate-spin" />
             </div>
             <h3 className="text-xl font-bold text-[var(--text-primary)]">
-              Verifying Payment with shivansh.p@fam...
+              Verifying Payment with Gateway...
             </h3>
             <p className="text-xs text-[var(--text-secondary)] font-mono max-w-md mx-auto">
               Cryptographic verification in progress. Do not refresh this window.
@@ -786,18 +776,18 @@ export function UpgradeModal({
             </div>
 
             {verifiedInvoice && (
-              <div className="p-3.5 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-subtle)] text-left font-mono text-xs max-w-md mx-auto space-y-1">
+              <div className="p-3.5 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-subtle)] text-left font-mono text-xs max-w-md mx-auto space-y-1.5">
                 <div className="flex justify-between">
                   <span className="text-[var(--text-muted)]">Invoice ID:</span>
                   <span className="text-[var(--text-primary)] font-bold">{verifiedInvoice.id}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[var(--text-muted)]">Recipient:</span>
-                  <span className="text-[#ea580c]">{verifiedInvoice.recipient}</span>
+                  <span className="text-[var(--text-muted)]">Plan:</span>
+                  <span className="text-[#ea580c] font-semibold">{selectedPlan.name} ({selectedPlan.englishSubtitle})</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-[var(--text-muted)]">Amount Paid:</span>
-                  <span className="text-[#10b981] font-bold">{verifiedInvoice.amount}</span>
+                  <span className="text-[#10b981] font-bold">{verifiedInvoice.amount} (Taxes included)</span>
                 </div>
               </div>
             )}

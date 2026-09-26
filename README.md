@@ -93,13 +93,13 @@ make evaluate
   - **Claude 3.7 Sonnet** (Hybrid reasoning token budgets)
   - **Local Ollama** (Completely air-gapped zero-data-egress execution)
 - **Hindi Identity Subscription Plans:**
-  - **आरम्भ** (Starter) — Free tier, 25 verified runs/mo
-  - **प्रगति** (Builder) — ₹2,499/mo, 150 verified runs/mo
-  - **प्रवीण** (Professional) — ₹6,999/mo, 500 verified runs/mo
-  - **दल** (Team) — ₹16,999/mo, unlimited verified runs
+  - **आरम्भ** (Free) — Free tier, 25 verified runs/mo
+  - **उत्कर्ष** (Pro) — ₹999/mo (or ₹799/mo yearly), 150 verified runs/mo, taxes included
+  - **शिखर** (Max) — ₹2,499/mo (or ₹1,999/mo yearly), 500 verified runs/mo, taxes included
+  - **दल** (Team) — ₹4,999/mo, unlimited verified team runs
 - **Payment Architecture:**
-  - Official hosted/sandbox checkout routed server-side to verified merchant: `shivansh.p@fam`.
-  - Cryptographic server-side verification with zero custom card forms on Parishram UI.
+  - Official hosted checkout with single final amount and taxes included.
+  - Zero custom card forms on Parishram UI with cryptographically signed invoice IDs.
 
 ---
 
@@ -178,10 +178,10 @@ Tests verify:
   - 12 comprehensive categories: General, Appearance, Editor, AI & Models, Agent Policy, Repository, Terminal, Verification, Notifications, Privacy & Security, Account Profile, Plan & Billing.
   - Interactive search bar with instant progressive disclosure.
 - **Authentic Subscription & Upgrade Flow:**
-  - **Authentic Hindi Tiers:** **आरम्भ** (Starter, ₹0), **प्रगति** (Builder, ₹999/mo or ₹799/mo yearly, Save 20%), **प्रवीण** (Professional, ₹2,499/mo), and **दल** (Team, ₹4,999/mo).
+  - **Authentic Hindi Tiers:** **आरम्भ** (Free, ₹0), **उत्कर्ष** (Pro, ₹999/mo or ₹799/mo yearly, Save 20%), **शिखर** (Max, ₹2,499/mo), and **दल** (Team, ₹4,999/mo).
   - **Dynamic Theme Invariance:** Modal and checkout flow dynamically respond to Light and Dark mode switching using semantic CSS variables.
   - **Minimalist Dashboard Placements:** Subtle topbar indicator (`आरम्भ · Upgrade ↗`) and clean link near the left account section in the sidebar.
-  - **2-Column Indian GST Checkout:** Subtotal, 18% GST calculation, auto-renewal terms, and instant UPI handoff to `shivansh.p@fam`.
+  - **Single Final Amount Checkout:** Clean single total with taxes included, automated renewals, and instant UPI handoff.
 
 ---
 

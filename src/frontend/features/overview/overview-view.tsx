@@ -258,7 +258,7 @@ export function OverviewView({ onStartRun, onOpenRun, onOpenBilling }: OverviewV
               </div>
 
               <p className="text-[11px] text-[var(--text-secondary)] font-sans pt-1">
-                Upgrade to <strong className="text-[var(--text-primary)]">प्रगति (Builder)</strong> for ₹2,499/mo to unlock Claude 3.7 Sonnet, Kimi K2.5, 128k context, and 150 runs/mo.
+                Upgrade to <strong className="text-[var(--text-primary)]">उत्कर्ष (Pro)</strong> for ₹999/mo to unlock Kimi K2, GLM 4.5, 256k context, and 150 runs/mo.
               </p>
             </div>
 
@@ -267,7 +267,7 @@ export function OverviewView({ onStartRun, onOpenRun, onOpenBilling }: OverviewV
               className="px-3.5 py-2 rounded-lg bg-[#ea580c] hover:bg-[#f97316] text-white font-bold text-xs flex items-center gap-1.5 transition-all shadow-md active:scale-95 shrink-0 cursor-pointer"
             >
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Upgrade to प्रगति ⚡</span>
+              <span>Upgrade to उत्कर्ष ⚡</span>
             </button>
           </div>
         )}

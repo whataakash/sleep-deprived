@@ -15,8 +15,8 @@ export interface PlanFeature {
 
 export interface PricingPlan {
   id: PlanTier;
-  name: string; // Hindi primary name (e.g. 'आरम्भ', 'प्रगति', 'प्रवीण', 'दल')
-  englishSubtitle: string; // English descriptor (e.g. 'Starter', 'Builder', 'Professional', 'Team')
+  name: string; // Hindi primary name (e.g. 'आरम्भ', 'उत्कर्ष', 'शिखर', 'दल')
+  englishSubtitle: string; // English descriptor (e.g. 'Free', 'Pro', 'Max', 'Team')
   tagline: string;
   monthlyPriceInr: number;
   monthlyPriceUsd: number;

@@ -12,7 +12,7 @@ Modern AI interfaces have fallen into a trap of generic templates: neon purple g
 
 ### Core Tenets:
 1. **Developer-First Precision:** High information density, monospace-first metrics, subtle borders, and intentional whitespace.
-2. **Subtle Indian/Hindi Heritage:** The product wordmark (`परिश्रम`) and subscription plan tiers (`आरम्भ`, `प्रगति`, `प्रवीण`, `दल`) introduce an intentional cultural identity, while technical developer concepts (Repository, Diffs, Proofs, Tests, Terminal) remain in standard English.
+2. **Subtle Indian/Hindi Heritage:** The product wordmark (`परिश्रम`) and subscription plan tiers (`आरम्भ`, `उत्कर्ष`, `शिखर`, `दल`) introduce an intentional cultural identity, while technical developer concepts (Repository, Diffs, Proofs, Tests, Terminal) remain in standard English.
 3. **Glass-Box Observability:** The UI never conceals what the agent is doing. Every AST search, test execution, error stack trace, and git patch is inspectable and verifiable.
 4. **Restrained Color & Contrast:** Colors carry strict semantic meaning (Flame for active work, Green for verified proof, Amber for diagnostics, Red for failure). No decorative rainbow gradients.
 
@@ -142,15 +142,15 @@ The subscription modal is engineered to reflect Parishram's distinct visual iden
   - In **Light Mode**: Pristine white panels, subtle cool-gray borders, graphite text, and vibrant orange action buttons.
 - **Unified Billing Frequency Toggle:** A single clean switcher `[ मासिक (Monthly) | वार्षिक (Yearly - बचत 20%) ]` centered at the top, avoiding duplicate or awkward audience pills.
 - **Card Hierarchy:**
-  - **आरम्भ (Starter)**: Clean elevated container, ₹0, clear developer scope.
-  - **प्रगति (Builder — Flagship Hero)**: Emphasized with `border-2 border-[#ea580c]`, prominent `⭐ सबसे लोकप्रिय (Most Popular)` pill, solid flame primary button, and 150 verified runs/mo.
-  - **प्रवीण (Professional)**: Dedicated power-user tier for complex architectural tasks, frontier models, and 1M context.
-  - **दल (Team Swarms)**: Streamlined team banner at the base of the grid for engineering organizations requiring seat governance and microVM sandboxes.
+  - **आरम्भ (Free)**: Clean elevated container, ₹0, clear developer scope.
+  - **उत्कर्ष (Pro — Flagship Hero)**: Emphasized with `border-2 border-[#ea580c]`, prominent `Most Popular` pill, solid flame primary button, and 150 verified runs/mo.
+  - **शिखर (Max)**: Dedicated power-user tier for complex architectural tasks, frontier models, and 1M context.
+  - **दल (Team)**: Streamlined team banner at the base of the grid for engineering organizations requiring seat governance and microVM sandboxes.
 
-### Step 2: Plan Configuration & Indian GST Checkout
+### Step 2: Plan Configuration & Unified Indian Checkout
 - **2-Column Layout:**
-  - **Left Column:** Interactive radio options with active flame rings, complete billing information (Name, Country, GSTIN/Tax ID, Address), and payment methods (UPI/FamPay directly to verified recipient `shivansh.p@fam` or Card).
-  - **Right Column (Sticky Order Summary):** Dynamic tax calculation with exact 18% GST breakdown, auto-renewal notice, recurring agreement checkbox, and instant gateway handoff.
+  - **Left Column:** Interactive radio options with active flame rings, complete billing information (Name, Country, GSTIN/Tax ID, Address), and payment methods (UPI AutoPay / QR or Card).
+  - **Right Column (Sticky Order Summary):** Single clear final amount with taxes included, auto-renewal notice, recurring agreement checkbox, and instant gateway handoff.
 - **Minimalist Triggers:**
   - Clean plan pill in topbar (`आरम्भ · Upgrade ↗`).
   - Minimal plan indicator right in the left account section at the bottom of the sidebar.

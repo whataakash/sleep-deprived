@@ -907,7 +907,7 @@ export function AccountCenter({ isOpen, onClose, initialCategory = 'general' }: 
                       <span>Active • Renews automatically on 2026-10-26</span>
                     </div>
                     <div className="text-[10px] text-[var(--text-muted)] mt-0.5">
-                      Merchant Destination: <code className="text-[#ea580c] font-semibold">shivansh.p@fam</code>
+                      Payment Route: <code className="text-[#ea580c] font-semibold">Parishram Verified Gateway</code>
                     </div>
                   </div>
 
@@ -964,7 +964,7 @@ export function AccountCenter({ isOpen, onClose, initialCategory = 'general' }: 
                     <div className="text-[10px] uppercase tracking-wider text-[var(--text-muted)] font-semibold">
                       Payment History & Invoices
                     </div>
-                    <span className="text-[10px] text-[var(--text-muted)]">Verified recipient: shivansh.p@fam</span>
+                    <span className="text-[10px] text-[var(--text-muted)]">Verified Payment Channel</span>
                   </div>
 
                   <div className="border border-[var(--border-subtle)] rounded-lg overflow-hidden bg-[var(--bg-canvas)]">
@@ -976,21 +976,21 @@ export function AccountCenter({ isOpen, onClose, initialCategory = 'general' }: 
                           <th className="p-2.5 font-semibold">Plan</th>
                           <th className="p-2.5 font-semibold">Amount</th>
                           <th className="p-2.5 font-semibold">Status</th>
-                          <th className="p-2.5 font-semibold">Recipient</th>
+                          <th className="p-2.5 font-semibold">Channel</th>
                         </tr>
                       </thead>
                       <tbody>
                         <tr className="border-b border-[var(--border-subtle)] hover:bg-[var(--bg-subtle)] transition-colors">
                           <td className="p-2.5 text-[var(--text-secondary)]">2026-09-01</td>
                           <td className="p-2.5 font-mono text-[var(--text-primary)] font-medium">INV-PARISHRAM-90142</td>
-                          <td className="p-2.5 text-[var(--text-primary)]">प्रगति (Builder)</td>
-                          <td className="p-2.5 font-bold text-[var(--text-primary)]">₹2,499</td>
+                          <td className="p-2.5 text-[var(--text-primary)]">उत्कर्ष (Pro)</td>
+                          <td className="p-2.5 font-bold text-[var(--text-primary)]">₹999 (Taxes incl.)</td>
                           <td className="p-2.5">
                             <span className="px-1.5 py-0.5 rounded bg-[#10b981]/15 text-[#10b981] font-bold text-[10px]">
                               PAID
                             </span>
                           </td>
-                          <td className="p-2.5 text-[var(--text-secondary)] font-mono text-[10px]">shivansh.p@fam</td>
+                          <td className="p-2.5 text-[var(--text-secondary)] font-mono text-[10px]">UPI AutoPay</td>
                         </tr>
                       </tbody>
                     </table>
