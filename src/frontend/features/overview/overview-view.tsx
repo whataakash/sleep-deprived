@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
+import { motion } from 'motion/react';
 import {
   FolderGit2,
   Cpu,
@@ -88,11 +89,24 @@ export function OverviewView({ onStartRun, onOpenRun, onOpenBilling }: OverviewV
   const currentPlan = user?.plan || 'FREE';
   const planInfo = getPlanDisplay(currentPlan);
 
-  const [taskPrompt, setTaskPrompt] = useState(
-    'Fix the authentication failures in auth-gateway-service: forward active session tokens across internal service requests and ensure all regression tests pass.'
-  );
+  const [taskPrompt, setTaskPrompt] = useState('');
   const [selectedModelId, setSelectedModelId] = useState('qwen3-coder-next');
   const [selectedAgentMode, setSelectedAgentMode] = useState<'dual' | 'navigator' | 'supervisor'>('dual');
+
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const autoResize = useCallback((el: HTMLTextAreaElement) => {
+    el.style.height = 'auto';
+    el.style.height = `${el.scrollHeight}px`;
+  }, []);
+
+  const handlePromptChange = useCallback(
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      setTaskPrompt(e.target.value);
+      autoResize(e.target);
+    },
+    [autoResize]
+  );
 
   const runsUsed = user?.usage.runsUsedThisMonth || 14;
   const maxRuns = typeof user?.usage.maxMonthlyRuns === 'number' ? user.usage.maxMonthlyRuns : 25;
@@ -178,17 +192,28 @@ export function OverviewView({ onStartRun, onOpenRun, onOpenBilling }: OverviewV
           </div>
         </div>
 
-        {/* Task Intake Box */}
-        <div className="bg-[var(--bg-panel)] border border-[var(--border-subtle)] rounded-xl p-4 space-y-4 shadow-sm transition-colors">
+        {/* Task Intake Box — auto-growing, motion-animated */}
+        <motion.div
+          layout
+          transition={{ duration: 0.18, ease: [0.25, 0.1, 0.25, 1] }}
+          className="bg-[var(--bg-panel)] border border-[var(--border-subtle)] rounded-xl p-4 shadow-sm transition-colors flex flex-col gap-0"
+        >
           <textarea
-            rows={4}
+            ref={textareaRef}
             value={taskPrompt}
-            onChange={(e) => setTaskPrompt(e.target.value)}
-            placeholder="Describe a software task... e.g. Fix the failing authentication tests and update the implementation without changing the public API."
+            onChange={handlePromptChange}
+            placeholder="How can I help you today?"
+            aria-label="Task prompt"
+            style={{
+              minHeight: '3rem',
+              maxHeight: '13rem',
+              height: 'auto',
+              overflowY: taskPrompt ? 'auto' : 'hidden',
+            }}
             className="w-full bg-transparent text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none resize-none leading-relaxed font-sans"
           />
 
-          <div className="pt-3 border-t border-[var(--border-subtle)] flex flex-wrap items-center justify-between gap-3 font-mono text-xs">
+          <div className="pt-3 mt-1 border-t border-[var(--border-subtle)] flex flex-wrap items-center justify-between gap-3 font-mono text-xs">
             {/* Repository & Model Pickers */}
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-1 px-2.5 py-1 rounded bg-[var(--bg-elevated)] border border-[var(--border-subtle)] text-[11px] text-[var(--text-secondary)]">
@@ -234,7 +259,7 @@ export function OverviewView({ onStartRun, onOpenRun, onOpenBilling }: OverviewV
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
-        </div>
+        </motion.div>
 
         {/* PSYCHOLOGY & FINANCE UPGRADE CARD (ChatGPT Plus / Claude Pro Style) */}
         {currentPlan === 'FREE' && (

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
+import Image from 'next/image';
 import { ForgeTemperature, AgentState } from '@/types/agent';
 import {
   FolderGit2,
@@ -81,6 +82,60 @@ export function Topbar({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Resolved theme tracking (supports 'light', 'dark', and 'system' seamlessly)
+  const [resolvedTheme, setResolvedTheme] = useState<'dark' | 'light'>(() => {
+    if (typeof document !== 'undefined') {
+      const dataTheme = document.documentElement.getAttribute('data-theme');
+      if (dataTheme === 'light' || dataTheme === 'dark') return dataTheme;
+      if (document.documentElement.classList.contains('light')) return 'light';
+    }
+    if (currentTheme === 'light' || currentTheme === 'dark') return currentTheme;
+    return 'dark';
+  });
+
+  useEffect(() => {
+    const updateTheme = () => {
+      if (typeof document !== 'undefined') {
+        const dataTheme = document.documentElement.getAttribute('data-theme');
+        if (dataTheme === 'light' || dataTheme === 'dark') {
+          setResolvedTheme(dataTheme);
+          return;
+        }
+        if (document.documentElement.classList.contains('light')) {
+          setResolvedTheme('light');
+          return;
+        }
+        if (document.documentElement.classList.contains('dark')) {
+          setResolvedTheme('dark');
+          return;
+        }
+      }
+      if (currentTheme === 'light' || currentTheme === 'dark') {
+        setResolvedTheme(currentTheme);
+      } else if (typeof window !== 'undefined') {
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        setResolvedTheme(prefersDark ? 'dark' : 'light');
+      }
+    };
+
+    updateTheme();
+
+    const media = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleMediaChange = () => updateTheme();
+    media.addEventListener('change', handleMediaChange);
+
+    const observer = new MutationObserver(() => updateTheme());
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class', 'data-theme'],
+    });
+
+    return () => {
+      media.removeEventListener('change', handleMediaChange);
+      observer.disconnect();
+    };
+  }, [currentTheme]);
+
   const toggleTheme = () => {
     const nextTheme = currentTheme === 'light' ? 'dark' : 'light';
     updatePreferences({ theme: nextTheme });
@@ -88,11 +143,35 @@ export function Topbar({
 
   return (
     <header className="w-full bg-[var(--bg-canvas)] border-b border-[var(--border-subtle)] px-4 sm:px-6 h-16 flex items-center justify-between gap-4 text-xs font-mono select-none z-20 transition-colors">
-      {/* LEFT: Prominent Brand */}
+      {/* LEFT: Prominent Brand Logo */}
       <div className="flex items-center gap-3">
-        <span className="font-black text-2xl sm:text-[26px] tracking-tight text-[var(--text-primary)] select-none">
-          परिश्रम
-        </span>
+        <div
+          className="relative flex items-center h-8 sm:h-[34px] w-[108px] sm:w-[115px] select-none"
+          title="Parishram"
+        >
+          {/* Dark Mode: PARISHRAM logo dark.png (for dark backgrounds) */}
+          <Image
+            src="/PARISHRAM%20logo%20dark.png"
+            alt="Parishram"
+            width={115}
+            height={34}
+            priority
+            className={`absolute inset-0 w-full h-full object-contain object-left transition-opacity duration-200 motion-reduce:transition-none ${
+              resolvedTheme === 'dark' ? 'opacity-100' : 'opacity-0 pointer-events-none'
+            }`}
+          />
+          {/* Light Mode: PARISHRAM LOGO LIGHTMODE.png (for light backgrounds) */}
+          <Image
+            src="/PARISHRAM%20LOGO%20LIGHTMODE.png"
+            alt="Parishram"
+            width={115}
+            height={34}
+            priority
+            className={`absolute inset-0 w-full h-full object-contain object-left transition-opacity duration-200 motion-reduce:transition-none ${
+              resolvedTheme === 'light' ? 'opacity-100' : 'opacity-0 pointer-events-none'
+            }`}
+          />
+        </div>
       </div>
 
       {/* CENTER / CONTEXT: Quiet Secondary Status */}

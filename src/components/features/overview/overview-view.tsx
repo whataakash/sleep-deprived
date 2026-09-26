@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
+import { motion } from 'motion/react';
 import {
   FolderGit2,
   Cpu,
@@ -102,11 +103,26 @@ export function OverviewView({
   const currentPlan = user?.plan || 'FREE';
   const planInfo = getPlanDisplay(currentPlan);
 
-  const [taskPrompt, setTaskPrompt] = useState(
-    'Fix the authentication failures in auth-gateway-service: forward active session tokens across internal service requests and ensure all regression tests pass.'
-  );
+  const [taskPrompt, setTaskPrompt] = useState('');
   const [selectedModelId, setSelectedModelId] = useState('qwen3-coder-next');
   const [selectedAgentMode, setSelectedAgentMode] = useState<'dual' | 'navigator' | 'supervisor'>('dual');
+
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Instantly resize the textarea to fit content — no debounce so typing feels immediate.
+  // The outer motion.div picks up the layout shift and animates it smoothly.
+  const autoResize = useCallback((el: HTMLTextAreaElement) => {
+    el.style.height = 'auto'; // collapse first so shrink works
+    el.style.height = `${el.scrollHeight}px`;
+  }, []);
+
+  const handlePromptChange = useCallback(
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      setTaskPrompt(e.target.value);
+      autoResize(e.target);
+    },
+    [autoResize]
+  );
 
   const runsUsed = user?.usage.runsUsedThisMonth || 14;
   const maxRuns = typeof user?.usage.maxMonthlyRuns === 'number' ? user.usage.maxMonthlyRuns : 25;
@@ -192,17 +208,34 @@ export function OverviewView({
           </div>
         </div>
 
-        {/* Task Intake Box */}
-        <div className="bg-[var(--bg-panel)] border border-[var(--border-subtle)] rounded-xl p-4 space-y-4 shadow-sm transition-colors">
+        {/* Task Intake Box — auto-growing, motion-animated */}
+        <motion.div
+          layout
+          transition={{ duration: 0.18, ease: [0.25, 0.1, 0.25, 1] }}
+          className="bg-[var(--bg-panel)] border border-[var(--border-subtle)] rounded-xl p-4 shadow-sm transition-colors flex flex-col gap-0"
+        >
+          {/*
+           * The textarea itself is sized by scrollHeight (via autoResize).
+           * min-height keeps it compact when empty (~2 lines of text).
+           * max-height caps growth; overflow-y:auto then handles internal scroll.
+           * The outer motion.div animates the resulting height change.
+           */}
           <textarea
-            rows={4}
+            ref={textareaRef}
             value={taskPrompt}
-            onChange={(e) => setTaskPrompt(e.target.value)}
-            placeholder="Describe a software task... e.g. Fix the failing authentication tests and update the implementation without changing the public API."
+            onChange={handlePromptChange}
+            placeholder="How can I help you today?"
+            aria-label="Task prompt"
+            style={{
+              minHeight: '3rem',     /* ~2 lines — compact when empty */
+              maxHeight: '13rem',    /* ~8 lines — then scroll internally */
+              height: 'auto',
+              overflowY: taskPrompt ? 'auto' : 'hidden',
+            }}
             className="w-full bg-transparent text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none resize-none leading-relaxed font-sans"
           />
 
-          <div className="pt-3 border-t border-[var(--border-subtle)] flex flex-wrap items-center justify-between gap-3 font-mono text-xs">
+          <div className="pt-3 mt-1 border-t border-[var(--border-subtle)] flex flex-wrap items-center justify-between gap-3 font-mono text-xs">
             {/* Repository & Model Pickers */}
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-1 px-2.5 py-1 rounded bg-[var(--bg-elevated)] border border-[var(--border-subtle)] text-[11px] text-[var(--text-secondary)]">
@@ -248,7 +281,7 @@ export function OverviewView({
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
-        </div>
+        </motion.div>
 
         {/* Secondary Contextual Action: Run Demo */}
         <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-[var(--text-muted)] font-mono px-1">
