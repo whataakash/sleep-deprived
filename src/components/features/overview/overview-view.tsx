@@ -62,6 +62,14 @@ interface OverviewViewProps {
   isDemoRunning?: boolean;
   onResetDemo?: () => void;
   onNavigateToModels?: () => void;
+  lastCompletedRun?: {
+    runNumber: number;
+    title: string;
+    testsPassed: number;
+    testsTotal: number;
+    isVerified: boolean;
+  };
+  onViewProof?: () => void;
 }
 
 export function OverviewView({
@@ -73,6 +81,8 @@ export function OverviewView({
   isDemoRunning,
   onResetDemo,
   onNavigateToModels,
+  lastCompletedRun,
+  onViewProof,
 }: OverviewViewProps) {
   const { session } = useAuth();
   const user = session.user;
@@ -301,68 +311,36 @@ export function OverviewView({
 
   return (
     <div className="flex-1 flex flex-col items-center justify-start overflow-y-auto px-4 sm:px-6 lg:px-8 py-6 select-none font-sans transition-colors">
-      <div className="w-full max-w-4xl lg:max-w-5xl space-y-6">
-        {/* ENLARGED HERO SECTION: "What are you thinking to build?" */}
-        <div className="p-6 sm:p-7 rounded-2xl bg-gradient-to-br from-[var(--bg-elevated)] via-[var(--bg-panel)] to-[var(--bg-canvas)] border border-[var(--border-subtle)] space-y-3.5 shadow-sm relative overflow-hidden">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="space-y-1.5">
-              <div className="flex items-center gap-2">
-                <span className="p-1 rounded-md bg-[#ea580c]/15 text-[#ea580c] border border-[#ea580c]/30">
-                  <Sparkles className="w-4 h-4" />
-                </span>
-                <span className="text-[11px] font-mono font-bold tracking-wider uppercase text-[#ea580c]">
-                  PARISHRAM AI CORE DISPATCHER
-                </span>
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#10b981]/15 text-[#10b981] font-mono font-bold">
-                  AUTONOMOUS SMART ROUTING
-                </span>
-              </div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[var(--text-primary)]">
-                What are we building?
-              </h1>
-              <p className="text-xs text-[var(--text-secondary)] font-mono max-w-2xl leading-relaxed">
-                Autonomous software engineering with deterministic proof of work. Describe any feature, bug, or refactor to route dynamically across free open models and frontier reasoning engines.
-              </p>
-            </div>
-
-            {onNavigateToModels && (
-              <button
-                type="button"
-                onClick={onNavigateToModels}
-                className="self-start sm:self-center shrink-0 px-4 py-2.5 rounded-xl bg-[var(--bg-canvas)] hover:bg-[var(--bg-elevated)] border border-[#ea580c]/40 text-xs font-mono font-bold text-[var(--text-primary)] hover:text-[#ea580c] transition-all cursor-pointer flex items-center gap-2 shadow-xs group"
-              >
-                <Sliders className="w-3.5 h-3.5 text-[#ea580c] group-hover:rotate-45 transition-transform" />
-                <span>Models & Arena</span>
-                <ArrowRight className="w-3.5 h-3.5 text-[var(--text-muted)] group-hover:translate-x-0.5 transition-transform" />
-              </button>
-            )}
-          </div>
+      <div className="w-full max-w-3xl lg:max-w-4xl space-y-5">
+        {/* HERO SECTION: "What are we building?" */}
+        <div className="pt-2 pb-0.5 space-y-1">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[var(--text-primary)]">
+            What are we building?
+          </h1>
+          <p className="text-xs text-[var(--text-secondary)] font-mono max-w-xl">
+            Autonomous software engineering with deterministic verification and cryptographic proof.
+          </p>
         </div>
 
-        {/* AI Agent Selection Bar (Above Chat) */}
-        <div className="flex flex-col gap-1.5 font-mono text-xs">
-          <div className="text-[11px] text-[var(--text-muted)] uppercase tracking-wider font-semibold flex items-center justify-between">
-            <span>Select AI Agent Dispatch Mode</span>
-            <span className="text-[10px] text-[var(--text-muted)] lowercase">co-operative reasoning</span>
-          </div>
-
+        {/* AI Agent Selection Bar (Above Composer) */}
+        <div className="space-y-1.5 font-mono text-xs">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-            {/* Dual Agent (Navigator + Supervisor) */}
+            {/* Dual Agent (Autonomous Pair) */}
             <button
               type="button"
               onClick={() => setSelectedAgentMode('dual')}
               className={`p-2.5 rounded-lg border text-left transition-all cursor-pointer ${
                 selectedAgentMode === 'dual'
-                  ? 'bg-[var(--bg-elevated)] border-[#ea580c] ring-1 ring-[#ea580c]/30'
-                  : 'bg-[var(--bg-panel)] border-[var(--border-subtle)] hover:border-[var(--border-medium)]'
+                  ? 'bg-[var(--bg-elevated)] border-[#ea580c] text-[var(--text-primary)]'
+                  : 'bg-[var(--bg-panel)] border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-medium)]'
               }`}
             >
-              <div className="flex items-center gap-1.5 font-bold text-xs text-[var(--text-primary)]">
+              <div className="flex items-center gap-1.5 font-semibold text-xs text-[var(--text-primary)]">
                 <Zap className="w-3.5 h-3.5 text-[#ea580c]" />
                 <span>Autonomous Pair</span>
               </div>
-              <div className="text-[10px] text-[var(--text-muted)] font-sans mt-0.5 leading-tight">
-                Navigator cartography + Supervisor proof verification
+              <div className="text-[10px] text-[var(--text-muted)] font-sans mt-0.5">
+                Navigator & Supervisor in co-op loop
               </div>
             </button>
 
@@ -372,16 +350,16 @@ export function OverviewView({
               onClick={() => setSelectedAgentMode('navigator')}
               className={`p-2.5 rounded-lg border text-left transition-all cursor-pointer ${
                 selectedAgentMode === 'navigator'
-                  ? 'bg-[var(--bg-elevated)] border-[#38bdf8] ring-1 ring-[#38bdf8]/30'
-                  : 'bg-[var(--bg-panel)] border-[var(--border-subtle)] hover:border-[var(--border-medium)]'
+                  ? 'bg-[var(--bg-elevated)] border-[#ea580c] text-[var(--text-primary)]'
+                  : 'bg-[var(--bg-panel)] border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-medium)]'
               }`}
             >
-              <div className="flex items-center gap-1.5 font-bold text-xs text-[var(--text-primary)]">
+              <div className="flex items-center gap-1.5 font-semibold text-xs text-[var(--text-primary)]">
                 <Compass className="w-3.5 h-3.5 text-[#38bdf8]" />
                 <span>Navigating AI</span>
               </div>
-              <div className="text-[10px] text-[var(--text-muted)] font-sans mt-0.5 leading-tight">
-                AST mapping, call trees, dependency context search
+              <div className="text-[10px] text-[var(--text-muted)] font-sans mt-0.5">
+                Repository cartography & symbol search
               </div>
             </button>
 
@@ -391,16 +369,16 @@ export function OverviewView({
               onClick={() => setSelectedAgentMode('supervisor')}
               className={`p-2.5 rounded-lg border text-left transition-all cursor-pointer ${
                 selectedAgentMode === 'supervisor'
-                  ? 'bg-[var(--bg-elevated)] border-[#10b981] ring-1 ring-[#10b981]/30'
-                  : 'bg-[var(--bg-panel)] border-[var(--border-subtle)] hover:border-[var(--border-medium)]'
+                  ? 'bg-[var(--bg-elevated)] border-[#ea580c] text-[var(--text-primary)]'
+                  : 'bg-[var(--bg-panel)] border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-medium)]'
               }`}
             >
-              <div className="flex items-center gap-1.5 font-bold text-xs text-[var(--text-primary)]">
+              <div className="flex items-center gap-1.5 font-semibold text-xs text-[var(--text-primary)]">
                 <ShieldCheck className="w-3.5 h-3.5 text-[#10b981]" />
                 <span>Supervisor AI</span>
               </div>
-              <div className="text-[10px] text-[var(--text-muted)] font-sans mt-0.5 leading-tight">
-                Scope guard, security scanning, invariant proofs
+              <div className="text-[10px] text-[var(--text-muted)] font-sans mt-0.5">
+                Scope barrier & verification gate
               </div>
             </button>
           </div>
@@ -425,30 +403,24 @@ export function OverviewView({
           className={`bg-[var(--bg-panel)] border rounded-xl p-4 shadow-sm transition-all flex flex-col gap-0 ${
             isDragging
               ? 'border-[#ea580c] ring-2 ring-[#ea580c]/30 bg-[#ea580c]/5'
-              : 'border-[var(--border-subtle)]'
+              : 'border-[var(--border-subtle)] focus-within:border-[var(--border-medium)]'
           }`}
         >
           {detectedRepo && (
-            <div className="mb-2.5 px-3 py-1.5 rounded-lg bg-[#ea580c]/12 border border-[#ea580c]/30 flex items-center justify-between text-xs font-mono">
-              <div className="flex items-center gap-2">
-                <Link2 className="w-3.5 h-3.5 text-[#ea580c]" />
-                <span className="text-[var(--text-muted)] text-[11px]">TARGET REPO DETECTED:</span>
-                <span className="font-bold text-[var(--text-primary)]">
-                  {detectedRepo.owner}/{detectedRepo.repo} {detectedRepo.issueNum ? `(Issue #${detectedRepo.issueNum})` : ''}
+            <div className="mb-2.5 px-3 py-1.5 rounded-lg bg-[#ea580c]/10 border border-[#ea580c]/25 flex items-center justify-between text-xs font-mono">
+              <div className="flex items-center gap-2 truncate">
+                <Link2 className="w-3.5 h-3.5 text-[#ea580c] shrink-0" />
+                <span className="text-[var(--text-muted)] text-[11px]">TARGET REPO:</span>
+                <span className="font-bold text-[var(--text-primary)] truncate">
+                  {detectedRepo.owner}/{detectedRepo.repo} {detectedRepo.issueNum ? `(#${detectedRepo.issueNum})` : ''}
                 </span>
               </div>
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 font-bold border border-emerald-500/30">
-                Ready to Clone & Fix
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 font-bold border border-emerald-500/30 shrink-0">
+                Detected
               </span>
             </div>
           )}
 
-          {/*
-           * The textarea itself is sized by scrollHeight (via autoResize).
-           * min-height keeps it compact when empty (~2 lines of text).
-           * max-height caps growth; overflow-y:auto then handles internal scroll.
-           * The outer motion.div animates the resulting height change.
-           */}
           <textarea
             ref={textareaRef}
             value={taskPrompt}
@@ -457,8 +429,8 @@ export function OverviewView({
             placeholder="How can I help you today?"
             aria-label="Task prompt"
             style={{
-              minHeight: '3.5rem',     /* ~2 lines — compact and substantial */
-              maxHeight: '13rem',    /* ~8 lines — then scroll internally */
+              minHeight: '3.5rem',
+              maxHeight: '13rem',
               height: 'auto',
               overflowY: taskPrompt ? 'auto' : 'hidden',
             }}
@@ -524,7 +496,7 @@ export function OverviewView({
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 aria-label="Attach local files"
-                title="Attach local files, code, or media"
+                title="Attach local files"
                 className="flex items-center justify-center w-8 h-8 rounded-lg bg-[var(--bg-elevated)] hover:bg-[var(--bg-subtle)] border border-[var(--border-subtle)] hover:border-[var(--border-medium)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all cursor-pointer shadow-2xs group"
               >
                 <Paperclip className="w-3.5 h-3.5 text-[var(--text-muted)] group-hover:text-[var(--text-primary)]" />
@@ -539,7 +511,7 @@ export function OverviewView({
                   className="bg-transparent text-[var(--text-primary)] outline-none cursor-pointer"
                 >
                   <option value="qwen3-coder-next" className="bg-[var(--bg-panel)] text-[var(--text-primary)]">
-                    Qwen3-Coder-Next (Auto Recommended)
+                    Qwen3-Coder-Next
                   </option>
                   <option value="kimi-k2-5-agent" className="bg-[var(--bg-panel)] text-[var(--text-primary)]">
                     Kimi K2.5 Multimodal
@@ -600,35 +572,14 @@ export function OverviewView({
               <button
                 type="button"
                 onClick={handleSubmitTask}
-                aria-label="Run task"
-                title="Run task"
+                aria-label="Send task"
+                title="Send task"
                 className="flex items-center justify-center w-9 h-9 rounded-lg bg-[#ea580c] hover:bg-[#f97316] text-white transition-all shadow-xs active:scale-[0.98] motion-reduce:active:scale-100 cursor-pointer min-w-[36px] min-h-[36px]"
               >
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
           </div>
-
-          {/* Dynamic Live Difficulty Evaluation Badge */}
-          {liveDifficulty && (
-            <div className="mt-3 pt-3 border-t border-[var(--border-subtle)] flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
-              <div className="flex items-center gap-2">
-                <span className="text-[var(--text-muted)] text-[10px] uppercase font-bold">Parishram AI:</span>
-                <span
-                  className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                    liveDifficulty.tier === 'FRONTIER'
-                      ? 'bg-purple-500/15 text-purple-400 border border-purple-500/30'
-                      : 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
-                  }`}
-                >
-                  Score {liveDifficulty.score}/10 — {liveDifficulty.tier === 'FRONTIER' ? 'Frontier Reasoning Engine' : 'Free/Local Open-Source Model'}
-                </span>
-              </div>
-              <div className="text-[11px] text-[var(--text-muted)] truncate max-w-sm sm:max-w-md">
-                {liveDifficulty.signals.join(' • ')}
-              </div>
-            </div>
-          )}
         </motion.div>
 
         {/* Secondary Contextual Action: Run Demo */}
@@ -662,21 +613,47 @@ export function OverviewView({
           <div className="hidden sm:flex items-center gap-3 text-[11px] text-[var(--text-muted)]">
             <span className="flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-[#10b981]" />
-              <span>Zero prompt leakage</span>
+              <span>Deterministic verification</span>
             </span>
             <span>·</span>
-            <span>Deterministic verification</span>
+            <span>Cryptographic proof</span>
           </div>
         </div>
 
-        {/* Faulty Repository Quick Preset Chips */}
-        <div className="space-y-2 font-mono text-xs">
-          <div className="text-[11px] text-[var(--text-muted)] font-semibold uppercase tracking-wider flex items-center justify-between">
-            <span className="flex items-center gap-1.5">
-              <FolderGit2 className="w-3.5 h-3.5 text-[#ea580c]" />
-              <span>Or click a faulty repository benchmark to fix:</span>
-            </span>
-            <span className="text-[10px] text-[var(--text-muted)] lowercase">1-click clone & run</span>
+        {/* Progressive Disclosure: Completed Run Verification Card */}
+        {lastCompletedRun && lastCompletedRun.isVerified && (
+          <div className="p-3.5 rounded-xl bg-[var(--bg-panel)] border border-[#10b981]/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-mono shadow-2xs">
+            <div className="flex items-center gap-3">
+              <div className="w-2.5 h-2.5 rounded-full bg-[#10b981] shrink-0" />
+              <div>
+                <div className="font-bold text-[var(--text-primary)]">
+                  Task completed · Run #{lastCompletedRun.runNumber}
+                </div>
+                <div className="text-[11px] text-[var(--text-muted)] flex flex-wrap items-center gap-2 mt-0.5 font-sans">
+                  <span className="text-[#10b981] font-semibold">✓ Tests passed ({lastCompletedRun.testsPassed}/{lastCompletedRun.testsTotal})</span>
+                  <span>·</span>
+                  <span className="text-[#10b981] font-semibold">✓ Scope verified</span>
+                  <span>·</span>
+                  <span className="text-[#10b981] font-semibold">✓ Proof generated</span>
+                </div>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={onViewProof}
+              className="px-3 py-1.5 rounded-lg bg-[#10b981]/15 text-[#10b981] hover:bg-[#10b981]/25 border border-[#10b981]/30 font-semibold cursor-pointer transition-colors self-start sm:self-center shrink-0 flex items-center gap-1.5"
+            >
+              <span>View proof</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        )}
+
+        {/* Recent Work / Sample Benchmarks */}
+        <div className="space-y-2.5 pt-2">
+          <div className="flex items-center justify-between text-xs font-mono text-[var(--text-muted)]">
+            <span className="font-semibold uppercase tracking-wider text-[11px]">Recent Work</span>
+            <span className="text-[10px]">Click to load</span>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
@@ -687,14 +664,14 @@ export function OverviewView({
                 setTaskPrompt(text);
                 if (textareaRef.current) setTimeout(() => autoResize(textareaRef.current!), 0);
               }}
-              className="p-2.5 rounded-lg bg-[var(--bg-panel)] hover:bg-[var(--bg-elevated)] border border-[var(--border-subtle)] hover:border-[#ea580c]/50 text-left transition-colors cursor-pointer group shadow-xs"
+              className="p-3 rounded-xl bg-[var(--bg-panel)] hover:bg-[var(--bg-elevated)] border border-[var(--border-subtle)] hover:border-[#ea580c]/40 text-left transition-all cursor-pointer group shadow-2xs"
             >
-              <div className="flex items-center gap-1.5 text-[var(--text-primary)] group-hover:text-[#ea580c] font-semibold text-xs">
-                <Link2 className="w-3 h-3 text-[#ea580c]" />
+              <div className="flex items-center gap-1.5 text-[var(--text-primary)] group-hover:text-[#ea580c] font-semibold text-xs font-mono">
+                <FolderGit2 className="w-3.5 h-3.5 text-[#ea580c]" />
                 <span className="truncate">auth-gateway-service</span>
               </div>
-              <div className="text-[10px] text-[var(--text-muted)] mt-0.5 truncate font-sans">
-                Token split null pointer bug
+              <div className="text-[11px] text-[var(--text-muted)] mt-1 truncate font-sans">
+                Forward session token in client
               </div>
             </button>
 
@@ -705,14 +682,14 @@ export function OverviewView({
                 setTaskPrompt(text);
                 if (textareaRef.current) setTimeout(() => autoResize(textareaRef.current!), 0);
               }}
-              className="p-2.5 rounded-lg bg-[var(--bg-panel)] hover:bg-[var(--bg-elevated)] border border-[var(--border-subtle)] hover:border-[#38bdf8]/50 text-left transition-colors cursor-pointer group shadow-xs"
+              className="p-3 rounded-xl bg-[var(--bg-panel)] hover:bg-[var(--bg-elevated)] border border-[var(--border-subtle)] hover:border-[#38bdf8]/40 text-left transition-all cursor-pointer group shadow-2xs"
             >
-              <div className="flex items-center gap-1.5 text-[var(--text-primary)] group-hover:text-[#38bdf8] font-semibold text-xs">
-                <Link2 className="w-3 h-3 text-[#38bdf8]" />
+              <div className="flex items-center gap-1.5 text-[var(--text-primary)] group-hover:text-[#38bdf8] font-semibold text-xs font-mono">
+                <FolderGit2 className="w-3.5 h-3.5 text-[#38bdf8]" />
                 <span className="truncate">redis-token-bucket</span>
               </div>
-              <div className="text-[10px] text-[var(--text-muted)] mt-0.5 truncate font-sans">
-                Concurrency mutex deadlock
+              <div className="text-[11px] text-[var(--text-muted)] mt-1 truncate font-sans">
+                Mutex deadlock on retry
               </div>
             </button>
 
@@ -723,31 +700,16 @@ export function OverviewView({
                 setTaskPrompt(text);
                 if (textareaRef.current) setTimeout(() => autoResize(textareaRef.current!), 0);
               }}
-              className="p-2.5 rounded-lg bg-[var(--bg-panel)] hover:bg-[var(--bg-elevated)] border border-[var(--border-subtle)] hover:border-[#10b981]/50 text-left transition-colors cursor-pointer group shadow-xs"
+              className="p-3 rounded-xl bg-[var(--bg-panel)] hover:bg-[var(--bg-elevated)] border border-[var(--border-subtle)] hover:border-[#10b981]/40 text-left transition-all cursor-pointer group shadow-2xs"
             >
-              <div className="flex items-center gap-1.5 text-[var(--text-primary)] group-hover:text-[#10b981] font-semibold text-xs">
-                <Link2 className="w-3 h-3 text-[#10b981]" />
+              <div className="flex items-center gap-1.5 text-[var(--text-primary)] group-hover:text-[#10b981] font-semibold text-xs font-mono">
+                <FolderGit2 className="w-3.5 h-3.5 text-[#10b981]" />
                 <span className="truncate">database-migrator</span>
               </div>
-              <div className="text-[10px] text-[var(--text-muted)] mt-0.5 truncate font-sans">
-                Schema invariant violation
+              <div className="text-[11px] text-[var(--text-muted)] mt-1 truncate font-sans">
+                Schema invariant verification
               </div>
             </button>
-          </div>
-        </div>
-
-
-
-        {/* Minimal System Status Footer */}
-        <div className="pt-4 border-t border-[var(--border-subtle)] flex flex-wrap items-center justify-between gap-3 text-[11px] text-[var(--text-muted)] font-mono">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#10b981]" />
-            <span className="text-[var(--text-secondary)]">All systems operational</span>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <span>Sandboxed chroot: active</span>
-            <span>Deterministic harness: v2.4</span>
           </div>
         </div>
       </div>

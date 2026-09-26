@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * परिश्रम् (PARISHRAM) — Terminal User Interface (TUI) & Evaluation CLI
+ * PARISHRAM — Terminal User Interface (TUI) & Evaluation CLI
  *
  * Official Hackathon 2026 Evaluation Standard Interface:
  *   export AI_API_KEY="<PROVIDED_API_KEY>"
@@ -82,8 +82,8 @@ async function getIssueInput(): Promise<string> {
 async function runTerminalHarness() {
   console.clear();
   console.log(`${c.orange}╔══════════════════════════════════════════════════════════════════════════════╗${c.reset}`);
-  console.log(`${c.orange}║${c.reset}   ${c.bold}परिश्रम् (PARISHRAM) — AUTONOMOUS CODING-AGENT HARNESS (TUI MODE)${c.reset}        ${c.orange}║${c.reset}`);
-  console.log(`${c.orange}║${c.reset}   ${c.dim}"Understand. Execute. Verify. Prove." — LCC × DevClub Hackathon 2026${c.reset} ${c.orange}║${c.reset}`);
+  console.log(`${c.orange}║${c.reset}   ${c.bold}PARISHRAM — AUTONOMOUS CODING-AGENT HARNESS (TUI MODE)${c.reset}                     ${c.orange}║${c.reset}`);
+  console.log(`${c.orange}║${c.reset}   ${c.dim}"Understand. Execute. Verify. Prove." — LCC × DevClub Hackathon 2026${c.reset}       ${c.orange}║${c.reset}`);
   console.log(`${c.orange}╚══════════════════════════════════════════════════════════════════════════════╝${c.reset}\n`);
 
   const apiKey = process.env.AI_API_KEY;

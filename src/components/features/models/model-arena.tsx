@@ -45,9 +45,12 @@ export function ModelArena({ onApplyWinner }: ModelArenaProps) {
             <span className="font-bold text-sm text-[var(--text-primary)] uppercase tracking-wider">
               Model Arena: Multi-Model Evaluation & Synthesis Comparison
             </span>
+            <span className="text-[9px] px-1.5 py-0.2 rounded bg-[var(--bg-subtle)] text-[var(--text-muted)] border border-[var(--border-subtle)] font-bold shrink-0">
+              REFERENCE BENCHMARKS
+            </span>
           </div>
           <p className="text-[11px] text-[var(--text-secondary)] font-sans mt-0.5">
-            Evaluate the same engineering task across candidate models. Benchmark tokens, latency, cost, and test pass invariants.
+            Standardized benchmark evaluation across candidate models. Compares token efficiency, latency, cost, and test pass invariants.
           </p>
         </div>
 

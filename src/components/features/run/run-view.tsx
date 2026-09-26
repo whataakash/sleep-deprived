@@ -165,106 +165,6 @@ export function RunView({
         </div>
       </div>
 
-      {/* DEDICATED GOVERNANCE, EVIDENCE & REASONING SECTION */}
-      <div className="px-3 py-2.5 bg-[var(--bg-panel)] border-b border-[var(--border-subtle)] font-mono text-xs select-none">
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-2">
-            <span className="text-[11px] font-bold text-[var(--text-primary)] uppercase tracking-wider">
-              Governance, Evidence & Decision Intelligence
-            </span>
-            <span className="text-[10px] px-1.5 py-0.2 rounded bg-[var(--bg-subtle)] text-[var(--text-muted)] border border-[var(--border-subtle)]">
-              Auditable Controls
-            </span>
-          </div>
-          <span className="text-[10px] text-[var(--text-muted)] hidden sm:inline">
-            Directly select a safety or evidence view below:
-          </span>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-          {/* Card 1: Evidence Graph */}
-          <button
-            type="button"
-            onClick={() => setActiveTab('evidence-graph')}
-            className={`p-3 rounded-lg border text-left transition-all cursor-pointer flex flex-col justify-between ${
-              activeTab === 'evidence-graph'
-                ? 'bg-[var(--bg-elevated)] border-[#10b981] ring-1 ring-[#10b981]/30 shadow-xs'
-                : 'bg-[var(--bg-canvas)] border-[var(--border-subtle)] hover:border-[#10b981]/50 hover:bg-[var(--bg-elevated)]'
-            }`}
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1.5 font-bold text-xs text-[var(--text-primary)]">
-                <Layers className="w-4 h-4 text-[#10b981]" />
-                <span>Evidence Graph</span>
-              </div>
-              <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#10b981]/15 text-[#10b981] font-bold">
-                14 NODES
-              </span>
-            </div>
-            <div className="text-[11px] text-[var(--text-secondary)] font-sans mt-1 line-clamp-1">
-              Causal DAG traceability from task intake to proof verification
-            </div>
-            <div className="mt-2 text-[10px] text-[#10b981] font-semibold flex items-center gap-1">
-              <span>Inspect Proof Graph →</span>
-            </div>
-          </button>
-
-          {/* Card 2: Human Approval Gate */}
-          <button
-            type="button"
-            onClick={() => setActiveTab('approval-gate')}
-            className={`p-3 rounded-lg border text-left transition-all cursor-pointer flex flex-col justify-between ${
-              activeTab === 'approval-gate'
-                ? 'bg-[var(--bg-elevated)] border-[#ea580c] ring-1 ring-[#ea580c]/30 shadow-xs'
-                : 'bg-[var(--bg-canvas)] border-[var(--border-subtle)] hover:border-[#ea580c]/50 hover:bg-[var(--bg-elevated)]'
-            }`}
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1.5 font-bold text-xs text-[var(--text-primary)]">
-                <ShieldAlert className="w-4 h-4 text-[#ea580c]" />
-                <span>Approval Gate</span>
-              </div>
-              <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#ea580c]/20 text-[#ea580c] font-bold animate-pulse">
-                1 PENDING
-              </span>
-            </div>
-            <div className="text-[11px] text-[var(--text-secondary)] font-sans mt-1 line-clamp-1">
-              Supervisor halted 1 high-risk production action for authorization
-            </div>
-            <div className="mt-2 text-[10px] text-[#ea580c] font-semibold flex items-center gap-1">
-              <span>Review Gate Decision →</span>
-            </div>
-          </button>
-
-          {/* Card 3: Why? Reasoning */}
-          <button
-            type="button"
-            onClick={() => setActiveTab('why')}
-            className={`p-3 rounded-lg border text-left transition-all cursor-pointer flex flex-col justify-between ${
-              activeTab === 'why'
-                ? 'bg-[var(--bg-elevated)] border-[#38bdf8] ring-1 ring-[#38bdf8]/30 shadow-xs'
-                : 'bg-[var(--bg-canvas)] border-[var(--border-subtle)] hover:border-[#38bdf8]/50 hover:bg-[var(--bg-elevated)]'
-            }`}
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1.5 font-bold text-xs text-[var(--text-primary)]">
-                <HelpCircle className="w-4 h-4 text-[#38bdf8]" />
-                <span>Why? Reasoning</span>
-              </div>
-              <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#38bdf8]/15 text-[#38bdf8] font-bold">
-                EXPLAINABLE
-              </span>
-            </div>
-            <div className="text-[11px] text-[var(--text-secondary)] font-sans mt-1 line-clamp-1">
-              Autonomous AST selection & model router rationale
-            </div>
-            <div className="mt-2 text-[10px] text-[#38bdf8] font-semibold flex items-center gap-1">
-              <span>Explain Autonomous Choices →</span>
-            </div>
-          </button>
-        </div>
-      </div>
-
       {/* SEGMENTED NAVIGATION TABS */}
       <div className="px-3 py-2 bg-[var(--bg-panel)] border-b border-[var(--border-subtle)] flex flex-wrap items-center gap-1.5 font-mono text-xs select-none">
         {/* RECENT RUNS & PERSISTED HISTORY */}
@@ -282,7 +182,7 @@ export function RunView({
 
         <div className="h-3.5 w-[1px] bg-[var(--border-subtle)] mx-0.5 hidden sm:block shrink-0" />
 
-        {/* EXECUTION & OBSERVABILITY */}
+        {/* PRIMARY WORKFLOW: Glass Box -> Changes -> Recovery -> Contract -> Proof */}
         <button
           onClick={() => setActiveTab('timeline')}
           className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md transition-colors cursor-pointer shrink-0 text-xs ${
@@ -304,7 +204,7 @@ export function RunView({
           }`}
         >
           <FileCode className="w-3.5 h-3.5 text-[#38bdf8]" />
-          <span>Changes (+14, -2)</span>
+          <span>Changes</span>
         </button>
 
         <button
@@ -316,7 +216,7 @@ export function RunView({
           }`}
         >
           <Flame className="w-3.5 h-3.5 text-[#ea580c]" />
-          <span>Recovery (1 Retry)</span>
+          <span>Recovery</span>
         </button>
 
         <button
@@ -345,6 +245,43 @@ export function RunView({
 
         <div className="h-3.5 w-[1px] bg-[var(--border-subtle)] mx-0.5 hidden sm:block shrink-0" />
 
+        {/* VERIFICATION & EVIDENCE TABS */}
+        <button
+          onClick={() => setActiveTab('evidence-graph')}
+          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md transition-colors cursor-pointer shrink-0 text-xs ${
+            activeTab === 'evidence-graph'
+              ? 'bg-[#ea580c] text-white font-bold shadow-xs'
+              : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] border border-transparent'
+          }`}
+        >
+          <Layers className="w-3.5 h-3.5 text-[#10b981]" />
+          <span>Evidence Graph</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('approval-gate')}
+          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md transition-colors cursor-pointer shrink-0 text-xs ${
+            activeTab === 'approval-gate'
+              ? 'bg-[#ea580c] text-white font-bold shadow-xs'
+              : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] border border-transparent'
+          }`}
+        >
+          <ShieldAlert className="w-3.5 h-3.5 text-[#ea580c]" />
+          <span>Approval Gate</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('why')}
+          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md transition-colors cursor-pointer shrink-0 text-xs ${
+            activeTab === 'why'
+              ? 'bg-[#ea580c] text-white font-bold shadow-xs'
+              : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] border border-transparent'
+          }`}
+        >
+          <HelpCircle className="w-3.5 h-3.5 text-[#38bdf8]" />
+          <span>Why? Reasoning</span>
+        </button>
+
         <button
           onClick={() => setActiveTab('scope-security')}
           className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md transition-colors cursor-pointer shrink-0 text-xs ${
@@ -366,7 +303,7 @@ export function RunView({
           }`}
         >
           <CheckCircle2 className="w-3.5 h-3.5 text-[#10b981]" />
-          <span>Regression Detection</span>
+          <span>Regressions</span>
         </button>
 
         <button
@@ -390,7 +327,7 @@ export function RunView({
           }`}
         >
           <GitFork className="w-3.5 h-3.5 text-[#a78bfa]" />
-          <span>Branch Experiments</span>
+          <span>Branches</span>
         </button>
 
         <button
@@ -402,7 +339,7 @@ export function RunView({
           }`}
         >
           <BookOpen className="w-3.5 h-3.5 text-[#38bdf8]" />
-          <span>Auto Docs</span>
+          <span>Docs</span>
         </button>
       </div>
 
@@ -487,81 +424,146 @@ export function RunView({
                 <div className="flex items-center gap-2">
                   <History className="w-4 h-4 text-[#ea580c]" />
                   <h2 className="text-sm font-bold uppercase tracking-wider text-[var(--text-primary)]">
-                    Recent Runs & Persisted Tasks
+                    Recent Runs & Execution History
                   </h2>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#10b981]/15 text-[#10b981] font-bold">
-                    All Tasks Persisted
-                  </span>
                 </div>
                 <p className="text-[11px] text-[var(--text-secondary)] font-sans mt-1">
-                  Historical autonomous software engineering executions with deterministic proof of work and verification statuses.
+                  Active task execution records alongside reference benchmark baselines.
                 </p>
               </div>
 
               <div className="flex items-center gap-2">
                 <span className="text-[11px] text-[var(--text-muted)]">
-                  Total: <strong className="text-[var(--text-primary)]">{RECENT_RUNS.length} runs</strong>
+                  Active: <strong className="text-[var(--text-primary)]">Run #{run.runNumber}</strong>
                 </span>
                 <span>·</span>
-                <span className="text-[11px] text-[#10b981]">100% Verified</span>
+                <span className="text-[11px] text-[var(--text-muted)]">
+                  Reference: <strong className="text-[var(--text-primary)]">{RECENT_RUNS.length} baselines</strong>
+                </span>
               </div>
             </div>
 
+            {/* Section 1: Real Current Execution Data */}
             <div className="space-y-2 font-mono text-xs">
-              {RECENT_RUNS.map((r) => (
-                <button
-                  key={r.id}
-                  type="button"
-                  onClick={() => setActiveTab('timeline')}
-                  className={`w-full p-3.5 rounded-xl border text-left transition-all cursor-pointer group flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs ${
-                    r.number === run.runNumber
-                      ? 'bg-[var(--bg-elevated)] border-[#ea580c]/50 ring-1 ring-[#ea580c]/30'
-                      : 'bg-[var(--bg-panel)] hover:bg-[var(--bg-elevated)] border-[var(--border-subtle)] hover:border-[var(--border-medium)]'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={`w-2.5 h-2.5 rounded-full shrink-0 ${
-                        r.status === 'VERIFIED' ? 'bg-[#10b981]' : 'bg-[#ef4444]'
-                      }`}
-                    />
-                    <div>
-                      <div className="font-semibold text-xs text-[var(--text-primary)] group-hover:text-[#ea580c] transition-colors">
-                        {r.title}
-                      </div>
-                      <div className="text-[11px] text-[var(--text-muted)] flex flex-wrap items-center gap-2 mt-1">
-                        <span className="font-bold text-[var(--text-secondary)]">Run #{r.number}</span>
-                        <span>·</span>
-                        <span>{r.agentMode}</span>
-                        <span>·</span>
-                        <span>{r.filesCount} {r.filesCount === 1 ? 'file' : 'files'} changed</span>
-                        <span>·</span>
-                        <span>{r.duration}</span>
-                        <span>·</span>
-                        <span className="text-[#38bdf8]">{r.modelUsed}</span>
-                      </div>
+              <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-[#ea580c]">
+                <span className="w-2 h-2 rounded-full bg-[#ea580c] animate-pulse" />
+                <span>Current Real Execution</span>
+                <span className="text-[9px] px-1.5 py-0.2 rounded bg-[#ea580c]/15 text-[#ea580c] border border-[#ea580c]/30 font-bold">
+                  LIVE SESSION
+                </span>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setActiveTab('timeline')}
+                className="w-full p-3.5 rounded-xl border border-[#ea580c]/50 bg-[var(--bg-elevated)] ring-1 ring-[#ea580c]/30 text-left transition-all cursor-pointer group flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs"
+              >
+                <div className="flex items-center gap-3">
+                  <div
+                    className={`w-2.5 h-2.5 rounded-full shrink-0 ${
+                      isVerified ? 'bg-[#10b981]' : 'bg-[#ea580c]'
+                    }`}
+                  />
+                  <div>
+                    <div className="font-semibold text-xs text-[var(--text-primary)] group-hover:text-[#ea580c] transition-colors">
+                      {run.taskTitle}
+                    </div>
+                    <div className="text-[11px] text-[var(--text-muted)] flex flex-wrap items-center gap-2 mt-1">
+                      <span className="font-bold text-[var(--text-secondary)]">Run #{run.runNumber}</span>
+                      <span>·</span>
+                      <span>Autonomous Pair</span>
+                      <span>·</span>
+                      <span>{run.events.length} lifecycle events</span>
+                      <span>·</span>
+                      <span className="text-[#38bdf8] font-mono truncate max-w-[220px]">
+                        Proof: {proof.proofHash ? `${proof.proofHash.slice(0, 16)}...` : 'Generating...'}
+                      </span>
                     </div>
                   </div>
+                </div>
 
-                  <div className="flex items-center gap-3 self-end sm:self-center shrink-0">
-                    <span
-                      className={`text-[10px] px-2 py-0.5 rounded font-bold ${
-                        r.status === 'VERIFIED'
-                          ? 'bg-[#10b981]/15 text-[#10b981] border border-[#10b981]/30'
-                          : 'bg-[#ef4444]/15 text-[#ef4444] border border-[#ef4444]/30'
-                      }`}
-                    >
-                      {r.status}
-                    </span>
-                    <span className="text-[11px] text-[var(--text-muted)]">
-                      {r.timestamp}
-                    </span>
-                    <span className="text-[11px] font-bold text-[#ea580c] group-hover:translate-x-0.5 transition-transform flex items-center gap-0.5">
-                      Inspect →
-                    </span>
-                  </div>
-                </button>
-              ))}
+                <div className="flex items-center gap-3 self-end sm:self-center shrink-0">
+                  <span
+                    className={`text-[10px] px-2 py-0.5 rounded font-bold ${
+                      isVerified
+                        ? 'bg-[#10b981]/15 text-[#10b981] border border-[#10b981]/30'
+                        : 'bg-[#ea580c]/15 text-[#ea580c] border border-[#ea580c]/30'
+                    }`}
+                  >
+                    {isVerified ? 'VERIFIED' : currentState}
+                  </span>
+                  <span className="text-[11px] font-bold text-[#ea580c] group-hover:translate-x-0.5 transition-transform flex items-center gap-0.5">
+                    Inspect Real Run →
+                  </span>
+                </div>
+              </button>
+            </div>
+
+            {/* Section 2: Reference Benchmark Baselines */}
+            <div className="space-y-2 pt-2 font-mono text-xs">
+              <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
+                <span>Reference Benchmark Executions</span>
+                <span className="text-[9px] px-1.5 py-0.2 rounded bg-[var(--bg-subtle)] text-[var(--text-muted)] border border-[var(--border-subtle)] font-bold">
+                  REFERENCE DATA
+                </span>
+              </div>
+
+              <div className="space-y-2 font-mono text-xs">
+                {RECENT_RUNS.map((r) => (
+                  <button
+                    key={r.id}
+                    type="button"
+                    onClick={() => setActiveTab('timeline')}
+                    className={`w-full p-3 rounded-xl border text-left transition-all cursor-pointer group flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs ${
+                      r.number === run.runNumber
+                        ? 'bg-[var(--bg-elevated)] border-[#ea580c]/50 ring-1 ring-[#ea580c]/30'
+                        : 'bg-[var(--bg-panel)] hover:bg-[var(--bg-elevated)] border-[var(--border-subtle)] hover:border-[var(--border-medium)]'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={`w-2 h-2 rounded-full shrink-0 ${
+                          r.status === 'VERIFIED' ? 'bg-[#10b981]' : 'bg-[#ef4444]'
+                        }`}
+                      />
+                      <div>
+                        <div className="font-semibold text-xs text-[var(--text-primary)] group-hover:text-[#ea580c] transition-colors">
+                          {r.title}
+                        </div>
+                        <div className="text-[11px] text-[var(--text-muted)] flex flex-wrap items-center gap-2 mt-0.5">
+                          <span className="font-bold text-[var(--text-secondary)]">Run #{r.number}</span>
+                          <span>·</span>
+                          <span>{r.agentMode}</span>
+                          <span>·</span>
+                          <span>{r.filesCount} {r.filesCount === 1 ? 'file' : 'files'} changed</span>
+                          <span>·</span>
+                          <span>{r.duration}</span>
+                          <span>·</span>
+                          <span className="text-[#38bdf8]">{r.modelUsed}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 self-end sm:self-center shrink-0">
+                      <span
+                        className={`text-[10px] px-2 py-0.5 rounded font-bold ${
+                          r.status === 'VERIFIED'
+                            ? 'bg-[#10b981]/15 text-[#10b981] border border-[#10b981]/30'
+                            : 'bg-[#ef4444]/15 text-[#ef4444] border border-[#ef4444]/30'
+                        }`}
+                      >
+                        {r.status}
+                      </span>
+                      <span className="text-[11px] text-[var(--text-muted)]">
+                        {r.timestamp}
+                      </span>
+                      <span className="text-[11px] font-bold text-[#ea580c] group-hover:translate-x-0.5 transition-transform flex items-center gap-0.5">
+                        Inspect →
+                      </span>
+                    </div>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         )}

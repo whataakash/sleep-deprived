@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * परिश्रम् Autonomous Coding Harness — Headless CLI Evaluation Runner
+ * PARISHRAM Autonomous Coding Harness — Headless CLI Evaluation Runner
  *
  * Evaluation workflow:
  *   export AI_API_KEY="<PROVIDED_API_KEY>"
@@ -12,7 +12,7 @@ import { HarnessPipeline } from '../src/lib/harness/pipeline';
 
 async function main() {
   console.log('============================================================');
-  console.log(' परिश्रम् AUTONOMOUS CODING HARNESS — HEADLESS EVALUATOR');
+  console.log(' PARISHRAM AUTONOMOUS CODING HARNESS — HEADLESS EVALUATOR');
   console.log('============================================================\n');
 
   const apiKey = process.env.AI_API_KEY;

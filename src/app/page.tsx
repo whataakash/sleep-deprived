@@ -243,6 +243,18 @@ function ParishramAppInner() {
               isDemoRunning={isDemoRunning}
               onResetDemo={handleResetDemo}
               onNavigateToModels={() => setActiveView('models')}
+              lastCompletedRun={
+                isVerified
+                  ? {
+                      runNumber: currentRun.runNumber,
+                      title: currentRun.taskTitle,
+                      testsPassed: proofRecord.tests.unit.passed,
+                      testsTotal: proofRecord.tests.unit.total,
+                      isVerified: true,
+                    }
+                  : undefined
+              }
+              onViewProof={() => setActiveView('runs')}
             />
           )}
 

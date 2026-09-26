@@ -12,7 +12,7 @@ export const CURRENT_2026_MODELS: DynamicCodingModel[] = [
   // HACKATHON EVALUATION MODEL (LOCKED WHEN IN EVALUATION MODE)
   {
     id: 'hackathon-prescribed-model',
-    displayName: 'परिश्रम AI',
+    displayName: 'Parishram AI',
     provider: 'HackathonPrescribed',
     family: 'Evaluation',
     category: 'CODING',

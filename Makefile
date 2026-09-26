@@ -1,5 +1,5 @@
 # ==============================================================================
-# परिश्रम — Autonomous AI Coding Harness
+# PARISHRAM — Autonomous AI Coding Harness
 # LCC × DevClub Hackathon Evaluation Standard Makefile
 # ==============================================================================
 
@@ -9,11 +9,11 @@ SHELL := /bin/bash
 all: setup test
 
 help:
-	@echo "परिश्रम — Autonomous AI Coding Harness"
+	@echo "PARISHRAM — Autonomous AI Coding Harness"
 	@echo ""
 	@echo "Standard Evaluation Targets:"
 	@echo "  make setup     - Install dependencies and build project (clean reproduction)"
-	@echo "  make run       - Launch परिश्रम Terminal User Interface (TUI) evaluation harness"
+	@echo "  make run       - Launch PARISHRAM Terminal User Interface (TUI) evaluation harness"
 	@echo "  make web       - Launch Next.js Glass-Box Web Dashboard at http://localhost:3000"
 	@echo "  make test      - Run automated evaluation compliance & verification tests"
 	@echo "  make evaluate  - Run headless CLI evaluation against prescribed test issue"
@@ -29,19 +29,19 @@ help:
 
 # 1. SETUP: Clean installation and project compilation
 setup:
-	@echo "==> Setting up परिश्रम dependencies..."
+	@echo "==> Setting up PARISHRAM dependencies..."
 	npm ci || npm install
-	@echo "==> Compiling परिश्रम Next.js production build..."
+	@echo "==> Compiling PARISHRAM Next.js production build..."
 	npm run build
 
-# 2. RUN: Launch परिश्रम AI Harness Terminal User Interface (TUI) & Evaluation CLI
+# 2. RUN: Launch PARISHRAM AI Harness Terminal User Interface (TUI) & Evaluation CLI
 run:
-	@echo "==> Initializing परिश्रम AI Harness Terminal Interface..."
+	@echo "==> Initializing PARISHRAM AI Harness Terminal Interface..."
 	@AI_API_KEY="$${AI_API_KEY}" AI_MODEL="$${AI_MODEL}" ISSUE="$${ISSUE:-$(ISSUE)}" npx tsx scripts/terminal-harness.ts $(filter-out $@,$(MAKECMDGOALS)) $(ARGS)
 
 # 2b. WEB: Launch Next.js Glass-Box Web Dashboard
 web:
-	@echo "==> Launching परिश्रम Glass-Box Web Dashboard at http://localhost:3000..."
+	@echo "==> Launching PARISHRAM Glass-Box Web Dashboard at http://localhost:3000..."
 	@if [ -d ".next" ]; then \
 		AI_API_KEY="$${AI_API_KEY}" AI_MODEL="$${AI_MODEL}" npm run start; \
 	else \

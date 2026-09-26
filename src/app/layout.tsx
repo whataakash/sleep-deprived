@@ -2,11 +2,11 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'परिश्रम — Autonomous AI Coding-Agent Harness | Build it. Test it. Prove it.',
+  title: 'Parishram — Autonomous AI Coding Harness | Understand. Execute. Verify. Prove.',
   description:
-    'परिश्रम turns foundation models into verified software engineers through context retrieval, tool orchestration, failure recovery, and evidence-backed verification.',
+    'Parishram turns foundation models into verified software engineers through context retrieval, tool orchestration, failure recovery, and evidence-backed verification.',
   keywords: [
-    'परिश्रम',
+    'Parishram',
     'AI coding harness',
     'autonomous coding agent',
     'software engineering agent',
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     'evidence-based coding',
     'agentic workflow',
   ],
-  authors: [{ name: 'परिश्रम Systems' }],
+  authors: [{ name: 'Parishram Systems' }],
 };
 
 export const viewport: Viewport = {

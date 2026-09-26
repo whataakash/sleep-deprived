@@ -148,7 +148,8 @@ export function Topbar({
       <div className="flex items-center gap-3">
         <div
           className="relative flex items-center h-8 sm:h-[34px] w-[108px] sm:w-[115px] select-none"
-          title="Parishram"
+          title="Parishram (परिश्रम)"
+          aria-label="Parishram"
         >
           {/* Dark Mode: PARISHRAM logo dark.png (for dark backgrounds) */}
           <Image
@@ -199,25 +200,13 @@ export function Topbar({
         {isEvalMode && (
           <div className="flex items-center gap-1 px-2 py-0.5 rounded bg-[#ea580c]/10 border border-[#ea580c]/25 text-[#ea580c] text-[10px] font-medium">
             <Lock className="w-3 h-3" />
-            <span>परिश्रम AI (Evaluation)</span>
+            <span>PARISHRAM (Evaluation)</span>
           </div>
         )}
       </div>
 
-      {/* RIGHT: [upgrade] [search] [theme] [profile] */}
+      {/* RIGHT: [search] [theme] [profile] */}
       <div className="flex items-center gap-2 sm:gap-2.5">
-        {/* Simple, quiet Upgrade Action */}
-        {onOpenUpgrade && (
-          <button
-            onClick={onOpenUpgrade}
-            className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[var(--bg-elevated)] hover:bg-[var(--bg-subtle)] border border-[var(--border-subtle)] hover:border-[var(--border-medium)] text-xs font-mono text-[var(--text-secondary)] hover:text-[#ea580c] transition-all cursor-pointer min-h-[40px] shadow-xs"
-            title="Upgrade Plan"
-            aria-label="Upgrade Plan"
-          >
-            <span>Upgrade</span>
-            <ArrowRight className="w-3.5 h-3.5 text-[#ea580c]" />
-          </button>
-        )}
 
         {/* Command Palette search trigger: Icon-only with accessible label */}
         <button
