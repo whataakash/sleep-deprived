@@ -98,7 +98,7 @@ test('5. Cryptographic proof and invariant verification', () => {
 
   assert.ok(proof.proofHash.length === 64, 'Proof hash must be SHA-256');
   assert.equal(proof.status, 'VERIFIED');
-  assert.equal(proof.badgeTitle, 'FORGED ✓');
+  assert.equal(proof.badgeTitle, 'VERIFIED ✓');
   assert.equal(proof.taskCoverage.satisfiedCount, 4);
   assert.equal(proof.build.typecheck.status, 'passed');
   assert.equal(proof.build.productionBuild.status, 'passed');

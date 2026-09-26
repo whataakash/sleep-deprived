@@ -14,6 +14,8 @@ import {
 import { useAuth } from '@/lib/auth/context';
 import { EvaluationModelAdapter } from '@/lib/models/evaluation-adapter';
 
+import { getPlanDisplay } from '@/lib/billing/plans';
+
 export type MainNavView = 'overview' | 'runs' | 'repositories' | 'models' | 'evaluations';
 
 interface SidebarProps {
@@ -34,6 +36,7 @@ export function Sidebar({
   const { session } = useAuth();
   const user = session.user;
   const isEvalMode = EvaluationModelAdapter.isEvaluationMode();
+  const planInfo = getPlanDisplay(user?.plan || 'BUILDER');
 
   return (
     <aside className="w-60 bg-[var(--bg-canvas)] border-r border-[var(--border-subtle)] flex flex-col justify-between select-none z-10 shrink-0 font-mono text-xs transition-colors">
@@ -48,8 +51,8 @@ export function Sidebar({
             onClick={() => onSelectView('overview')}
             className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded transition-colors cursor-pointer ${
               activeView === 'overview'
-                ? 'bg-[var(--bg-active)] text-white font-semibold border border-[var(--border-active)]'
-                : 'text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)] hover:text-white'
+                ? 'bg-[var(--bg-active)] text-[var(--text-primary)] font-semibold border border-[var(--border-active)]'
+                : 'text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)] hover:text-[var(--text-primary)]'
             }`}
           >
             <Layers className="w-3.5 h-3.5 text-[#ea580c]" />
@@ -60,8 +63,8 @@ export function Sidebar({
             onClick={() => onSelectView('runs')}
             className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded transition-colors cursor-pointer ${
               activeView === 'runs'
-                ? 'bg-[var(--bg-active)] text-white font-semibold border border-[var(--border-active)]'
-                : 'text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)] hover:text-white'
+                ? 'bg-[var(--bg-active)] text-[var(--text-primary)] font-semibold border border-[var(--border-active)]'
+                : 'text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)] hover:text-[var(--text-primary)]'
             }`}
           >
             <div className="flex items-center gap-2.5">
@@ -83,8 +86,8 @@ export function Sidebar({
             onClick={() => onSelectView('repositories')}
             className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded transition-colors cursor-pointer ${
               activeView === 'repositories'
-                ? 'bg-[var(--bg-active)] text-white font-semibold border border-[var(--border-active)]'
-                : 'text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)] hover:text-white'
+                ? 'bg-[var(--bg-active)] text-[var(--text-primary)] font-semibold border border-[var(--border-active)]'
+                : 'text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)] hover:text-[var(--text-primary)]'
             }`}
           >
             <FolderGit2 className="w-3.5 h-3.5 text-[#fbbf24]" />
@@ -102,8 +105,8 @@ export function Sidebar({
             onClick={() => onSelectView('models')}
             className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded transition-colors cursor-pointer ${
               activeView === 'models'
-                ? 'bg-[var(--bg-active)] text-white font-semibold border border-[var(--border-active)]'
-                : 'text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)] hover:text-white'
+                ? 'bg-[var(--bg-active)] text-[var(--text-primary)] font-semibold border border-[var(--border-active)]'
+                : 'text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)] hover:text-[var(--text-primary)]'
             }`}
           >
             <div className="flex items-center gap-2.5">
@@ -121,8 +124,8 @@ export function Sidebar({
             onClick={() => onSelectView('evaluations')}
             className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded transition-colors cursor-pointer ${
               activeView === 'evaluations'
-                ? 'bg-[var(--bg-active)] text-white font-semibold border border-[var(--border-active)]'
-                : 'text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)] hover:text-white'
+                ? 'bg-[var(--bg-active)] text-[var(--text-primary)] font-semibold border border-[var(--border-active)]'
+                : 'text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)] hover:text-[var(--text-primary)]'
             }`}
           >
             <BarChart3 className="w-3.5 h-3.5 text-[#10b981]" />
@@ -138,7 +141,7 @@ export function Sidebar({
 
           <button
             onClick={() => onOpenDownload && onOpenDownload()}
-            className="w-full flex items-center justify-between px-2.5 py-1.5 rounded transition-colors cursor-pointer text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)] hover:text-white group"
+            className="w-full flex items-center justify-between px-2.5 py-1.5 rounded transition-colors cursor-pointer text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)] hover:text-[var(--text-primary)] group"
             title="Download परिश्रम desktop runtime (macOS, Linux, Windows)"
           >
             <div className="flex items-center gap-2.5">
@@ -168,7 +171,8 @@ export function Sidebar({
                 {user?.name || 'Evaluator Session'}
               </div>
               <div className="text-[10px] text-[var(--text-muted)] flex items-center gap-1">
-                <span className="text-[#f97316] font-bold">{user?.plan || 'BUILDER'}</span>
+                <span className="text-[#ea580c] font-bold">{planInfo.hindiName}</span>
+                <span className="text-[9px]">({planInfo.englishSubtitle})</span>
                 <span>·</span>
                 <span>{user?.usage.runsUsedThisMonth || 14} runs</span>
               </div>

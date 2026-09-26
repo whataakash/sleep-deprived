@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
 
     // 1. Run text-only model inference
     const modelResponse = await evalAdapter.generateText({
-      systemPrompt: 'You are FORGE, an autonomous coding harness operating in strict evaluation mode.',
+      systemPrompt: 'You are Parishram, an autonomous coding harness operating in strict evaluation mode.',
       userPrompt: task,
       contextFiles: [
         {

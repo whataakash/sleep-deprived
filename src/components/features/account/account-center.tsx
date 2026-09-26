@@ -32,6 +32,9 @@ import {
   Check,
 } from 'lucide-react';
 import { EvaluationModelAdapter } from '@/lib/models/evaluation-adapter';
+import { getPlanDisplay, PRICING_PLANS } from '@/lib/billing/plans';
+import { CheckoutModal } from '@/components/features/billing/checkout-modal';
+import { PricingPlan } from '@/types/billing';
 
 interface AccountCenterProps {
   isOpen: boolean;
@@ -51,6 +54,8 @@ export function AccountCenter({ isOpen, onClose, initialCategory = 'general' }: 
     useAuth();
   const [activeCategory, setActiveCategory] = useState<string>(initialCategory);
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [selectedPlanForCheckout, setSelectedPlanForCheckout] = useState<PricingPlan | null>(null);
 
   // Form states
   const [nameInput, setNameInput] = useState(session.user?.name || '');
@@ -62,6 +67,7 @@ export function AccountCenter({ isOpen, onClose, initialCategory = 'general' }: 
   const isEvalMode = EvaluationModelAdapter.isEvaluationMode();
   const user = session.user;
   const prefs = user?.preferences;
+  const planInfo = getPlanDisplay(user?.plan || 'BUILDER');
 
   const CATEGORIES: SettingCategory[] = useMemo(
     () => [
@@ -139,7 +145,7 @@ export function AccountCenter({ isOpen, onClose, initialCategory = 'general' }: 
                 {searchQuery && (
                   <button
                     onClick={() => setSearchQuery('')}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-white"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-primary)]"
                   >
                     <X className="w-3 h-3" />
                   </button>
@@ -157,8 +163,8 @@ export function AccountCenter({ isOpen, onClose, initialCategory = 'general' }: 
                     onClick={() => setActiveCategory(cat.id)}
                     className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded text-left transition-colors cursor-pointer ${
                       isActive
-                        ? 'bg-[var(--bg-active)] text-white font-semibold border border-[var(--border-active)]'
-                        : 'text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)] hover:text-white'
+                        ? 'bg-[var(--bg-active)] text-[var(--text-primary)] font-semibold border border-[var(--border-active)]'
+                        : 'text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)] hover:text-[var(--text-primary)]'
                     }`}
                   >
                     <span className={isActive ? 'text-[#ea580c]' : 'text-[var(--text-muted)]'}>
@@ -214,7 +220,7 @@ export function AccountCenter({ isOpen, onClose, initialCategory = 'general' }: 
 
             <button
               onClick={onClose}
-              className="p-1 rounded bg-[var(--bg-subtle)] hover:bg-[var(--bg-active)] text-[var(--text-muted)] hover:text-white transition-colors"
+              className="p-1 rounded bg-[var(--bg-subtle)] hover:bg-[var(--bg-active)] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
@@ -327,7 +333,7 @@ export function AccountCenter({ isOpen, onClose, initialCategory = 'general' }: 
                         }}
                         className={`p-3 rounded-lg border text-left flex flex-col gap-1 transition-all cursor-pointer ${
                           prefs?.theme === t.id
-                            ? 'bg-[var(--bg-active)] border-[#ea580c] text-white shadow-xs'
+                            ? 'bg-[var(--bg-active)] border-[#ea580c] text-[var(--text-primary)] shadow-xs'
                             : 'bg-[var(--bg-canvas)] border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--border-medium)]'
                         }`}
                       >
@@ -874,27 +880,113 @@ export function AccountCenter({ isOpen, onClose, initialCategory = 'general' }: 
 
             {/* 12. BILLING & PLAN */}
             {activeCategory === 'billing' && (
-              <div className="space-y-4">
-                <div className="p-3 rounded bg-[var(--bg-canvas)] border border-[var(--border-subtle)] flex items-center justify-between">
+              <div className="space-y-5">
+                {/* Plan Card */}
+                <div className="p-4 rounded-lg bg-[var(--bg-canvas)] border border-[var(--border-subtle)] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
-                    <div className="text-[10px] text-[var(--text-muted)]">Current Subscription Plan</div>
-                    <div className="font-extrabold text-base text-white">{user?.plan || 'BUILDER'}</div>
-                    <div className="text-[10px] text-[#10b981]">Active • Renews automatically</div>
+                    <div className="text-[10px] uppercase tracking-wider text-[var(--text-muted)] font-semibold">
+                      Current Subscription Plan
+                    </div>
+                    <div className="flex items-baseline gap-2 mt-0.5">
+                      <span className="font-extrabold text-xl text-[var(--text-primary)]">
+                        {planInfo.hindiName}
+                      </span>
+                      <span className="text-xs text-[var(--text-secondary)] font-normal">
+                        ({planInfo.englishSubtitle})
+                      </span>
+                    </div>
+                    <div className="text-[11px] text-[#10b981] flex items-center gap-1.5 mt-1 font-semibold">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#10b981]" />
+                      <span>Active • Renews automatically on 2026-10-26</span>
+                    </div>
+                    <div className="text-[10px] text-[var(--text-muted)] mt-0.5">
+                      Merchant Destination: <code className="text-[#ea580c] font-semibold">shivansh.p@fam</code>
+                    </div>
                   </div>
-                  <span className="text-[10px] px-2 py-1 rounded bg-[#ea580c]/15 text-[#ea580c] font-bold">
-                    BUILDER TIER
-                  </span>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => {
+                        const targetPlan = user?.plan === 'BUILDER' ? PRICING_PLANS[2] : PRICING_PLANS[1];
+                        setSelectedPlanForCheckout(targetPlan);
+                        setIsCheckoutOpen(true);
+                      }}
+                      className="px-3.5 py-1.5 rounded-md bg-[#ea580c] hover:bg-[#f97316] text-white font-semibold text-xs transition-colors cursor-pointer shadow-xs active:scale-[0.98]"
+                    >
+                      Change Plan
+                    </button>
+                  </div>
                 </div>
 
-                <div className="space-y-1.5">
-                  <div className="flex justify-between text-[11px]">
-                    <span className="text-[var(--text-muted)]">Monthly Autonomous Runs:</span>
-                    <span className="font-bold text-white">
-                      {user?.usage.runsUsedThisMonth || 14} / {user?.usage.maxMonthlyRuns || 150}
-                    </span>
+                {/* Quotas & Usage Breakdown */}
+                <div className="p-4 rounded-lg bg-[var(--bg-canvas)] border border-[var(--border-subtle)] space-y-3">
+                  <div className="text-[10px] uppercase tracking-wider text-[var(--text-muted)] font-semibold">
+                    Compute & Quota Consumption
                   </div>
-                  <div className="w-full h-1.5 bg-[var(--bg-elevated)] rounded-full overflow-hidden">
-                    <div className="h-full bg-[#ea580c]" style={{ width: '9.3%' }} />
+
+                  <div className="space-y-3 text-xs">
+                    <div>
+                      <div className="flex justify-between text-[11px] mb-1">
+                        <span className="text-[var(--text-secondary)]">Monthly Autonomous Agent Runs:</span>
+                        <span className="font-bold text-[var(--text-primary)]">
+                          {user?.usage.runsUsedThisMonth || 14} / {user?.usage.maxMonthlyRuns || 150} runs
+                        </span>
+                      </div>
+                      <div className="w-full h-1.5 bg-[var(--bg-elevated)] rounded-full overflow-hidden">
+                        <div className="h-full bg-[#ea580c]" style={{ width: '9.3%' }} />
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="flex justify-between text-[11px] mb-1">
+                        <span className="text-[var(--text-secondary)]">Token Context Quota:</span>
+                        <span className="font-bold text-[var(--text-primary)]">
+                          {(user?.usage.tokensUsedThisMonth || 38450).toLocaleString()} / 256,000 tokens
+                        </span>
+                      </div>
+                      <div className="w-full h-1.5 bg-[var(--bg-elevated)] rounded-full overflow-hidden">
+                        <div className="h-full bg-[#38bdf8]" style={{ width: '15%' }} />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Invoices & Payment History */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="text-[10px] uppercase tracking-wider text-[var(--text-muted)] font-semibold">
+                      Payment History & Invoices
+                    </div>
+                    <span className="text-[10px] text-[var(--text-muted)]">Verified recipient: shivansh.p@fam</span>
+                  </div>
+
+                  <div className="border border-[var(--border-subtle)] rounded-lg overflow-hidden bg-[var(--bg-canvas)]">
+                    <table className="w-full text-left border-collapse text-[11px]">
+                      <thead>
+                        <tr className="bg-[var(--bg-elevated)] border-b border-[var(--border-subtle)] text-[var(--text-muted)]">
+                          <th className="p-2.5 font-semibold">Date</th>
+                          <th className="p-2.5 font-semibold">Invoice ID</th>
+                          <th className="p-2.5 font-semibold">Plan</th>
+                          <th className="p-2.5 font-semibold">Amount</th>
+                          <th className="p-2.5 font-semibold">Status</th>
+                          <th className="p-2.5 font-semibold">Recipient</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr className="border-b border-[var(--border-subtle)] hover:bg-[var(--bg-subtle)] transition-colors">
+                          <td className="p-2.5 text-[var(--text-secondary)]">2026-09-01</td>
+                          <td className="p-2.5 font-mono text-[var(--text-primary)] font-medium">INV-PARISHRAM-90142</td>
+                          <td className="p-2.5 text-[var(--text-primary)]">प्रगति (Builder)</td>
+                          <td className="p-2.5 font-bold text-[var(--text-primary)]">₹2,499</td>
+                          <td className="p-2.5">
+                            <span className="px-1.5 py-0.5 rounded bg-[#10b981]/15 text-[#10b981] font-bold text-[10px]">
+                              PAID
+                            </span>
+                          </td>
+                          <td className="p-2.5 text-[var(--text-secondary)] font-mono text-[10px]">shivansh.p@fam</td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
                 </div>
               </div>
@@ -902,6 +994,15 @@ export function AccountCenter({ isOpen, onClose, initialCategory = 'general' }: 
           </div>
         </div>
       </div>
+
+      {/* Checkout Modal */}
+      <CheckoutModal
+        plan={selectedPlanForCheckout}
+        currency="INR"
+        billingCycle="monthly"
+        isOpen={isCheckoutOpen}
+        onClose={() => setIsCheckoutOpen(false)}
+      />
     </div>
   );
 }

@@ -3,17 +3,13 @@
 import React, { useState, useEffect } from 'react';
 import {
   Search,
-  Terminal,
   ShieldCheck,
   FileCode,
   FolderGit2,
   Cpu,
   BarChart3,
-  CreditCard,
-  Layers,
   X,
   Play,
-  RotateCcw,
 } from 'lucide-react';
 import { MainNavView } from '@/components/layout/sidebar';
 
@@ -38,8 +34,7 @@ export function CommandPalette({
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
-        if (isOpen) onClose();
-        else onClose(); // parent toggles
+        onClose();
       } else if (e.key === 'Escape' && isOpen) {
         onClose();
       }
@@ -82,20 +77,20 @@ export function CommandPalette({
       },
     },
     {
-      id: 'open-repo',
-      title: 'Open Repository Explorer & AST Symbols',
+      id: 'view-overview',
+      title: 'Go to Overview & Task Intake',
       category: 'Navigation',
-      icon: <FolderGit2 className="w-4 h-4 text-[#fbbf24]" />,
+      icon: <FolderGit2 className="w-4 h-4 text-[#ea580c]" />,
       action: () => {
-        onSelectView('repositories');
+        onSelectView('overview');
         onClose();
       },
     },
     {
-      id: 'switch-qwen',
-      title: 'Select Model: Qwen3-Coder-Next (Auto Recommended)',
+      id: 'switch-qwen3',
+      title: 'Select Model: Qwen3-Coder-Next (Agentic)',
       category: 'Models',
-      icon: <Cpu className="w-4 h-4 text-[#ea580c]" />,
+      icon: <Cpu className="w-4 h-4 text-[#a78bfa]" />,
       action: () => {
         onSelectModel('qwen3-coder-next');
         onClose();
@@ -103,7 +98,7 @@ export function CommandPalette({
     },
     {
       id: 'switch-kimi',
-      title: 'Select Model: Kimi K2.5 Multimodal (Builder Tier)',
+      title: 'Select Model: Kimi K2.5 Multimodal (256k)',
       category: 'Models',
       icon: <Cpu className="w-4 h-4 text-[#38bdf8]" />,
       action: () => {
@@ -112,19 +107,19 @@ export function CommandPalette({
       },
     },
     {
-      id: 'switch-deepseek',
-      title: 'Select Model: DeepSeek V3 Coder (Pro Tier)',
+      id: 'switch-glm5',
+      title: 'Select Model: GLM-5 MoE',
       category: 'Models',
-      icon: <Cpu className="w-4 h-4 text-[#a78bfa]" />,
+      icon: <Cpu className="w-4 h-4 text-[#fbbf24]" />,
       action: () => {
-        onSelectModel('deepseek-v3-coder');
+        onSelectModel('glm-5-moe');
         onClose();
       },
     },
     {
-      id: 'open-bench',
-      title: 'Run Task Benchmarks & Evaluation Scorecard',
-      category: 'Evaluation',
+      id: 'view-eval',
+      title: 'Open Official Hackathon Evaluation Benchmark',
+      category: 'Navigation',
       icon: <BarChart3 className="w-4 h-4 text-[#10b981]" />,
       action: () => {
         onSelectView('evaluations');
@@ -139,10 +134,10 @@ export function CommandPalette({
   );
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-start justify-center pt-20 p-4">
-      <div className="w-full max-w-xl bg-[#111419] border border-[#2e3742] rounded-xl shadow-2xl overflow-hidden font-mono text-xs">
+    <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-start justify-center pt-20 p-4 transition-colors">
+      <div className="w-full max-w-xl bg-[var(--bg-panel)] border border-[var(--border-subtle)] rounded-xl shadow-2xl overflow-hidden font-mono text-xs">
         {/* Search header */}
-        <div className="p-3 border-b border-[#232a32] flex items-center gap-2.5">
+        <div className="p-3 border-b border-[var(--border-subtle)] flex items-center gap-2.5">
           <Search className="w-4 h-4 text-[#ea580c]" />
           <input
             type="text"
@@ -150,11 +145,11 @@ export function CommandPalette({
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             autoFocus
-            className="flex-1 bg-transparent text-white placeholder-[var(--text-muted)] outline-none text-sm"
+            className="flex-1 bg-transparent text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none text-sm"
           />
           <button
             onClick={onClose}
-            className="p-1 rounded hover:bg-[#1a2027] text-[var(--text-muted)] hover:text-white transition-colors cursor-pointer"
+            className="p-1 rounded hover:bg-[var(--bg-subtle)] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -171,15 +166,15 @@ export function CommandPalette({
               <button
                 key={cmd.id}
                 onClick={cmd.action}
-                className="w-full p-2.5 rounded flex items-center justify-between hover:bg-[#181d24] transition-colors cursor-pointer text-left group"
+                className="w-full p-2.5 rounded flex items-center justify-between hover:bg-[var(--bg-subtle)] transition-colors cursor-pointer text-left group"
               >
                 <div className="flex items-center gap-2.5">
                   {cmd.icon}
-                  <span className="text-[var(--text-primary)] group-hover:text-white font-medium">
+                  <span className="text-[var(--text-primary)] font-medium">
                     {cmd.title}
                   </span>
                 </div>
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#1c222a] text-[var(--text-muted)]">
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--bg-elevated)] border border-[var(--border-subtle)] text-[var(--text-muted)]">
                   {cmd.category}
                 </span>
               </button>
@@ -187,7 +182,7 @@ export function CommandPalette({
           )}
         </div>
 
-        <div className="p-2.5 bg-[#0d1014] border-t border-[#1f2630] flex items-center justify-between text-[11px] text-[var(--text-muted)]">
+        <div className="p-2.5 bg-[var(--bg-elevated)] border-t border-[var(--border-subtle)] flex items-center justify-between text-[11px] text-[var(--text-muted)]">
           <span>Navigate with arrows</span>
           <span>Press ESC to close</span>
         </div>

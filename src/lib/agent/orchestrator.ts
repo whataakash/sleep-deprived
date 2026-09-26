@@ -228,7 +228,7 @@ export const INITIAL_RUN_1042: Run = {
       runId: 'run-1042',
       timestamp: '10:42:36',
       type: 'proof.generated',
-      title: 'PROOF GENERATED (FORGED ✓)',
+      title: 'PROOF GENERATED (VERIFIED ✓)',
       summary: 'Deterministic proof record sealed with SHA256 e3b0c442... 4/4 requirements verified by evidence.',
       state: 'PROVE',
       temperature: 'FORGING',

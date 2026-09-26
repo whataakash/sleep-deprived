@@ -15,6 +15,12 @@ html.dark {
   --text-secondary: #9da6b3;
   --text-muted: #647080;
 
+  --surface: #111418;
+  --surface-elevated: #161b21;
+  --border: #232a32;
+  --muted: #1c222a;
+  --muted-foreground: #647080;
+
   --forge-flame: #ea580c;
   --forge-flame-light: #f97316;
   --forge-glow: rgba(234, 88, 12, 0.15);
@@ -25,32 +31,46 @@ html.dark {
   --status-failure-glow: rgba(239, 68, 68, 0.18);
   --status-warning: #f59e0b;
   --status-active: #3b82f6;
+
+  --code-bg: #0b0e12;
+  --code-border: #1f262f;
+  --code-text: #f4f5f7;
 }
 
 html.light {
-  --bg-canvas: #f8fafc;
+  --bg-canvas: #f6f8fa;
   --bg-panel: #ffffff;
-  --bg-elevated: #f1f5f9;
-  --bg-subtle: #e2e8f0;
-  --bg-active: #cbd5e1;
-  --border-subtle: #e2e8f0;
-  --border-medium: #cbd5e1;
-  --border-active: #94a3b8;
+  --bg-elevated: #f0f3f6;
+  --bg-subtle: #e6ebf1;
+  --bg-active: #d8e1ea;
+  --border-subtle: #d0d7de;
+  --border-medium: #afb8c1;
+  --border-active: #8c959f;
 
-  --text-primary: #0f172a;
+  --text-primary: #1f2328;
   --text-secondary: #475569;
-  --text-muted: #64748b;
+  --text-muted: #656d76;
+
+  --surface: #ffffff;
+  --surface-elevated: #f0f3f6;
+  --border: #d0d7de;
+  --muted: #e6ebf1;
+  --muted-foreground: #656d76;
 
   --forge-flame: #ea580c;
   --forge-flame-light: #f97316;
   --forge-glow: rgba(234, 88, 12, 0.12);
 
-  --status-verified: #059669;
-  --status-verified-glow: rgba(5, 150, 105, 0.15);
-  --status-failure: #dc2626;
-  --status-failure-glow: rgba(220, 38, 38, 0.15);
-  --status-warning: #d97706;
-  --status-active: #2563eb;
+  --status-verified: #097e59;
+  --status-verified-glow: rgba(9, 126, 89, 0.15);
+  --status-failure: #cf222e;
+  --status-failure-glow: rgba(207, 34, 46, 0.15);
+  --status-warning: #b05a00;
+  --status-active: #0969da;
+
+  --code-bg: #f6f8fa;
+  --code-border: #d0d7de;
+  --code-text: #1f2328;
 }
 
 @theme inline {
@@ -78,6 +98,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
 code,
@@ -87,7 +108,7 @@ samp {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
 }
 
-/* Custom minimal scrollbar */
+/* Custom minimal scrollbar that adapts cleanly to current theme */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -98,16 +119,16 @@ samp {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #252c36;
+  background: var(--border-medium);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #343e4d;
+  background: var(--border-active);
 }
 
-/* The signature Forge Line animation */
-@keyframes forgePulse {
+/* The signature Parishram Path pulse animation */
+@keyframes parishramPulse {
   0% {
     opacity: 0.6;
     transform: scaleX(0.98);
@@ -122,12 +143,6 @@ samp {
   }
 }
 
-.forge-line-glow {
-  box-shadow: 0 0 12px rgba(249, 115, 22, 0.45);
-}
-
 .verified-stamp-glow {
   box-shadow: 0 0 20px rgba(16, 185, 129, 0.25);
 }
-
-

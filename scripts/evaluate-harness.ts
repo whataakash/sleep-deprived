@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * FORGE Autonomous Coding Harness - Evaluation CLI Runner
+ * परिश्रम Autonomous Coding Harness - Evaluation CLI Runner
  *
  * Evaluation workflow:
  *   export AI_API_KEY="<PROVIDED_API_KEY>"
@@ -53,7 +53,7 @@ async function main() {
   console.log('[STAGE 2: UNDERSTAND & PLAN]');
   const startTime = Date.now();
   const modelRes = await evalAdapter.generateText({
-    systemPrompt: 'You are FORGE, an autonomous coding harness operating in strict evaluation mode.',
+    systemPrompt: 'You are Parishram, an autonomous coding harness operating in strict evaluation mode.',
     userPrompt: taskArg,
     contextFiles: [{ path: 'src/auth/token-validator.ts', content: tokenFile }],
   });

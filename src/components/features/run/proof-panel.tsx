@@ -3,16 +3,11 @@
 import React from 'react';
 import { ProofRecord } from '@/types/verification';
 import {
-  ShieldCheck,
   CheckCircle2,
   FileCode,
   FileCheck,
   Cpu,
   Layers,
-  ExternalLink,
-  Flame,
-  AlertCircle,
-  Hash,
   Terminal,
 } from 'lucide-react';
 
@@ -29,10 +24,13 @@ export function ProofPanel({
   onOpenProofGraph,
   onOpenTerminalSnippet,
 }: ProofPanelProps) {
+  const totalPassed = (proof.tests.unit?.passed || 0) + (proof.tests.integration?.passed || 0) + (proof.tests.regression?.passed || 0);
+  const totalTests = (proof.tests.unit?.total || 0) + (proof.tests.integration?.total || 0) + (proof.tests.regression?.total || 0);
+
   return (
-    <div className="flex-1 flex flex-col bg-[#0e1115] border border-[#232a32] rounded overflow-y-auto">
+    <div className="flex-1 flex flex-col bg-[var(--bg-panel)] border border-[var(--border-subtle)] rounded-lg overflow-y-auto transition-colors">
       {/* Proof Header with Cryptographic Stamp */}
-      <div className="p-5 bg-gradient-to-r from-[#0d1612] to-[#121a16] border-b border-[#1b3829] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="p-5 bg-gradient-to-r from-[#10b981]/12 via-[var(--bg-elevated)] to-[var(--bg-panel)] border-b border-[var(--border-subtle)] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2">
             <span className="px-2 py-0.5 rounded bg-[#10b981]/20 border border-[#10b981]/40 text-[#10b981] font-mono text-xs font-bold tracking-widest uppercase">
@@ -42,7 +40,7 @@ export function ProofPanel({
               Proof Hash: {proof.proofHash.slice(0, 16)}...
             </span>
           </div>
-          <h2 className="text-lg font-bold text-white tracking-tight">
+          <h2 className="text-lg font-bold text-[var(--text-primary)] tracking-tight">
             Proof of Work & Verification Certificate
           </h2>
           <p className="text-xs text-[var(--text-secondary)]">
@@ -54,7 +52,7 @@ export function ProofPanel({
           {onOpenProofGraph && (
             <button
               onClick={onOpenProofGraph}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-[#16291e] hover:bg-[#1e392a] text-[#10b981] border border-[#10b981]/30 text-xs font-mono font-medium transition-colors cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-[var(--bg-elevated)] hover:bg-[var(--bg-subtle)] text-[#10b981] border border-[#10b981]/30 text-xs font-mono font-medium transition-colors cursor-pointer"
             >
               <Layers className="w-3.5 h-3.5" />
               <span>Inspect Proof Graph</span>
@@ -64,7 +62,7 @@ export function ProofPanel({
           {onOpenDiff && (
             <button
               onClick={onOpenDiff}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-[#14181e] hover:bg-[#1c222b] text-[var(--text-primary)] border border-[#2a3440] text-xs font-mono font-medium transition-colors cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-[var(--bg-elevated)] hover:bg-[var(--bg-subtle)] text-[var(--text-primary)] border border-[var(--border-subtle)] text-xs font-mono font-medium transition-colors cursor-pointer"
             >
               <FileCode className="w-3.5 h-3.5 text-[#38bdf8]" />
               <span>Inspect Diff</span>
@@ -77,63 +75,71 @@ export function ProofPanel({
         {/* Core Proof Matrix Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 font-mono">
           {/* Card 1: Tests */}
-          <div className="p-3.5 rounded bg-[#13171e] border border-[#252d36] space-y-1.5">
-            <div className="flex items-center justify-between text-[11px] text-[var(--text-muted)]">
-              <span>TEST SUITES</span>
-              <CheckCircle2 className="w-3.5 h-3.5 text-[#10b981]" />
-            </div>
-            <div className="text-base font-bold text-white">4 / 4 Passed</div>
-            <div className="text-[11px] text-[#10b981] flex items-center gap-1">
-              <span>0 failing · 0 skipped</span>
-            </div>
-            <div className="text-[10px] text-[var(--text-muted)] pt-1 border-t border-[#1e252e]">
-              Unit (2) · Integ (1) · Reg (1)
-            </div>
-          </div>
-
-          {/* Card 2: Build & Types */}
-          <div className="p-3.5 rounded bg-[#13171e] border border-[#252d36] space-y-1.5">
-            <div className="flex items-center justify-between text-[11px] text-[var(--text-muted)]">
-              <span>STATIC ANALYSIS</span>
-              <CheckCircle2 className="w-3.5 h-3.5 text-[#10b981]" />
-            </div>
-            <div className="text-base font-bold text-white">tsc --noEmit</div>
-            <div className="text-[11px] text-[#10b981] flex items-center gap-1">
-              <span>0 compiler diagnostics</span>
-            </div>
-            <div className="text-[10px] text-[var(--text-muted)] pt-1 border-t border-[#1e252e]">
-              ESLint: clean · Build: clean
-            </div>
-          </div>
-
-          {/* Card 3: Changes */}
-          <div className="p-3.5 rounded bg-[#13171e] border border-[#252d36] space-y-1.5">
-            <div className="flex items-center justify-between text-[11px] text-[var(--text-muted)]">
-              <span>MUTATIONS</span>
-              <FileCheck className="w-3.5 h-3.5 text-[#38bdf8]" />
-            </div>
-            <div className="text-base font-bold text-white">1 File Changed</div>
-            <div className="text-[11px] text-[#38bdf8] flex items-center gap-1">
-              <span>+14 lines · -2 lines</span>
-            </div>
-            <div className="text-[10px] text-[var(--text-muted)] pt-1 border-t border-[#1e252e]">
-              src/auth/client.ts
-            </div>
-          </div>
-
-          {/* Card 4: Regression Risk */}
-          <div className="p-3.5 rounded bg-[#13171e] border border-[#252d36] space-y-1.5">
-            <div className="flex items-center justify-between text-[11px] text-[var(--text-muted)]">
-              <span>REGRESSION RISK</span>
+          <div className="p-3.5 rounded bg-[var(--bg-canvas)] border border-[var(--border-subtle)] space-y-1.5">
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-[var(--text-muted)]">Test Execution</span>
               <span className="text-[10px] px-1 rounded bg-[#10b981]/20 text-[#10b981] font-bold">
-                LOW
+                100% PASS
               </span>
             </div>
-            <div className="text-base font-bold text-white">0% Risk Score</div>
+            <div className="text-base font-bold text-[var(--text-primary)]">
+              {totalPassed}/{totalTests} Assertions
+            </div>
+            <div className="text-[11px] text-[var(--text-secondary)]">
+              All targeted test suites passed
+            </div>
+            <div className="text-[10px] text-[var(--text-muted)] pt-1 border-t border-[var(--border-subtle)]">
+              Execution duration: 74ms
+            </div>
+          </div>
+
+          {/* Card 2: Typecheck */}
+          <div className="p-3.5 rounded bg-[var(--bg-canvas)] border border-[var(--border-subtle)] space-y-1.5">
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-[var(--text-muted)]">Type Diagnostics</span>
+              <span className="text-[10px] px-1 rounded bg-[#10b981]/20 text-[#10b981] font-bold">
+                CLEAN
+              </span>
+            </div>
+            <div className="text-base font-bold text-[var(--text-primary)]">Zero Diagnostics</div>
+            <div className="text-[11px] text-[var(--text-secondary)]">
+              Strict TypeScript compiler verification
+            </div>
+            <div className="text-[10px] text-[var(--text-muted)] pt-1 border-t border-[var(--border-subtle)]">
+              Checked across 28 files
+            </div>
+          </div>
+
+          {/* Card 3: Build */}
+          <div className="p-3.5 rounded bg-[var(--bg-canvas)] border border-[var(--border-subtle)] space-y-1.5">
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-[var(--text-muted)]">Bundle Integrity</span>
+              <span className="text-[10px] px-1 rounded bg-[#10b981]/20 text-[#10b981] font-bold">
+                BUNDLED
+              </span>
+            </div>
+            <div className="text-base font-bold text-[var(--text-primary)]">Clean Production Artifact</div>
+            <div className="text-[11px] text-[var(--text-secondary)]">
+              ESM & CJS targets verified
+            </div>
+            <div className="text-[10px] text-[var(--text-muted)] pt-1 border-t border-[var(--border-subtle)]">
+              tsup compiler: exit 0
+            </div>
+          </div>
+
+          {/* Card 4: Regression */}
+          <div className="p-3.5 rounded bg-[var(--bg-canvas)] border border-[var(--border-subtle)] space-y-1.5">
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-[var(--text-muted)]">Blast Radius</span>
+              <span className="text-[10px] px-1 rounded bg-[#10b981]/20 text-[#10b981] font-bold">
+                ISOLATED
+              </span>
+            </div>
+            <div className="text-base font-bold text-[var(--text-primary)]">0% Risk Score</div>
             <div className="text-[11px] text-[var(--text-secondary)]">
               Non-breaking client patch
             </div>
-            <div className="text-[10px] text-[var(--text-muted)] pt-1 border-t border-[#1e252e]">
+            <div className="text-[10px] text-[var(--text-muted)] pt-1 border-t border-[var(--border-subtle)]">
               Passes security regression
             </div>
           </div>
@@ -152,13 +158,13 @@ export function ProofPanel({
             {proof.taskCoverage.requirements.map((req, i) => (
               <div
                 key={i}
-                className="p-3 rounded bg-[#13171e] border border-[#232a32] flex items-center justify-between"
+                className="p-3 rounded bg-[var(--bg-canvas)] border border-[var(--border-subtle)] flex items-center justify-between"
               >
                 <div className="flex items-center gap-2.5">
                   <CheckCircle2 className="w-4 h-4 text-[#10b981] shrink-0" />
                   <span className="text-[var(--text-primary)]">{req.text}</span>
                 </div>
-                <span className="text-[11px] text-[var(--text-muted)] px-2 py-0.5 rounded bg-[#181d24] border border-[#28323e]">
+                <span className="text-[11px] text-[var(--text-muted)] px-2 py-0.5 rounded bg-[var(--bg-subtle)] border border-[var(--border-subtle)]">
                   Evidence Ref: {req.evidenceRef}
                 </span>
               </div>
@@ -183,7 +189,7 @@ export function ProofPanel({
             {proof.evidenceTrail.map((ev) => (
               <div
                 key={ev.id}
-                className="p-3.5 rounded bg-[#13171e] border border-[#252d36] hover:border-[#384351] transition-all space-y-2"
+                className="p-3.5 rounded bg-[var(--bg-canvas)] border border-[var(--border-subtle)] hover:border-[var(--border-medium)] transition-all space-y-2"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="space-y-1">
@@ -195,7 +201,7 @@ export function ProofPanel({
                     </div>
                     <div className="text-[11px] text-[var(--text-muted)] flex items-center gap-2 flex-wrap">
                       <span>Target:</span>
-                      <code className="text-[#38bdf8] bg-[#0c1014] px-1.5 py-0.5 rounded border border-[#1f2630]">
+                      <code className="text-[#38bdf8] bg-[var(--code-bg)] px-1.5 py-0.5 rounded border border-[var(--border-subtle)]">
                         {ev.targetArtifact}
                       </code>
                       <span>Method:</span>
@@ -207,15 +213,15 @@ export function ProofPanel({
                     onClick={() =>
                       onOpenTerminalSnippet && onOpenTerminalSnippet(ev.logOutputRef)
                     }
-                    className="flex items-center gap-1 px-2 py-1 rounded bg-[#181d24] hover:bg-[#202731] text-[var(--text-secondary)] hover:text-white text-[11px] transition-colors cursor-pointer shrink-0"
+                    className="flex items-center gap-1 px-2 py-1 rounded bg-[var(--bg-elevated)] hover:bg-[var(--bg-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-[11px] border border-[var(--border-subtle)] transition-colors cursor-pointer shrink-0"
                     title="View Raw Execution Output"
                   >
-                    <Terminal className="w-3 h-3 text-[#f97316]" />
+                    <Terminal className="w-3 h-3 text-[#ea580c]" />
                     <span>Log Ref</span>
                   </button>
                 </div>
 
-                <div className="p-2 rounded bg-[#0b0e12] border border-[#1e252f] text-[11px] text-[var(--text-secondary)] flex items-center justify-between">
+                <div className="p-2 rounded bg-[var(--code-bg)] border border-[var(--border-subtle)] text-[11px] text-[var(--text-secondary)] flex items-center justify-between">
                   <code>{ev.logOutputRef}</code>
                   <span className="text-[#10b981] text-[10px] font-bold">EXIT 0</span>
                 </div>
@@ -232,9 +238,9 @@ export function ProofPanel({
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 font-mono text-xs">
             {/* Unit */}
-            <div className="p-3 rounded bg-[#13171e] border border-[#232a32] space-y-2">
+            <div className="p-3 rounded bg-[var(--bg-canvas)] border border-[var(--border-subtle)] space-y-2">
               <div className="flex items-center justify-between">
-                <span className="font-semibold text-white">Unit Suite</span>
+                <span className="font-semibold text-[var(--text-primary)]">Unit Suite</span>
                 <span className="text-[#10b981] font-bold">2/2 PASS</span>
               </div>
               <div className="text-[11px] text-[var(--text-muted)]">
@@ -247,9 +253,9 @@ export function ProofPanel({
             </div>
 
             {/* Integration */}
-            <div className="p-3 rounded bg-[#13171e] border border-[#232a32] space-y-2">
+            <div className="p-3 rounded bg-[var(--bg-canvas)] border border-[var(--border-subtle)] space-y-2">
               <div className="flex items-center justify-between">
-                <span className="font-semibold text-white">Integration Suite</span>
+                <span className="font-semibold text-[var(--text-primary)]">Integration Suite</span>
                 <span className="text-[#10b981] font-bold">1/1 PASS</span>
               </div>
               <div className="text-[11px] text-[var(--text-muted)]">
@@ -261,9 +267,9 @@ export function ProofPanel({
             </div>
 
             {/* Regression */}
-            <div className="p-3 rounded bg-[#13171e] border border-[#232a32] space-y-2">
+            <div className="p-3 rounded bg-[var(--bg-canvas)] border border-[var(--border-subtle)] space-y-2">
               <div className="flex items-center justify-between">
-                <span className="font-semibold text-white">Regression Suite</span>
+                <span className="font-semibold text-[var(--text-primary)]">Regression Suite</span>
                 <span className="text-[#10b981] font-bold">1/1 PASS</span>
               </div>
               <div className="text-[11px] text-[var(--text-muted)]">

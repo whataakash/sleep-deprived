@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { FileCode, CheckCircle2, ShieldCheck, Copy, ArrowLeft } from 'lucide-react';
+import { FileCode, ShieldCheck, Copy, ArrowLeft } from 'lucide-react';
 
 interface DiffViewerProps {
   onBackToRun?: () => void;
@@ -16,7 +16,7 @@ const DIFF_LINES = [
   { type: 'delete', oldNo: 25, newNo: null, content: '-   const headers = options.headers || {};' },
   { type: 'add', oldNo: null, newNo: 25, content: '+   const headers = new Headers(options.headers || {});' },
   { type: 'add', oldNo: null, newNo: 26, content: '+   ' },
-  { type: 'add', oldNo: null, newNo: 27, content: '+   // FIX APPLIED BY FORGE:' },
+  { type: 'add', oldNo: null, newNo: 27, content: '+   // FIX APPLIED BY PARISHRAM:' },
   { type: 'add', oldNo: null, newNo: 28, content: '+   if (this.currentSession && this.currentSession.token) {' },
   { type: 'add', oldNo: null, newNo: 29, content: '+     headers.set(\'Authorization\', `Bearer ${this.currentSession.token}`);' },
   { type: 'add', oldNo: null, newNo: 30, content: '+     headers.set(\'X-Session-ID\', this.currentSession.id);' },
@@ -38,14 +38,14 @@ export function DiffViewer({ onBackToRun }: DiffViewerProps) {
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-[#0e1115] border border-[#232a32] rounded overflow-hidden">
+    <div className="flex-1 flex flex-col bg-[var(--bg-panel)] border border-[var(--border-subtle)] rounded-lg overflow-hidden transition-colors">
       {/* File Header */}
-      <div className="p-3 bg-[#13171d] border-b border-[#232a32] flex items-center justify-between">
+      <div className="p-3 bg-[var(--bg-elevated)] border-b border-[var(--border-subtle)] flex items-center justify-between">
         <div className="flex items-center gap-3">
           {onBackToRun && (
             <button
               onClick={onBackToRun}
-              className="flex items-center gap-1 text-xs text-[var(--text-muted)] hover:text-white transition-colors cursor-pointer"
+              className="flex items-center gap-1 text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>Back</span>
@@ -71,7 +71,7 @@ export function DiffViewer({ onBackToRun }: DiffViewerProps) {
 
           <button
             onClick={handleCopy}
-            className="flex items-center gap-1 px-2.5 py-1 rounded bg-[#181d24] hover:bg-[#202731] border border-[#2a3440] text-xs text-[var(--text-secondary)] hover:text-white transition-colors cursor-pointer font-mono"
+            className="flex items-center gap-1 px-2.5 py-1 rounded bg-[var(--bg-subtle)] hover:bg-[var(--bg-active)] border border-[var(--border-subtle)] text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer font-mono"
           >
             <Copy className="w-3 h-3" />
             <span>{copied ? 'Copied!' : 'Copy Diff'}</span>
@@ -80,7 +80,7 @@ export function DiffViewer({ onBackToRun }: DiffViewerProps) {
       </div>
 
       {/* Rationale Callout */}
-      <div className="p-3 bg-[#11161d] border-b border-[#232a32] text-xs font-mono flex items-center gap-2">
+      <div className="p-3 bg-[var(--bg-canvas)] border-b border-[var(--border-subtle)] text-xs font-mono flex items-center gap-2">
         <span className="text-[var(--text-muted)] font-bold">ENGINEERING REASON:</span>
         <span className="text-[var(--text-secondary)]">
           Inject Authorization Bearer header using active session token before dispatching HTTP request to internal services.
@@ -100,16 +100,16 @@ export function DiffViewer({ onBackToRun }: DiffViewerProps) {
                   key={idx}
                   className={`${
                     isAdd
-                      ? 'bg-[#10b981]/15 text-[#6ee7b7]'
+                      ? 'bg-[#10b981]/15 text-[#10b981] font-medium'
                       : isDel
-                      ? 'bg-[#ef4444]/15 text-[#fca5a5]'
-                      : 'text-[var(--text-secondary)] hover:bg-[#13171d]'
+                      ? 'bg-[#ef4444]/15 text-[#ef4444] font-medium'
+                      : 'text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)]'
                   }`}
                 >
-                  <td className="w-10 px-2 py-0.5 text-right text-[var(--text-muted)] border-r border-[#202630] select-none text-[11px]">
+                  <td className="w-10 px-2 py-0.5 text-right text-[var(--text-muted)] border-r border-[var(--border-subtle)] select-none text-[11px]">
                     {line.oldNo || ''}
                   </td>
-                  <td className="w-10 px-2 py-0.5 text-right text-[var(--text-muted)] border-r border-[#202630] select-none text-[11px]">
+                  <td className="w-10 px-2 py-0.5 text-right text-[var(--text-muted)] border-r border-[var(--border-subtle)] select-none text-[11px]">
                     {line.newNo || ''}
                   </td>
                   <td className="w-6 px-1 text-center font-bold select-none text-[11px]">

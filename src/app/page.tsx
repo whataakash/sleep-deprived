@@ -5,7 +5,7 @@ import { MotionConfig } from 'motion/react';
 import { AuthProvider, useAuth } from '@/lib/auth/context';
 import { Topbar } from '@/components/layout/topbar';
 import { Sidebar, MainNavView } from '@/components/layout/sidebar';
-import { ForgeLine } from '@/components/layout/forge-line';
+import { ParishramPath } from '@/components/layout/forge-line';
 import { OverviewView } from '@/components/features/overview/overview-view';
 import { RunView } from '@/components/features/run/run-view';
 import { RepoExplorer } from '@/components/features/repository/repo-explorer';
@@ -22,7 +22,7 @@ import { CURRENT_2026_MODELS } from '@/lib/models/gateway';
 import { EvaluationModelAdapter } from '@/lib/models/evaluation-adapter';
 import { Lock } from 'lucide-react';
 
-function ForgeAppInner() {
+function ParishramAppInner() {
   const { session } = useAuth();
   const [activeView, setActiveView] = useState<MainNavView>('overview');
   const [currentRun, setCurrentRun] = useState<Run>(INITIAL_RUN_1042);
@@ -35,6 +35,7 @@ function ForgeAppInner() {
 
   // Modals
   const [isAccountOpen, setIsAccountOpen] = useState<boolean>(false);
+  const [accountInitialCategory, setAccountInitialCategory] = useState<string>('general');
   const [isDownloadOpen, setIsDownloadOpen] = useState<boolean>(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState<boolean>(false);
 
@@ -116,7 +117,10 @@ function ForgeAppInner() {
         currentState={currentState}
         selectedModelName={selectedModel.displayName}
         onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
-        onOpenAccount={() => setIsAccountOpen(true)}
+        onOpenAccount={(cat) => {
+          setAccountInitialCategory(cat || 'general');
+          setIsAccountOpen(true);
+        }}
         onOpenDownload={() => setIsDownloadOpen(true)}
         onRunDemo={handleRunDemo}
         onResetDemo={handleResetDemo}
@@ -142,8 +146,8 @@ function ForgeAppInner() {
         </div>
       )}
 
-      {/* Responsive 5-Stage Forge Line */}
-      <ForgeLine
+      {/* Responsive 5-Stage Parishram Path */}
+      <ParishramPath
         currentState={currentState}
         personality={session.user?.preferences.personality || 'forge'}
         onSelectState={(st) => {
@@ -158,7 +162,10 @@ function ForgeAppInner() {
         <Sidebar
           activeView={activeView}
           onSelectView={setActiveView}
-          onOpenAccount={() => setIsAccountOpen(true)}
+          onOpenAccount={() => {
+            setAccountInitialCategory('general');
+            setIsAccountOpen(true);
+          }}
           onOpenDownload={() => setIsDownloadOpen(true)}
           runStatus={isVerified ? 'VERIFIED' : 'RUNNING'}
         />
@@ -192,7 +199,10 @@ function ForgeAppInner() {
             <ModelMarketplace
               currentModelId={selectedModel.id}
               onSelectModel={setSelectedModelId}
-              onOpenAccountKeys={() => setIsAccountOpen(true)}
+              onOpenAccountKeys={() => {
+                setAccountInitialCategory('ai');
+                setIsAccountOpen(true);
+              }}
             />
           )}
 
@@ -208,9 +218,13 @@ function ForgeAppInner() {
       </div>
 
       {/* Account & IDE Settings Modal */}
-      <AccountCenter isOpen={isAccountOpen} onClose={() => setIsAccountOpen(false)} />
+      <AccountCenter
+        isOpen={isAccountOpen}
+        onClose={() => setIsAccountOpen(false)}
+        initialCategory={accountInitialCategory}
+      />
 
-      {/* Download FORGE Desktop Modal */}
+      {/* Download Parishram Desktop Modal */}
       <DownloadModal isOpen={isDownloadOpen} onClose={() => setIsDownloadOpen(false)} />
 
       {/* Command Palette */}
@@ -225,11 +239,11 @@ function ForgeAppInner() {
   );
 }
 
-export default function ForgeApp() {
+export default function ParishramApp() {
   return (
     <MotionConfig reducedMotion="user">
       <AuthProvider>
-        <ForgeAppInner />
+        <ParishramAppInner />
       </AuthProvider>
     </MotionConfig>
   );

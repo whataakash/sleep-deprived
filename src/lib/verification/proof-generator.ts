@@ -83,7 +83,7 @@ export class ProofGenerator {
       {
         id: 'proof-final',
         type: 'proof',
-        label: 'FORGED ✓',
+        label: 'VERIFIED ✓',
         sublabel: 'Verified & Sealed',
         status: 'verified',
       },
@@ -104,7 +104,7 @@ export class ProofGenerator {
       verifiedTimestamp: '2026-09-26T10:42:36Z',
       proofHash: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
       status: 'VERIFIED',
-      badgeTitle: 'FORGED ✓',
+      badgeTitle: 'VERIFIED ✓',
       taskCoverage: {
         satisfiedCount: 4,
         totalCount: 4,

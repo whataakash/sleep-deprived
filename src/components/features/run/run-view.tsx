@@ -18,11 +18,7 @@ import {
   Layers,
   Flame,
   Terminal,
-  ChevronDown,
-  ChevronUp,
   HelpCircle,
-  ExternalLink,
-  RotateCcw,
 } from 'lucide-react';
 
 interface RunViewProps {
@@ -55,12 +51,12 @@ export function RunView({
   const isVerified = currentEventIndex >= run.events.length - 2;
 
   return (
-    <div className="flex-1 flex flex-col overflow-hidden gap-3 font-sans">
+    <div className="flex-1 flex flex-col overflow-hidden gap-3 font-sans transition-colors">
       {/* LEVEL 1: WHAT IS HAPPENING? */}
-      <div className="p-3 bg-[#101318] border border-[#202731] rounded-lg flex flex-wrap items-center justify-between gap-3 font-mono text-xs select-none">
+      <div className="p-3 bg-[var(--bg-panel)] border border-[var(--border-subtle)] rounded-lg flex flex-wrap items-center justify-between gap-3 font-mono text-xs select-none">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
-            <span className="font-extrabold text-white text-sm">Run #{run.runNumber}</span>
+            <span className="font-extrabold text-[var(--text-primary)] text-sm">Run #{run.runNumber}</span>
             <span className="text-[var(--text-muted)]">·</span>
             <span className="text-[var(--text-primary)] font-medium truncate max-w-md">
               {run.taskTitle}
@@ -71,7 +67,7 @@ export function RunView({
             className={`px-2 py-0.5 rounded text-[10px] font-bold ${
               isVerified
                 ? 'bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/30'
-                : 'bg-[#ea580c]/20 text-[#f97316] border border-[#ea580c]/30'
+                : 'bg-[#ea580c]/20 text-[#ea580c] border border-[#ea580c]/30'
             }`}
           >
             ● {isVerified ? 'VERIFIED' : currentState}
@@ -84,8 +80,8 @@ export function RunView({
             onClick={() => setActiveTab('proof')}
             className={`flex items-center gap-1.5 px-2.5 py-1 rounded transition-colors cursor-pointer ${
               activeTab === 'proof'
-                ? 'bg-[#ea580c] text-white font-bold'
-                : 'bg-[#151920] text-[var(--text-secondary)] hover:bg-[#1d232c]'
+                ? 'bg-[#ea580c] text-white font-bold shadow-xs'
+                : 'bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)] hover:text-[var(--text-primary)] border border-[var(--border-subtle)]'
             }`}
           >
             <ShieldCheck className="w-3.5 h-3.5" />
@@ -96,8 +92,8 @@ export function RunView({
             onClick={() => setActiveTab('diff')}
             className={`flex items-center gap-1.5 px-2.5 py-1 rounded transition-colors cursor-pointer ${
               activeTab === 'diff'
-                ? 'bg-[#ea580c] text-white font-bold'
-                : 'bg-[#151920] text-[var(--text-secondary)] hover:bg-[#1d232c]'
+                ? 'bg-[#ea580c] text-white font-bold shadow-xs'
+                : 'bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)] hover:text-[var(--text-primary)] border border-[var(--border-subtle)]'
             }`}
           >
             <FileCode className="w-3.5 h-3.5 text-[#38bdf8]" />
@@ -108,8 +104,8 @@ export function RunView({
             onClick={() => setActiveTab('recovery')}
             className={`flex items-center gap-1.5 px-2.5 py-1 rounded transition-colors cursor-pointer ${
               activeTab === 'recovery'
-                ? 'bg-[#ea580c] text-white font-bold'
-                : 'bg-[#151920] text-[var(--text-secondary)] hover:bg-[#1d232c]'
+                ? 'bg-[#ea580c] text-white font-bold shadow-xs'
+                : 'bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)] hover:text-[var(--text-primary)] border border-[var(--border-subtle)]'
             }`}
           >
             <Flame className="w-3.5 h-3.5 text-[#ea580c]" />
@@ -120,8 +116,8 @@ export function RunView({
             onClick={() => setActiveTab('timeline')}
             className={`flex items-center gap-1.5 px-2.5 py-1 rounded transition-colors cursor-pointer ${
               activeTab === 'timeline'
-                ? 'bg-[#ea580c] text-white font-bold'
-                : 'bg-[#151920] text-[var(--text-secondary)] hover:bg-[#1d232c]'
+                ? 'bg-[#ea580c] text-white font-bold shadow-xs'
+                : 'bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)] hover:text-[var(--text-primary)] border border-[var(--border-subtle)]'
             }`}
           >
             <Terminal className="w-3.5 h-3.5" />
@@ -130,7 +126,7 @@ export function RunView({
 
           <button
             onClick={() => setShowProofGraphModal(true)}
-            className="flex items-center gap-1 px-2.5 py-1 rounded bg-[#151920] hover:bg-[#1d232c] text-[var(--text-secondary)] hover:text-white border border-[#232a33] text-[11px] transition-colors cursor-pointer"
+            className="flex items-center gap-1 px-2.5 py-1 rounded bg-[var(--bg-elevated)] hover:bg-[var(--bg-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-subtle)] text-[11px] transition-colors cursor-pointer"
           >
             <Layers className="w-3.5 h-3.5 text-[#10b981]" />
             <span>Proof Graph</span>
@@ -138,7 +134,7 @@ export function RunView({
 
           <button
             onClick={() => setShowWhyModal(true)}
-            className="flex items-center gap-1 px-2 py-1 rounded bg-[#151920] hover:bg-[#1d232c] text-[var(--text-secondary)] hover:text-white border border-[#232a33] text-[11px] transition-colors cursor-pointer"
+            className="flex items-center gap-1 px-2 py-1 rounded bg-[var(--bg-elevated)] hover:bg-[var(--bg-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-subtle)] text-[11px] transition-colors cursor-pointer"
             title="Explain autonomous choices"
           >
             <HelpCircle className="w-3.5 h-3.5 text-[#38bdf8]" />
@@ -183,13 +179,13 @@ export function RunView({
 
       {/* Proof Graph Drawer Modal */}
       {showProofGraphModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="w-full max-w-4xl bg-[#0e1115] border border-[#252e38] rounded-xl overflow-hidden shadow-2xl flex flex-col max-h-[85vh]">
-            <div className="p-3 bg-[#13171d] border-b border-[#232a32] flex items-center justify-between font-mono text-xs">
-              <span className="font-bold text-white uppercase">Causal Proof Graph</span>
+        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="w-full max-w-4xl bg-[var(--bg-panel)] border border-[var(--border-subtle)] rounded-xl overflow-hidden shadow-2xl flex flex-col max-h-[85vh]">
+            <div className="p-3 bg-[var(--bg-elevated)] border-b border-[var(--border-subtle)] flex items-center justify-between font-mono text-xs">
+              <span className="font-bold text-[var(--text-primary)] uppercase">Causal Proof Graph</span>
               <button
                 onClick={() => setShowProofGraphModal(false)}
-                className="px-2 py-1 rounded bg-[#181d24] text-[var(--text-muted)] hover:text-white cursor-pointer"
+                className="px-2 py-1 rounded bg-[var(--bg-subtle)] hover:bg-[var(--bg-active)] text-[var(--text-muted)] hover:text-[var(--text-primary)] border border-[var(--border-subtle)] cursor-pointer"
               >
                 Close ✕
               </button>
@@ -203,8 +199,8 @@ export function RunView({
 
       {/* Why Modal */}
       {showWhyModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="w-full max-w-3xl bg-[#0e1115] border border-[#252e38] rounded-xl overflow-hidden shadow-2xl flex flex-col">
+        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="w-full max-w-3xl bg-[var(--bg-panel)] border border-[var(--border-subtle)] rounded-xl overflow-hidden shadow-2xl flex flex-col">
             <WhyDrawer filePath={whyTargetFile} onClose={() => setShowWhyModal(false)} />
           </div>
         </div>

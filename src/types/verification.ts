@@ -57,7 +57,7 @@ export interface ProofRecord {
   verifiedTimestamp: string;
   proofHash: string;                  // SHA256 deterministic proof stamp
   status: 'VERIFIED' | 'FAILED' | 'IN_PROGRESS';
-  badgeTitle: 'FORGED ✓' | 'UNVERIFIED' | 'REJECTED';
+  badgeTitle: 'VERIFIED ✓' | 'FORGED ✓' | 'UNVERIFIED' | 'REJECTED';
   taskCoverage: {
     satisfiedCount: number;
     totalCount: number;

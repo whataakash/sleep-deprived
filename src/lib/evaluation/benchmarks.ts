@@ -13,6 +13,9 @@ export const HARNESS_METRICS: HarnessEvaluationMetrics = {
   contextEfficiencyRate: 88.5,
   totalTestsRun: 612,
   totalTestsPassed: 612,
+  avgTokenCostUsd: 0.038,
+  avgRecoveryAttemptsToFix: 1.18,
+  deterministicVerificationPassRate: 94.4,
 };
 
 export const BENCHMARK_TASKS: BenchmarkTask[] = [

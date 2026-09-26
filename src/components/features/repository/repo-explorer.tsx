@@ -1,51 +1,39 @@
 'use client';
 
 import React, { useState } from 'react';
-import { RepoFile, SymbolDefinition } from '@/types/repository';
-import { MOCK_REPO_FILES, MOCK_SYMBOLS, MOCK_WHY_THIS_FILE } from '@/lib/repository/mock-repo';
 import {
   Folder,
   FolderOpen,
   FileCode,
   FileText,
   Search,
-  CheckCircle2,
-  Sparkles,
-  HelpCircle,
-  Hash,
   Layers,
+  HelpCircle,
+  Eye,
+  GitBranch,
 } from 'lucide-react';
+import { RepoFile, ASTSymbol, WhyThisFile } from '@/types/repository';
+import { MOCK_REPO_FILES, MOCK_SYMBOLS, MOCK_WHY_THIS_FILE, findFileContent } from '@/lib/repository/mock-repo';
 
 interface RepoExplorerProps {
   onSelectWhyFile?: (filePath: string) => void;
 }
 
 export function RepoExplorer({ onSelectWhyFile }: RepoExplorerProps) {
-  const [selectedFilePath, setSelectedFilePath] = useState<string>('src/auth/client.ts');
-  const [searchQuery, setSearchQuery] = useState<string>('');
-  const [activeTab, setActiveTab] = useState<'files' | 'symbols'>('files');
+  const [selectedFilePath, setSelectedFilePath] = useState('src/auth/client.ts');
   const [expandedFolders, setExpandedFolders] = useState<Record<string, boolean>>({
     src: true,
     'src/auth': true,
-    'src/server': true,
     tests: true,
-    'tests/unit': true,
-    'tests/integration': true,
-    'tests/regression': true,
   });
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeTab, setActiveTab] = useState<'files' | 'symbols'>('files');
 
   const toggleFolder = (path: string) => {
-    setExpandedFolders((prev) => ({ ...prev, [path]: !prev[path] }));
-  };
-
-  const findFileContent = (path: string): string => {
-    const queue = [...MOCK_REPO_FILES];
-    while (queue.length > 0) {
-      const current = queue.shift()!;
-      if (current.path === path) return current.content || '';
-      if (current.children) queue.push(...current.children);
-    }
-    return '';
+    setExpandedFolders((prev) => ({
+      ...prev,
+      [path]: !prev[path],
+    }));
   };
 
   const currentContent = findFileContent(selectedFilePath);
@@ -56,11 +44,11 @@ export function RepoExplorer({ onSelectWhyFile }: RepoExplorerProps) {
   );
 
   return (
-    <div className="flex-1 flex flex-col bg-[#0e1115] border border-[#232a32] rounded overflow-hidden">
+    <div className="flex-1 flex flex-col bg-[var(--bg-panel)] border border-[var(--border-subtle)] rounded-lg overflow-hidden transition-colors">
       {/* Top Bar with Context Telemetry */}
-      <div className="p-3 bg-[#13171d] border-b border-[#232a32] flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
+      <div className="p-3 bg-[var(--bg-elevated)] border-b border-[var(--border-subtle)] flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5 font-semibold text-white">
+          <div className="flex items-center gap-1.5 font-semibold text-[var(--text-primary)]">
             <Layers className="w-4 h-4 text-[#ea580c]" />
             <span>Repository Context Engine</span>
           </div>
@@ -85,7 +73,7 @@ export function RepoExplorer({ onSelectWhyFile }: RepoExplorerProps) {
             className={`px-2.5 py-1 rounded transition-colors cursor-pointer ${
               activeTab === 'files'
                 ? 'bg-[#ea580c] text-white font-semibold'
-                : 'bg-[#181d24] text-[var(--text-secondary)] hover:bg-[#202731]'
+                : 'bg-[var(--bg-subtle)] text-[var(--text-secondary)] hover:bg-[var(--bg-active)] hover:text-[var(--text-primary)]'
             }`}
           >
             File Tree
@@ -95,7 +83,7 @@ export function RepoExplorer({ onSelectWhyFile }: RepoExplorerProps) {
             className={`px-2.5 py-1 rounded transition-colors cursor-pointer ${
               activeTab === 'symbols'
                 ? 'bg-[#ea580c] text-white font-semibold'
-                : 'bg-[#181d24] text-[var(--text-secondary)] hover:bg-[#202731]'
+                : 'bg-[var(--bg-subtle)] text-[var(--text-secondary)] hover:bg-[var(--bg-active)] hover:text-[var(--text-primary)]'
             }`}
           >
             AST Symbols
@@ -106,17 +94,17 @@ export function RepoExplorer({ onSelectWhyFile }: RepoExplorerProps) {
       {/* Main Split: Left Tree, Right Preview */}
       <div className="flex-1 flex overflow-hidden">
         {/* Left pane: File tree / Symbol list */}
-        <div className="w-72 bg-[#0c0f13] border-r border-[#232a32] flex flex-col shrink-0 font-mono text-xs">
+        <div className="w-72 bg-[var(--bg-canvas)] border-r border-[var(--border-subtle)] flex flex-col shrink-0 font-mono text-xs">
           {/* Search box */}
-          <div className="p-2 border-b border-[#1f262f]">
-            <div className="flex items-center gap-2 px-2.5 py-1 rounded bg-[#14181e] border border-[#262e37] text-[11px]">
+          <div className="p-2 border-b border-[var(--border-subtle)]">
+            <div className="flex items-center gap-2 px-2.5 py-1 rounded bg-[var(--bg-elevated)] border border-[var(--border-subtle)] text-[11px]">
               <Search className="w-3.5 h-3.5 text-[var(--text-muted)]" />
               <input
                 type="text"
                 placeholder={activeTab === 'files' ? 'Filter files...' : 'Filter symbols...'}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-transparent text-white placeholder-[var(--text-muted)] outline-none"
+                className="w-full bg-transparent text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none"
               />
             </div>
           </div>
@@ -137,11 +125,11 @@ export function RepoExplorer({ onSelectWhyFile }: RepoExplorerProps) {
                   <button
                     key={`${sym.filePath}-${sym.name}`}
                     onClick={() => setSelectedFilePath(sym.filePath)}
-                    className="w-full p-2 rounded text-left bg-[#13171d] hover:bg-[#181d24] border border-[#232a32] transition-colors cursor-pointer"
+                    className="w-full p-2 rounded text-left bg-[var(--bg-panel)] hover:bg-[var(--bg-elevated)] border border-[var(--border-subtle)] transition-colors cursor-pointer"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="font-semibold text-white truncate">{sym.name}</span>
-                      <span className="text-[10px] text-[#38bdf8] uppercase">{sym.kind}</span>
+                      <span className="font-semibold text-[var(--text-primary)] truncate">{sym.name}</span>
+                      <span className="text-[10px] text-[#38bdf8] uppercase font-bold">{sym.kind}</span>
                     </div>
                     <div className="text-[10px] text-[var(--text-muted)] truncate">
                       {sym.filePath}:{sym.line}
@@ -154,18 +142,18 @@ export function RepoExplorer({ onSelectWhyFile }: RepoExplorerProps) {
         </div>
 
         {/* Right pane: Code Preview & "Why this file?" */}
-        <div className="flex-1 flex flex-col bg-[#0b0e12] overflow-hidden">
+        <div className="flex-1 flex flex-col bg-[var(--code-bg)] overflow-hidden">
           {/* File header with "Why this file?" banner if applicable */}
-          <div className="p-3 bg-[#111419] border-b border-[#232a32] flex items-center justify-between font-mono text-xs">
+          <div className="p-3 bg-[var(--bg-elevated)] border-b border-[var(--border-subtle)] flex items-center justify-between font-mono text-xs">
             <div className="flex items-center gap-2">
               <FileCode className="w-4 h-4 text-[#38bdf8]" />
-              <span className="font-semibold text-white">{selectedFilePath}</span>
+              <span className="font-semibold text-[var(--text-primary)]">{selectedFilePath}</span>
             </div>
 
             {currentWhy && (
               <button
                 onClick={() => onSelectWhyFile && onSelectWhyFile(selectedFilePath)}
-                className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#ea580c]/15 hover:bg-[#ea580c]/25 border border-[#ea580c]/30 text-[#f97316] text-[11px] font-semibold transition-colors cursor-pointer"
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#ea580c]/15 hover:bg-[#ea580c]/25 border border-[#ea580c]/30 text-[#ea580c] text-[11px] font-semibold transition-colors cursor-pointer"
               >
                 <HelpCircle className="w-3.5 h-3.5" />
                 <span>Why This File? ({currentWhy.relevanceScore}% Relevance)</span>
@@ -177,7 +165,7 @@ export function RepoExplorer({ onSelectWhyFile }: RepoExplorerProps) {
           <div className="flex-1 overflow-y-auto p-4 font-mono text-xs text-[var(--text-secondary)] select-text">
             <pre className="line-numbers whitespace-pre leading-relaxed">
               {currentContent.split('\n').map((line, idx) => (
-                <div key={idx} className="flex hover:bg-[#13181f]">
+                <div key={idx} className="flex hover:bg-[var(--bg-subtle)] transition-colors">
                   <span className="w-10 text-right pr-4 text-[var(--text-muted)] select-none text-[11px]">
                     {idx + 1}
                   </span>
@@ -229,7 +217,7 @@ function RenderFileTree({
             <div key={file.path}>
               <button
                 onClick={() => onToggleFolder(file.path)}
-                className="w-full flex items-center gap-1.5 px-2 py-1 rounded hover:bg-[#14181e] text-[var(--text-secondary)] hover:text-white transition-colors cursor-pointer"
+                className="w-full flex items-center gap-1.5 px-2 py-1 rounded hover:bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
                 style={{ paddingLeft: `${depth * 12 + 8}px` }}
               >
                 {isExpanded ? (
@@ -261,8 +249,8 @@ function RenderFileTree({
             onClick={() => onSelectFile(file.path)}
             className={`w-full flex items-center justify-between px-2 py-1 rounded transition-colors cursor-pointer ${
               isSelected
-                ? 'bg-[#181e26] text-white font-semibold border border-[#2b3644]'
-                : 'text-[var(--text-secondary)] hover:bg-[#13171d] hover:text-white'
+                ? 'bg-[var(--bg-active)] text-[var(--text-primary)] font-semibold border border-[var(--border-active)]'
+                : 'text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)] hover:text-[var(--text-primary)]'
             }`}
             style={{ paddingLeft: `${depth * 12 + 8}px` }}
           >
@@ -276,7 +264,7 @@ function RenderFileTree({
             </div>
 
             {isWhyRelevant && (
-              <span className="text-[9px] px-1 py-0.2 rounded bg-[#ea580c]/20 text-[#f97316] font-bold">
+              <span className="text-[9px] px-1 py-0.2 rounded bg-[#ea580c]/20 text-[#ea580c] font-bold">
                 RELEVANT
               </span>
             )}

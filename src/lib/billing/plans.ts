@@ -3,7 +3,8 @@ import { PricingPlan } from '@/types/billing';
 export const PRICING_PLANS: PricingPlan[] = [
   {
     id: 'FREE',
-    name: 'Scout',
+    name: 'आरम्भ',
+    englishSubtitle: 'Starter',
     tagline: 'For developers experimenting with open-weight autonomous agents.',
     monthlyPriceInr: 0,
     monthlyPriceUsd: 0,
@@ -24,7 +25,8 @@ export const PRICING_PLANS: PricingPlan[] = [
   },
   {
     id: 'BUILDER',
-    name: 'Forge',
+    name: 'प्रगति',
+    englishSubtitle: 'Builder',
     tagline: 'For engineers shipping features and squashing bugs autonomously.',
     monthlyPriceInr: 2499,
     monthlyPriceUsd: 29,
@@ -47,7 +49,8 @@ export const PRICING_PLANS: PricingPlan[] = [
   },
   {
     id: 'PRO',
-    name: 'Architect',
+    name: 'प्रवीण',
+    englishSubtitle: 'Professional',
     tagline: 'For senior engineers tackling complex multi-file architectural tasks.',
     monthlyPriceInr: 7999,
     monthlyPriceUsd: 99,
@@ -69,7 +72,8 @@ export const PRICING_PLANS: PricingPlan[] = [
   },
   {
     id: 'TEAM',
-    name: 'Overdrive',
+    name: 'दल',
+    englishSubtitle: 'Team',
     tagline: 'For engineering teams requiring centralized governance and private sandboxes.',
     monthlyPriceInr: 19999,
     monthlyPriceUsd: 249,
@@ -90,3 +94,13 @@ export const PRICING_PLANS: PricingPlan[] = [
     ],
   },
 ];
+
+export function getPlanDisplay(planId: string): { hindiName: string; englishSubtitle: string; label: string } {
+  const plan = PRICING_PLANS.find((p) => p.id === planId) || PRICING_PLANS[1];
+  return {
+    hindiName: plan.name,
+    englishSubtitle: plan.englishSubtitle,
+    label: `${plan.name} (${plan.englishSubtitle})`,
+  };
+}
+

@@ -1,28 +1,27 @@
 'use client';
 
 import React, { useState } from 'react';
-import { CURRENT_2026_MODELS, ModelRouter, FreeModelResolver } from '@/lib/models/gateway';
-import { DynamicCodingModel, ModelCategory } from '@/types/models';
-import { useAuth } from '@/lib/auth/context';
+import { ModelManifest, ModelCategory, CURRENT_2026_MODELS } from '@/lib/models/gateway';
 import { EntitlementService } from '@/lib/billing/entitlements';
+import { useAuth } from '@/lib/auth/context';
 import {
   Cpu,
-  KeyRound,
   ShieldCheck,
   CheckCircle2,
-  Sparkles,
-  HelpCircle,
-  Zap,
-  Server,
   Lock,
+  Sparkles,
+  Zap,
+  Sliders,
+  ArrowRight,
   ExternalLink,
-  Info,
+  Code2,
+  Terminal,
 } from 'lucide-react';
 
 interface ModelMarketplaceProps {
   currentModelId: string;
-  onSelectModel: (id: string) => void;
-  onOpenAccountKeys?: () => void;
+  onSelectModel: (modelId: string) => void;
+  onOpenAccountKeys: () => void;
 }
 
 export function ModelMarketplace({
@@ -32,19 +31,42 @@ export function ModelMarketplace({
 }: ModelMarketplaceProps) {
   const { session } = useAuth();
   const user = session.user;
-
-  const [activeCategory, setActiveCategory] = useState<'ALL' | ModelCategory>('ALL');
+  const [activeCategory, setActiveCategory] = useState<ModelCategory | 'ALL'>('ALL');
   const [activeTab, setActiveTab] = useState<'catalog' | 'router' | 'compare'>('catalog');
-  const [taskQuery, setTaskQuery] = useState(
-    'Fix failing authentication integration test with session token forwarding'
-  );
-  const [simulatedRouting, setSimulatedRouting] = useState(() =>
-    ModelRouter.routeTask(taskQuery, 3, user)
-  );
+  const [taskQuery, setTaskQuery] = useState('Fix failing integration tests for auth token dispatch');
+
+  // Simulated Router Decision
+  const [simulatedRouting, setSimulatedRouting] = useState({
+    selectedModel: CURRENT_2026_MODELS[0],
+    reasoning:
+      'Task involves cross-file edits and multiple regression test executions. Qwen3-Coder-Next has highest benchmark score for iterative repair with zero tool-calling hallucination.',
+    estimatedCostUsd: 0.0024,
+    taskComplexity: 'Medium-High',
+    contextRequiredTokens: 48000,
+    toolUsageIntensity: 'Heavy (test runner + AST scanner)',
+  });
 
   const handleTestRoute = () => {
-    const res = ModelRouter.routeTask(taskQuery, 3, user);
-    setSimulatedRouting(res);
+    // Router heuristic simulator
+    if (taskQuery.toLowerCase().includes('reason') || taskQuery.toLowerCase().includes('architect')) {
+      setSimulatedRouting({
+        selectedModel: CURRENT_2026_MODELS[3], // DeepSeek V3 Coder
+        reasoning: 'Architectural analysis requiring deep multi-step formal reasoning.',
+        estimatedCostUsd: 0.008,
+        taskComplexity: 'Very High',
+        contextRequiredTokens: 128000,
+        toolUsageIntensity: 'Moderate',
+      });
+    } else {
+      setSimulatedRouting({
+        selectedModel: CURRENT_2026_MODELS[0],
+        reasoning: 'Iterative coding task best resolved by fast, tool-calling agentic model.',
+        estimatedCostUsd: 0.0018,
+        taskComplexity: 'Medium',
+        contextRequiredTokens: 38000,
+        toolUsageIntensity: 'Heavy',
+      });
+    }
   };
 
   const filteredModels = CURRENT_2026_MODELS.filter((m) => {
@@ -53,12 +75,12 @@ export function ModelMarketplace({
   });
 
   return (
-    <div className="flex-1 flex flex-col bg-[#0e1115] border border-[#202731] rounded-lg overflow-hidden font-sans">
+    <div className="flex-1 flex flex-col bg-[var(--bg-panel)] border border-[var(--border-subtle)] rounded-lg overflow-hidden font-sans transition-colors">
       {/* Header bar */}
-      <div className="p-3 bg-[#111419] border-b border-[#202731] flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
+      <div className="p-3 bg-[var(--bg-elevated)] border-b border-[var(--border-subtle)] flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
         <div className="flex items-center gap-2">
           <Cpu className="w-4 h-4 text-[#ea580c]" />
-          <span className="font-semibold text-white uppercase tracking-wider">
+          <span className="font-semibold text-[var(--text-primary)] uppercase tracking-wider">
             Model Registry & Intelligence Router
           </span>
           <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#10b981]/15 text-[#10b981] font-bold">
@@ -72,8 +94,8 @@ export function ModelMarketplace({
             onClick={() => setActiveTab('catalog')}
             className={`px-2.5 py-1 rounded transition-colors cursor-pointer ${
               activeTab === 'catalog'
-                ? 'bg-[#ea580c] text-white font-semibold'
-                : 'bg-[#151920] text-[var(--text-secondary)] hover:bg-[#1d232c]'
+                ? 'bg-[#ea580c] text-white font-semibold shadow-xs'
+                : 'bg-[var(--bg-subtle)] text-[var(--text-secondary)] hover:bg-[var(--bg-active)] hover:text-[var(--text-primary)] border border-[var(--border-subtle)]'
             }`}
           >
             Catalog ({CURRENT_2026_MODELS.length})
@@ -83,8 +105,8 @@ export function ModelMarketplace({
             onClick={() => setActiveTab('router')}
             className={`px-2.5 py-1 rounded transition-colors cursor-pointer ${
               activeTab === 'router'
-                ? 'bg-[#ea580c] text-white font-semibold'
-                : 'bg-[#151920] text-[var(--text-secondary)] hover:bg-[#1d232c]'
+                ? 'bg-[#ea580c] text-white font-semibold shadow-xs'
+                : 'bg-[var(--bg-subtle)] text-[var(--text-secondary)] hover:bg-[var(--bg-active)] hover:text-[var(--text-primary)] border border-[var(--border-subtle)]'
             }`}
           >
             Router Simulator
@@ -94,8 +116,8 @@ export function ModelMarketplace({
             onClick={() => setActiveTab('compare')}
             className={`px-2.5 py-1 rounded transition-colors cursor-pointer ${
               activeTab === 'compare'
-                ? 'bg-[#ea580c] text-white font-semibold'
-                : 'bg-[#151920] text-[var(--text-secondary)] hover:bg-[#1d232c]'
+                ? 'bg-[#ea580c] text-white font-semibold shadow-xs'
+                : 'bg-[var(--bg-subtle)] text-[var(--text-secondary)] hover:bg-[var(--bg-active)] hover:text-[var(--text-primary)] border border-[var(--border-subtle)]'
             }`}
           >
             Compare
@@ -115,8 +137,8 @@ export function ModelMarketplace({
                   onClick={() => setActiveCategory(cat as any)}
                   className={`px-2 py-0.5 rounded transition-colors cursor-pointer ${
                     activeCategory === cat
-                      ? 'bg-[#222933] text-white font-semibold border border-[#333e4d]'
-                      : 'text-[var(--text-secondary)] hover:bg-[#151920]'
+                      ? 'bg-[var(--bg-active)] text-[var(--text-primary)] font-semibold border border-[var(--border-active)]'
+                      : 'text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)] hover:text-[var(--text-primary)]'
                   }`}
                 >
                   {cat}
@@ -135,14 +157,14 @@ export function ModelMarketplace({
                     key={model.id}
                     className={`p-4 rounded-lg border transition-all flex flex-col justify-between space-y-3 ${
                       isSelected
-                        ? 'bg-[#14181f] border-[#ea580c] ring-1 ring-[#ea580c]/30'
-                        : 'bg-[#101318] border-[#1f262f] hover:border-[#2d3744]'
+                        ? 'bg-[var(--bg-elevated)] border-[#ea580c] ring-1 ring-[#ea580c]/30'
+                        : 'bg-[var(--bg-canvas)] border-[var(--border-subtle)] hover:border-[var(--border-medium)]'
                     }`}
                   >
                     <div className="space-y-2.5">
                       <div className="flex items-start justify-between gap-2">
                         <div>
-                          <div className="font-bold text-white text-sm">{model.displayName}</div>
+                          <div className="font-bold text-[var(--text-primary)] text-sm">{model.displayName}</div>
                           <div className="text-[11px] text-[var(--text-muted)] mt-0.5">
                             {model.provider} · {model.license}
                           </div>
@@ -153,7 +175,7 @@ export function ModelMarketplace({
                             className={`text-[9px] px-1.5 py-0.2 rounded font-bold uppercase ${
                               model.accessType === 'FREE_HOSTED' || model.accessType === 'LOCAL'
                                 ? 'bg-[#10b981]/20 text-[#10b981]'
-                                : 'bg-[#ea580c]/20 text-[#f97316]'
+                                : 'bg-[#ea580c]/20 text-[#ea580c]'
                             }`}
                           >
                             {model.accessType.replace('_', ' ')}
@@ -166,7 +188,7 @@ export function ModelMarketplace({
                       </div>
 
                       {/* Capabilities pill row */}
-                      <div className="grid grid-cols-3 gap-1.5 p-2 rounded bg-[#0a0d10] border border-[#1b222a] text-[11px]">
+                      <div className="grid grid-cols-3 gap-1.5 p-2 rounded bg-[var(--bg-subtle)] border border-[var(--border-subtle)] text-[11px]">
                         <div>
                           <span className="text-[var(--text-muted)]">Coding: </span>
                           <span className="text-[#38bdf8] font-bold">{model.codingScore}</span>
@@ -177,14 +199,14 @@ export function ModelMarketplace({
                         </div>
                         <div>
                           <span className="text-[var(--text-muted)]">Context: </span>
-                          <span className="text-white">
+                          <span className="text-[var(--text-primary)] font-bold">
                             {(model.contextLength / 1000).toFixed(0)}k
                           </span>
                         </div>
                       </div>
 
                       {/* Why this model rationale */}
-                      <div className="p-2 rounded bg-[#0d1014] border border-[#1a2027] text-[11px] text-[var(--text-secondary)] font-sans leading-relaxed">
+                      <div className="p-2 rounded bg-[var(--bg-elevated)] border border-[var(--border-subtle)] text-[11px] text-[var(--text-secondary)] font-sans leading-relaxed">
                         <strong className="text-[var(--text-muted)] font-mono text-[10px] uppercase block mb-0.5">
                           Why This Model:
                         </strong>
@@ -202,14 +224,14 @@ export function ModelMarketplace({
                       )}
                     </div>
 
-                    <div className="pt-2 border-t border-[#1a2027]">
+                    <div className="pt-2 border-t border-[var(--border-subtle)]">
                       {entitlement.allowed ? (
                         <button
                           onClick={() => onSelectModel(model.id)}
                           className={`w-full py-1.5 rounded font-semibold text-xs transition-colors cursor-pointer ${
                             isSelected
-                              ? 'bg-[#ea580c] text-white'
-                              : 'bg-[#151920] hover:bg-[#1d232c] text-[var(--text-secondary)] hover:text-white border border-[#232b35]'
+                              ? 'bg-[#ea580c] text-white shadow-xs'
+                              : 'bg-[var(--bg-elevated)] hover:bg-[var(--bg-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-subtle)]'
                           }`}
                         >
                           {isSelected ? 'ACTIVE IN HARNESS' : 'SELECT MODEL'}
@@ -218,7 +240,7 @@ export function ModelMarketplace({
                         <div className="space-y-1.5">
                           <button
                             disabled
-                            className="w-full py-1.5 rounded bg-[#161a20] text-[var(--text-muted)] font-semibold text-xs border border-[#222933] cursor-not-allowed"
+                            className="w-full py-1.5 rounded bg-[var(--bg-subtle)] text-[var(--text-muted)] font-semibold text-xs border border-[var(--border-subtle)] cursor-not-allowed"
                           >
                             🔒 {model.minimumPlanRequired} TIER REQUIRED
                           </button>
@@ -237,12 +259,12 @@ export function ModelMarketplace({
 
         {activeTab === 'router' && (
           <div className="max-w-2xl mx-auto space-y-4 font-mono text-xs">
-            <div className="p-4 rounded-lg bg-[#111419] border border-[#202731] space-y-3">
-              <span className="font-bold text-white text-sm">
+            <div className="p-4 rounded-lg bg-[var(--bg-canvas)] border border-[var(--border-subtle)] space-y-3">
+              <span className="font-bold text-[var(--text-primary)] text-sm">
                 Evidence-Based Model Router
               </span>
               <p className="text-[var(--text-secondary)] font-sans text-xs leading-relaxed">
-                FORGE evaluates task complexity, expected AST file modifications, and context window requirements before dispatching to an agent model.
+                Parishram evaluates task complexity, expected AST file modifications, and context window requirements before dispatching to an agent model.
               </p>
 
               <div className="flex gap-2">
@@ -250,12 +272,12 @@ export function ModelMarketplace({
                   type="text"
                   value={taskQuery}
                   onChange={(e) => setTaskQuery(e.target.value)}
-                  className="flex-1 px-3 py-1.5 rounded bg-[#0a0d10] border border-[#222933] text-white outline-none focus:border-[#ea580c]"
+                  className="flex-1 px-3 py-1.5 rounded bg-[var(--bg-panel)] border border-[var(--border-subtle)] text-[var(--text-primary)] outline-none focus:border-[#ea580c]"
                   placeholder="Task query to classify..."
                 />
                 <button
                   onClick={handleTestRoute}
-                  className="px-4 py-1.5 rounded bg-[#ea580c] hover:bg-[#f97316] text-white font-semibold cursor-pointer"
+                  className="px-4 py-1.5 rounded bg-[#ea580c] hover:bg-[#f97316] text-white font-semibold cursor-pointer shadow-xs active:scale-[0.98]"
                 >
                   ROUTE
                 </button>
@@ -263,13 +285,13 @@ export function ModelMarketplace({
             </div>
 
             {/* Decision report */}
-            <div className="p-4 rounded-lg bg-[#101318] border border-[#202731] space-y-3">
+            <div className="p-4 rounded-lg bg-[var(--bg-canvas)] border border-[var(--border-subtle)] space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="px-2 py-0.5 rounded bg-[#ea580c]/20 text-[#f97316] font-bold">
+                  <span className="px-2 py-0.5 rounded bg-[#ea580c]/20 text-[#ea580c] font-bold">
                     SELECTED MODEL
                   </span>
-                  <span className="text-white font-bold text-sm">
+                  <span className="text-[var(--text-primary)] font-bold text-sm">
                     {simulatedRouting.selectedModel.displayName}
                   </span>
                 </div>
@@ -279,25 +301,25 @@ export function ModelMarketplace({
                 </span>
               </div>
 
-              <div className="p-3 rounded bg-[#0a0d10] border border-[#1a2027] text-[var(--text-secondary)] font-sans text-xs leading-relaxed">
-                <strong className="text-white font-mono">Why this model? </strong>
+              <div className="p-3 rounded bg-[var(--bg-subtle)] border border-[var(--border-subtle)] text-[var(--text-secondary)] font-sans text-xs leading-relaxed">
+                <strong className="text-[var(--text-primary)] font-mono">Why this model? </strong>
                 {simulatedRouting.reasoning}
               </div>
 
               <div className="grid grid-cols-3 gap-2 text-xs">
-                <div className="p-2.5 rounded bg-[#13171d] border border-[#1e252e]">
+                <div className="p-2.5 rounded bg-[var(--bg-elevated)] border border-[var(--border-subtle)]">
                   <span className="text-[var(--text-muted)] text-[10px]">COMPLEXITY:</span>
-                  <div className="text-white font-bold">{simulatedRouting.taskComplexity}</div>
+                  <div className="text-[var(--text-primary)] font-bold">{simulatedRouting.taskComplexity}</div>
                 </div>
-                <div className="p-2.5 rounded bg-[#13171d] border border-[#1e252e]">
+                <div className="p-2.5 rounded bg-[var(--bg-elevated)] border border-[var(--border-subtle)]">
                   <span className="text-[var(--text-muted)] text-[10px]">CONTEXT REQ:</span>
-                  <div className="text-white font-bold">
+                  <div className="text-[var(--text-primary)] font-bold">
                     {simulatedRouting.contextRequiredTokens.toLocaleString()} tokens
                   </div>
                 </div>
-                <div className="p-2.5 rounded bg-[#13171d] border border-[#1e252e]">
+                <div className="p-2.5 rounded bg-[var(--bg-elevated)] border border-[var(--border-subtle)]">
                   <span className="text-[var(--text-muted)] text-[10px]">TOOL INTENSITY:</span>
-                  <div className="text-white font-bold">{simulatedRouting.toolUsageIntensity}</div>
+                  <div className="text-[var(--text-primary)] font-bold">{simulatedRouting.toolUsageIntensity}</div>
                 </div>
               </div>
             </div>
@@ -306,9 +328,9 @@ export function ModelMarketplace({
 
         {activeTab === 'compare' && (
           <div className="space-y-4 font-mono text-xs overflow-x-auto">
-            <table className="w-full border-collapse border border-[#1f262f] text-left">
+            <table className="w-full border-collapse border border-[var(--border-subtle)] text-left">
               <thead>
-                <tr className="bg-[#111419] text-[var(--text-muted)] border-b border-[#1f262f]">
+                <tr className="bg-[var(--bg-elevated)] text-[var(--text-muted)] border-b border-[var(--border-subtle)]">
                   <th className="p-2.5">Model</th>
                   <th className="p-2.5">Provider</th>
                   <th className="p-2.5">Coding</th>
@@ -323,17 +345,17 @@ export function ModelMarketplace({
                 {CURRENT_2026_MODELS.map((m) => (
                   <tr
                     key={m.id}
-                    className="border-b border-[#1a2027] hover:bg-[#12161c] text-[var(--text-secondary)]"
+                    className="border-b border-[var(--border-subtle)] hover:bg-[var(--bg-subtle)] text-[var(--text-secondary)] transition-colors"
                   >
-                    <td className="p-2.5 font-bold text-white">{m.displayName}</td>
+                    <td className="p-2.5 font-bold text-[var(--text-primary)]">{m.displayName}</td>
                     <td className="p-2.5">{m.provider}</td>
                     <td className="p-2.5 text-[#38bdf8] font-bold">{m.codingScore}</td>
                     <td className="p-2.5 text-[#a78bfa] font-bold">{m.reasoningScore}</td>
                     <td className="p-2.5 text-[#10b981] font-bold">{m.agentScore}</td>
-                    <td className="p-2.5 text-white">{(m.contextLength / 1000).toFixed(0)}k</td>
+                    <td className="p-2.5 text-[var(--text-primary)]">{(m.contextLength / 1000).toFixed(0)}k</td>
                     <td className="p-2.5 text-[var(--text-muted)]">{m.license}</td>
                     <td className="p-2.5">
-                      <span className="px-1.5 py-0.5 rounded bg-[#1b222b] text-white text-[10px]">
+                      <span className="px-1.5 py-0.5 rounded bg-[var(--bg-elevated)] border border-[var(--border-subtle)] text-[var(--text-primary)] text-[10px]">
                         {m.accessType}
                       </span>
                     </td>

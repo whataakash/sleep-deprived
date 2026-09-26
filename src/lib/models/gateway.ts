@@ -428,3 +428,5 @@ export class ModelRouter {
     return CURRENT_2026_MODELS.find((m) => m.id === id) || CURRENT_2026_MODELS[0];
   }
 }
+
+export type { ModelCategory, DynamicCodingModel, DynamicCodingModel as ModelManifest };

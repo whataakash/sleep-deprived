@@ -501,3 +501,17 @@ export const MOCK_WHY_THIS_FILE: Record<string, WhyThisFile> = {
     referencedByFailingTests: ['tests/integration/auth.test.ts:38'],
   },
 };
+
+export function findFileContent(path: string): string {
+  function search(files: RepoFile[]): string | undefined {
+    for (const f of files) {
+      if (f.path === path && f.content) return f.content;
+      if (f.children) {
+        const found = search(f.children);
+        if (found) return found;
+      }
+    }
+    return undefined;
+  }
+  return search(MOCK_REPO_FILES) || '// File content not loaded or unavailable';
+}

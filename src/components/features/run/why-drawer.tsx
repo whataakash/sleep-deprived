@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { MOCK_WHY_THIS_FILE } from '@/lib/repository/mock-repo';
-import { HelpCircle, FileCode, Cpu, TestTube, RotateCcw, X, CheckCircle2 } from 'lucide-react';
+import { HelpCircle, FileCode, Cpu, TestTube, RotateCcw, X } from 'lucide-react';
 
 interface WhyDrawerProps {
   filePath?: string;
@@ -13,11 +13,11 @@ export function WhyDrawer({ filePath = 'src/auth/client.ts', onClose }: WhyDrawe
   const fileExplain = MOCK_WHY_THIS_FILE[filePath] || MOCK_WHY_THIS_FILE['src/auth/client.ts'];
 
   return (
-    <div className="w-full bg-[#12161c] border-t border-[#232a32] p-4 font-mono text-xs select-none">
-      <div className="flex items-center justify-between pb-3 border-b border-[#232a32]">
+    <div className="w-full bg-[var(--bg-panel)] border-t border-[var(--border-subtle)] p-4 font-mono text-xs select-none transition-colors">
+      <div className="flex items-center justify-between pb-3 border-b border-[var(--border-subtle)]">
         <div className="flex items-center gap-2">
           <HelpCircle className="w-4 h-4 text-[#ea580c]" />
-          <span className="font-bold text-white uppercase tracking-wider">
+          <span className="font-bold text-[var(--text-primary)] uppercase tracking-wider">
             Explainable Autonomous Reasoning: &ldquo;Why?&rdquo;
           </span>
           <span className="text-[11px] text-[var(--text-muted)]">
@@ -27,7 +27,7 @@ export function WhyDrawer({ filePath = 'src/auth/client.ts', onClose }: WhyDrawe
 
         <button
           onClick={onClose}
-          className="p-1 rounded hover:bg-[#1a2027] text-[var(--text-muted)] hover:text-white transition-colors cursor-pointer"
+          className="p-1 rounded hover:bg-[var(--bg-subtle)] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
         >
           <X className="w-4 h-4" />
         </button>
@@ -35,7 +35,7 @@ export function WhyDrawer({ filePath = 'src/auth/client.ts', onClose }: WhyDrawe
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-4">
         {/* Why this file? */}
-        <div className="p-3.5 rounded bg-[#161b22] border border-[#252d37] space-y-2">
+        <div className="p-3.5 rounded bg-[var(--bg-canvas)] border border-[var(--border-subtle)] space-y-2">
           <div className="flex items-center gap-2 text-[#38bdf8] font-bold">
             <FileCode className="w-4 h-4" />
             <span>Why This File? ({fileExplain.filePath})</span>
@@ -56,7 +56,7 @@ export function WhyDrawer({ filePath = 'src/auth/client.ts', onClose }: WhyDrawe
         </div>
 
         {/* Why this model? */}
-        <div className="p-3.5 rounded bg-[#161b22] border border-[#252d37] space-y-2">
+        <div className="p-3.5 rounded bg-[var(--bg-canvas)] border border-[var(--border-subtle)] space-y-2">
           <div className="flex items-center gap-2 text-[#ea580c] font-bold">
             <Cpu className="w-4 h-4" />
             <span>Why This Model? (Kimi K2 Agentic)</span>
@@ -73,7 +73,7 @@ export function WhyDrawer({ filePath = 'src/auth/client.ts', onClose }: WhyDrawe
             </li>
             <li className="flex items-center justify-between">
               <span>Context Size:</span>
-              <span className="font-mono text-white">42,800 tokens</span>
+              <span className="font-mono text-[var(--text-primary)] font-bold">42,800 tokens</span>
             </li>
             <li className="flex items-center justify-between">
               <span>Tool Call Intensity:</span>
@@ -87,7 +87,7 @@ export function WhyDrawer({ filePath = 'src/auth/client.ts', onClose }: WhyDrawe
         </div>
 
         {/* Why this test? */}
-        <div className="p-3.5 rounded bg-[#161b22] border border-[#252d37] space-y-2">
+        <div className="p-3.5 rounded bg-[var(--bg-canvas)] border border-[var(--border-subtle)] space-y-2">
           <div className="flex items-center gap-2 text-[#a78bfa] font-bold">
             <TestTube className="w-4 h-4" />
             <span>Why This Test? (auth.integration.test.ts)</span>
@@ -97,23 +97,23 @@ export function WhyDrawer({ filePath = 'src/auth/client.ts', onClose }: WhyDrawe
             Targeted test execution strategy covers the exact modified AST execution path (<code className="text-[#38bdf8]">fetchWithAuth</code>).
           </p>
 
-          <div className="p-2 rounded bg-[#0f1318] border border-[#1f2630] text-[11px] text-[#10b981]">
+          <div className="p-2 rounded bg-[var(--code-bg)] border border-[var(--border-subtle)] text-[11px] text-[#10b981]">
             ✓ Avoids running redundant suites before targeted patch passes.
           </div>
         </div>
 
         {/* Why did the agent retry? */}
-        <div className="p-3.5 rounded bg-[#161b22] border border-[#252d37] space-y-2">
+        <div className="p-3.5 rounded bg-[var(--bg-canvas)] border border-[var(--border-subtle)] space-y-2">
           <div className="flex items-center gap-2 text-[#f59e0b] font-bold">
             <RotateCcw className="w-4 h-4" />
             <span>Why Did The Agent Retry?</span>
           </div>
 
           <p className="text-[11px] text-[var(--text-secondary)] font-sans leading-relaxed">
-            Previous failure was classified as <strong className="text-white">TEST_FAILURE</strong> (HTTP 401), not an environment or hardware outage.
+            Previous failure was classified as <strong className="text-[var(--text-primary)]">TEST_FAILURE</strong> (HTTP 401), not an environment or hardware outage.
           </p>
 
-          <div className="p-2 rounded bg-[#0f1318] border border-[#1f2630] text-[11px] text-[#f59e0b]">
+          <div className="p-2 rounded bg-[var(--code-bg)] border border-[var(--border-subtle)] text-[11px] text-[#f59e0b]">
             Fingerprint: AUTH-401-TOKEN-MISSING. Matched proven recovery tactic.
           </div>
         </div>

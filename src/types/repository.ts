@@ -18,6 +18,8 @@ export interface SymbolDefinition {
   exported: boolean;
 }
 
+export type ASTSymbol = SymbolDefinition;
+
 export interface WhyThisFile {
   filePath: string;
   relevanceScore: number; // 0 - 100

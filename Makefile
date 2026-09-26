@@ -25,14 +25,14 @@ help:
 
 # 1. SETUP: Clean installation and project compilation
 setup:
-	@echo "==> Setting up FORGE dependencies..."
+	@echo "==> Setting up परिश्रम dependencies..."
 	npm ci || npm install
-	@echo "==> Compiling FORGE Next.js production build..."
+	@echo "==> Compiling परिश्रम Next.js production build..."
 	npm run build
 
-# 2. RUN: Start FORGE server in evaluation or product mode
+# 2. RUN: Start परिश्रम server in evaluation or product mode
 run:
-	@echo "==> Starting FORGE Harness (AI_API_KEY: $${AI_API_KEY:0:4}...$${AI_API_KEY: -4})..."
+	@echo "==> Starting परिश्रम Harness (AI_API_KEY: $${AI_API_KEY:0:4}...$${AI_API_KEY: -4})..."
 	@if [ -d ".next" ]; then \
 		npm run start; \
 	else \

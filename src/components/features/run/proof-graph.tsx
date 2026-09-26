@@ -45,9 +45,9 @@ export function ProofGraph({ nodes, edges, onSelectNode }: ProofGraphProps) {
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-[#0e1115] border border-[#232a32] rounded overflow-hidden">
+    <div className="flex-1 flex flex-col bg-[var(--bg-panel)] border border-[var(--border-subtle)] rounded-lg overflow-hidden transition-colors">
       {/* Header */}
-      <div className="p-3 bg-[#13171d] border-b border-[#232a32] flex items-center justify-between">
+      <div className="p-3 bg-[var(--bg-elevated)] border-b border-[var(--border-subtle)] flex items-center justify-between">
         <div className="space-y-0.5">
           <div className="flex items-center gap-2">
             <span className="text-xs font-semibold text-[var(--text-primary)] uppercase tracking-wider font-mono">
@@ -64,7 +64,7 @@ export function ProofGraph({ nodes, edges, onSelectNode }: ProofGraphProps) {
       </div>
 
       {/* Graph Visual Pipeline */}
-      <div className="p-6 bg-[#090b0e] overflow-x-auto">
+      <div className="p-6 bg-[var(--bg-canvas)] overflow-x-auto">
         <div className="flex items-center justify-between min-w-[780px] relative py-4">
           {nodes.map((node, index) => {
             const isSelected = node.id === selectedNodeId;
@@ -80,18 +80,18 @@ export function ProofGraph({ nodes, edges, onSelectNode }: ProofGraphProps) {
                   }}
                   className={`flex flex-col items-center p-3 rounded-lg border text-left transition-all duration-200 cursor-pointer w-32 shrink-0 ${
                     isSelected
-                      ? 'bg-[#182029] border-[#ea580c] ring-2 ring-[#ea580c]/30 shadow-lg scale-105'
-                      : 'bg-[#12161c] border-[#252d36] hover:border-[#384554]'
+                      ? 'bg-[var(--bg-elevated)] border-[#ea580c] ring-2 ring-[#ea580c]/30 shadow-md scale-105'
+                      : 'bg-[var(--bg-panel)] border-[var(--border-subtle)] hover:border-[var(--border-medium)]'
                   }`}
                 >
-                  <div className="w-8 h-8 rounded-full bg-[#181d24] border border-[#28323e] flex items-center justify-center mb-2">
+                  <div className="w-8 h-8 rounded-full bg-[var(--bg-subtle)] border border-[var(--border-subtle)] flex items-center justify-center mb-2">
                     {getNodeIcon(node.type)}
                   </div>
 
                   <span className="text-[10px] font-mono uppercase text-[var(--text-muted)] tracking-wider">
                     {node.type}
                   </span>
-                  <span className="text-xs font-semibold text-white text-center truncate w-full mt-0.5">
+                  <span className="text-xs font-semibold text-[var(--text-primary)] text-center truncate w-full mt-0.5">
                     {node.label}
                   </span>
                   <span className="text-[10px] text-[var(--text-muted)] text-center truncate w-full">
@@ -119,7 +119,7 @@ export function ProofGraph({ nodes, edges, onSelectNode }: ProofGraphProps) {
       </div>
 
       {/* Selected Node Details Drawer */}
-      <div className="p-4 bg-[#111418] border-t border-[#232a32] flex-1">
+      <div className="p-4 bg-[var(--bg-elevated)] border-t border-[var(--border-subtle)] flex-1">
         <div className="flex items-center gap-2 mb-2">
           <Info className="w-4 h-4 text-[#38bdf8]" />
           <span className="text-xs font-mono font-bold text-[var(--text-primary)] uppercase">
@@ -128,19 +128,19 @@ export function ProofGraph({ nodes, edges, onSelectNode }: ProofGraphProps) {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 font-mono text-xs">
-          <div className="p-3 rounded bg-[#161b22] border border-[#252d37] space-y-1">
+          <div className="p-3 rounded bg-[var(--bg-canvas)] border border-[var(--border-subtle)] space-y-1">
             <span className="text-[11px] text-[var(--text-muted)]">NODE TYPE:</span>
-            <div className="text-sm font-semibold text-white capitalize">{selectedNode.type}</div>
+            <div className="text-sm font-semibold text-[var(--text-primary)] capitalize">{selectedNode.type}</div>
             <div className="text-[11px] text-[var(--text-secondary)]">{selectedNode.sublabel}</div>
           </div>
 
-          <div className="p-3 rounded bg-[#161b22] border border-[#252d37] space-y-1">
+          <div className="p-3 rounded bg-[var(--bg-canvas)] border border-[var(--border-subtle)] space-y-1">
             <span className="text-[11px] text-[var(--text-muted)]">GROUND TRUTH EVIDENCE:</span>
             <div className="text-sm font-semibold text-[#10b981]">Deterministic Verified</div>
             <div className="text-[11px] text-[var(--text-secondary)]">Zero speculative inferences</div>
           </div>
 
-          <div className="p-3 rounded bg-[#161b22] border border-[#252d37] space-y-1">
+          <div className="p-3 rounded bg-[var(--bg-canvas)] border border-[var(--border-subtle)] space-y-1">
             <span className="text-[11px] text-[var(--text-muted)]">LINKED EDGE:</span>
             <div className="text-sm font-semibold text-[#ea580c]">
               Causal dependency confirmed

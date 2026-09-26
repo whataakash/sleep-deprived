@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Terminal, Copy, Check, ChevronUp, ChevronDown, Trash2 } from 'lucide-react';
+import { Terminal, Copy, Check, ChevronUp, ChevronDown } from 'lucide-react';
 
 interface TerminalDrawerProps {
   customSnippet?: string;
@@ -63,7 +63,7 @@ diff --git a/src/auth/client.ts b/src/auth/client.ts
 -    const headers = options.headers || {};
 +    const headers = new Headers(options.headers || {});
 +    
-+    // FIX APPLIED BY FORGE: Forward active session token
++    // FIX APPLIED BY PARISHRAM: Forward active session token
 +    if (this.currentSession && this.currentSession.token) {
 +      headers.set('Authorization', \`Bearer \${this.currentSession.token}\`);
 +      headers.set('X-Session-ID', this.currentSession.id);
@@ -79,16 +79,16 @@ diff --git a/src/auth/client.ts b/src/auth/client.ts
   };
 
   return (
-    <div className="w-full bg-[#0a0d10] border-t border-[#232a32] flex flex-col font-mono text-xs select-none z-10">
+    <div className="w-full bg-[var(--bg-canvas)] border-t border-[var(--border-subtle)] flex flex-col font-mono text-xs select-none z-10 transition-colors">
       {/* Header bar */}
-      <div className="px-4 py-2 bg-[#0e1217] flex items-center justify-between border-b border-[#1f2630]">
+      <div className="px-4 py-2 bg-[var(--bg-elevated)] flex items-center justify-between border-b border-[var(--border-subtle)]">
         <div className="flex items-center gap-3">
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="flex items-center gap-1.5 text-xs text-[var(--text-secondary)] hover:text-white transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
           >
             <Terminal className="w-4 h-4 text-[#ea580c]" />
-            <span className="font-semibold text-white">SANDBOX TERMINAL</span>
+            <span className="font-semibold text-[var(--text-primary)]">SANDBOX TERMINAL</span>
             {isOpen ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronUp className="w-3.5 h-3.5" />}
           </button>
 
@@ -100,8 +100,8 @@ diff --git a/src/auth/client.ts b/src/auth/client.ts
                   onClick={() => setActiveTab(tab)}
                   className={`px-2 py-0.5 rounded text-[11px] capitalize transition-colors cursor-pointer ${
                     activeTab === tab
-                      ? 'bg-[#1e2530] text-[#ea580c] font-semibold border border-[#2d3744]'
-                      : 'text-[var(--text-muted)] hover:text-white'
+                      ? 'bg-[var(--bg-active)] text-[#ea580c] font-semibold border border-[var(--border-active)]'
+                      : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
                   }`}
                 >
                   {tab}
@@ -116,7 +116,7 @@ diff --git a/src/auth/client.ts b/src/auth/client.ts
             <span className="text-[10px] text-[var(--text-muted)]">Container: isolated-microvm #89</span>
             <button
               onClick={handleCopy}
-              className="flex items-center gap-1 px-2 py-0.5 rounded bg-[#161c24] hover:bg-[#202732] text-[var(--text-muted)] hover:text-white transition-colors cursor-pointer text-[10px]"
+              className="flex items-center gap-1 px-2 py-0.5 rounded bg-[var(--bg-subtle)] hover:bg-[var(--bg-active)] border border-[var(--border-subtle)] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors cursor-pointer text-[10px]"
             >
               {copied ? <Check className="w-3 h-3 text-[#10b981]" /> : <Copy className="w-3 h-3" />}
               <span>{copied ? 'Copied' : 'Copy'}</span>
@@ -127,7 +127,7 @@ diff --git a/src/auth/client.ts b/src/auth/client.ts
 
       {/* Terminal Body */}
       {isOpen && (
-        <div className="h-44 overflow-y-auto p-3 bg-[#080a0c] text-[var(--text-secondary)] font-mono text-xs select-text">
+        <div className="h-44 overflow-y-auto p-3 bg-[var(--code-bg)] text-[var(--text-secondary)] font-mono text-xs select-text">
           <pre className="whitespace-pre">{currentText}</pre>
         </div>
       )}

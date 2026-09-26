@@ -103,21 +103,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  // Sync theme with document class
+  // Sync theme with document class with reactive system preference listener
   useEffect(() => {
-    if (typeof document !== 'undefined') {
-      const theme = user?.preferences?.theme || 'dark';
+    if (typeof document === 'undefined') return;
+
+    const theme = user?.preferences?.theme || 'dark';
+
+    const applyTheme = () => {
       if (theme === 'light') {
         document.documentElement.classList.add('light');
         document.documentElement.classList.remove('dark');
+        document.documentElement.setAttribute('data-theme', 'light');
       } else if (theme === 'dark') {
         document.documentElement.classList.add('dark');
         document.documentElement.classList.remove('light');
+        document.documentElement.setAttribute('data-theme', 'dark');
       } else {
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        // System preference
+        const media = window.matchMedia('(prefers-color-scheme: dark)');
+        const prefersDark = media.matches;
         document.documentElement.classList.toggle('dark', prefersDark);
         document.documentElement.classList.toggle('light', !prefersDark);
+        document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
       }
+    };
+
+    applyTheme();
+
+    if (theme === 'system') {
+      const media = window.matchMedia('(prefers-color-scheme: dark)');
+      const listener = () => applyTheme();
+      media.addEventListener('change', listener);
+      return () => media.removeEventListener('change', listener);
     }
   }, [user?.preferences?.theme]);
 
@@ -125,8 +142,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(u);
     try {
       if (u) {
+        localStorage.setItem('parishram_user_profile', JSON.stringify(u));
         localStorage.setItem('forge_user_profile', JSON.stringify(u));
       } else {
+        localStorage.removeItem('parishram_user_profile');
         localStorage.removeItem('forge_user_profile');
       }
     } catch (e) {

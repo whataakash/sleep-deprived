@@ -32,4 +32,7 @@ export interface HarnessEvaluationMetrics {
   contextEfficiencyRate: number;    // e.g. 88.5%
   totalTestsRun: number;
   totalTestsPassed: number;
+  avgTokenCostUsd?: number;
+  avgRecoveryAttemptsToFix?: number;
+  deterministicVerificationPassRate?: number;
 }
