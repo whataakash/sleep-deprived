@@ -9,14 +9,14 @@ import { DiffViewer } from './diff-viewer';
 import { RecoveryTrace } from './recovery-trace';
 import { GlassBoxTimeline } from './glass-box-timeline';
 import { TerminalDrawer } from './terminal-drawer';
-import { WhyDrawer } from './why-drawer';
 import { TaskContractPanel } from './task-contract-panel';
 import { ScopeSecurityPanel } from './scope-security-panel';
 import { RegressionPanel } from './regression-panel';
 import { CheckpointsPanel } from './checkpoints-panel';
 import { BranchingPanel } from './branching-panel';
 import { DocsPanel } from './docs-panel';
-import { ApprovalModal } from './approval-modal';
+import { ApprovalGatePanel } from './approval-gate-panel';
+import { WhyPanel } from './why-panel';
 import { MultiAgentSystem } from '@/lib/agent/multi-agent-system';
 import { StuckAgentDetector } from '@/lib/agent/stuck-detector';
 
@@ -36,6 +36,7 @@ import {
   ListChecks,
   Activity,
   AlertTriangle,
+  ArrowRight,
 } from 'lucide-react';
 
 interface RunViewProps {
@@ -49,16 +50,19 @@ interface RunViewProps {
 }
 
 export type RunViewTab =
-  | 'proof'
+  | 'timeline'
   | 'diff'
   | 'recovery'
   | 'contract'
+  | 'proof'
+  | 'evidence-graph'
+  | 'approval-gate'
+  | 'why'
   | 'scope-security'
   | 'regression'
   | 'checkpoints'
   | 'branching'
-  | 'docs'
-  | 'timeline';
+  | 'docs';
 
 export function RunView({
   run,
@@ -69,10 +73,7 @@ export function RunView({
   proof,
   onOpenWhyFile,
 }: RunViewProps) {
-  const [activeTab, setActiveTab] = useState<RunViewTab>('diff');
-  const [showProofGraphModal, setShowProofGraphModal] = useState(false);
-  const [showWhyModal, setShowWhyModal] = useState(false);
-  const [showApprovalModal, setShowApprovalModal] = useState(false);
+  const [activeTab, setActiveTab] = useState<RunViewTab>('timeline');
   const [whyTargetFile, setWhyTargetFile] = useState('src/auth/client.ts');
   const [customTerminalLog, setCustomTerminalLog] = useState<string | undefined>(undefined);
 
@@ -112,33 +113,11 @@ export function RunView({
           </span>
         </div>
 
-        {/* Global Action Modals (Proof Graph, Approval Gate, Why?) */}
-        <div className="flex items-center gap-1.5">
-          <button
-            onClick={() => setShowApprovalModal(true)}
-            className="flex items-center gap-1 px-2.5 py-1 rounded bg-[var(--bg-panel)] hover:bg-[var(--bg-subtle)] text-[#ea580c] border border-[#ea580c]/30 text-[11px] transition-colors cursor-pointer"
-            title="Inspect human permission gates for sensitive actions"
-          >
-            <ShieldAlert className="w-3.5 h-3.5" />
-            <span>Approval Gate</span>
-          </button>
-
-          <button
-            onClick={() => setShowProofGraphModal(true)}
-            className="flex items-center gap-1 px-2.5 py-1 rounded bg-[var(--bg-panel)] hover:bg-[var(--bg-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-subtle)] text-[11px] transition-colors cursor-pointer"
-          >
-            <Layers className="w-3.5 h-3.5 text-[#10b981]" />
-            <span>Evidence Graph</span>
-          </button>
-
-          <button
-            onClick={() => setShowWhyModal(true)}
-            className="flex items-center gap-1 px-2.5 py-1 rounded bg-[var(--bg-panel)] hover:bg-[var(--bg-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-subtle)] text-[11px] transition-colors cursor-pointer"
-            title="Explain autonomous choices"
-          >
-            <HelpCircle className="w-3.5 h-3.5 text-[#38bdf8]" />
-            <span>Why?</span>
-          </button>
+        {/* Status Indicators in Header */}
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] text-[var(--text-muted)] font-mono">
+            Proof: 100% · Invariants: 4/4 · Regressions: 0
+          </span>
         </div>
       </div>
 
@@ -171,8 +150,121 @@ export function RunView({
         </div>
       </div>
 
+      {/* DEDICATED GOVERNANCE, EVIDENCE & REASONING SECTION */}
+      <div className="px-3 py-2.5 bg-[var(--bg-panel)] border-b border-[var(--border-subtle)] font-mono text-xs select-none">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] font-bold text-[var(--text-primary)] uppercase tracking-wider">
+              Governance, Evidence & Decision Intelligence
+            </span>
+            <span className="text-[10px] px-1.5 py-0.2 rounded bg-[var(--bg-subtle)] text-[var(--text-muted)] border border-[var(--border-subtle)]">
+              Auditable Controls
+            </span>
+          </div>
+          <span className="text-[10px] text-[var(--text-muted)] hidden sm:inline">
+            Directly select a safety or evidence view below:
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+          {/* Card 1: Evidence Graph */}
+          <button
+            type="button"
+            onClick={() => setActiveTab('evidence-graph')}
+            className={`p-3 rounded-lg border text-left transition-all cursor-pointer flex flex-col justify-between ${
+              activeTab === 'evidence-graph'
+                ? 'bg-[var(--bg-elevated)] border-[#10b981] ring-1 ring-[#10b981]/30 shadow-xs'
+                : 'bg-[var(--bg-canvas)] border-[var(--border-subtle)] hover:border-[#10b981]/50 hover:bg-[var(--bg-elevated)]'
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5 font-bold text-xs text-[var(--text-primary)]">
+                <Layers className="w-4 h-4 text-[#10b981]" />
+                <span>Evidence Graph</span>
+              </div>
+              <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#10b981]/15 text-[#10b981] font-bold">
+                14 NODES
+              </span>
+            </div>
+            <div className="text-[11px] text-[var(--text-secondary)] font-sans mt-1 line-clamp-1">
+              Causal DAG traceability from task intake to proof verification
+            </div>
+            <div className="mt-2 text-[10px] text-[#10b981] font-semibold flex items-center gap-1">
+              <span>Inspect Proof Graph →</span>
+            </div>
+          </button>
+
+          {/* Card 2: Human Approval Gate */}
+          <button
+            type="button"
+            onClick={() => setActiveTab('approval-gate')}
+            className={`p-3 rounded-lg border text-left transition-all cursor-pointer flex flex-col justify-between ${
+              activeTab === 'approval-gate'
+                ? 'bg-[var(--bg-elevated)] border-[#ea580c] ring-1 ring-[#ea580c]/30 shadow-xs'
+                : 'bg-[var(--bg-canvas)] border-[var(--border-subtle)] hover:border-[#ea580c]/50 hover:bg-[var(--bg-elevated)]'
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5 font-bold text-xs text-[var(--text-primary)]">
+                <ShieldAlert className="w-4 h-4 text-[#ea580c]" />
+                <span>Approval Gate</span>
+              </div>
+              <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#ea580c]/20 text-[#ea580c] font-bold animate-pulse">
+                1 PENDING
+              </span>
+            </div>
+            <div className="text-[11px] text-[var(--text-secondary)] font-sans mt-1 line-clamp-1">
+              Supervisor halted 1 high-risk production action for authorization
+            </div>
+            <div className="mt-2 text-[10px] text-[#ea580c] font-semibold flex items-center gap-1">
+              <span>Review Gate Decision →</span>
+            </div>
+          </button>
+
+          {/* Card 3: Why? Reasoning */}
+          <button
+            type="button"
+            onClick={() => setActiveTab('why')}
+            className={`p-3 rounded-lg border text-left transition-all cursor-pointer flex flex-col justify-between ${
+              activeTab === 'why'
+                ? 'bg-[var(--bg-elevated)] border-[#38bdf8] ring-1 ring-[#38bdf8]/30 shadow-xs'
+                : 'bg-[var(--bg-canvas)] border-[var(--border-subtle)] hover:border-[#38bdf8]/50 hover:bg-[var(--bg-elevated)]'
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5 font-bold text-xs text-[var(--text-primary)]">
+                <HelpCircle className="w-4 h-4 text-[#38bdf8]" />
+                <span>Why? Reasoning</span>
+              </div>
+              <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#38bdf8]/15 text-[#38bdf8] font-bold">
+                EXPLAINABLE
+              </span>
+            </div>
+            <div className="text-[11px] text-[var(--text-secondary)] font-sans mt-1 line-clamp-1">
+              Autonomous AST selection & model router rationale
+            </div>
+            <div className="mt-2 text-[10px] text-[#38bdf8] font-semibold flex items-center gap-1">
+              <span>Explain Autonomous Choices →</span>
+            </div>
+          </button>
+        </div>
+      </div>
+
       {/* SEGMENTED NAVIGATION TABS */}
       <div className="px-3 py-2 bg-[var(--bg-panel)] border-b border-[var(--border-subtle)] flex flex-wrap items-center gap-1.5 font-mono text-xs select-none">
+        {/* EXECUTION & OBSERVABILITY */}
+        <button
+          onClick={() => setActiveTab('timeline')}
+          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md transition-colors cursor-pointer shrink-0 text-xs ${
+            activeTab === 'timeline'
+              ? 'bg-[#ea580c] text-white font-bold shadow-xs'
+              : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] border border-transparent'
+          }`}
+        >
+          <Terminal className="w-3.5 h-3.5 text-[#ea580c]" />
+          <span>Glass Box</span>
+        </button>
+
         <button
           onClick={() => setActiveTab('diff')}
           className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md transition-colors cursor-pointer shrink-0 text-xs ${
@@ -210,20 +302,6 @@ export function RunView({
         </button>
 
         <button
-          onClick={() => setActiveTab('timeline')}
-          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md transition-colors cursor-pointer shrink-0 text-xs ${
-            activeTab === 'timeline'
-              ? 'bg-[#ea580c] text-white font-bold shadow-xs'
-              : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] border border-transparent'
-          }`}
-        >
-          <Terminal className="w-3.5 h-3.5 text-[#ea580c]" />
-          <span>Glass Box</span>
-        </button>
-
-        <div className="h-3.5 w-[1px] bg-[var(--border-subtle)] mx-0.5 hidden sm:block shrink-0" />
-
-        <button
           onClick={() => setActiveTab('proof')}
           className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md transition-colors cursor-pointer shrink-0 text-xs ${
             activeTab === 'proof'
@@ -234,6 +312,8 @@ export function RunView({
           <ShieldCheck className="w-3.5 h-3.5 text-[#10b981]" />
           <span>Proof of Work</span>
         </button>
+
+        <div className="h-3.5 w-[1px] bg-[var(--border-subtle)] mx-0.5 hidden sm:block shrink-0" />
 
         <button
           onClick={() => setActiveTab('scope-security')}
@@ -298,17 +378,24 @@ export function RunView({
 
       {/* MAIN WORKSPACE CONTENT */}
       <div className="flex-1 flex overflow-hidden">
-        {activeTab === 'proof' && (
-          <ProofPanel
-            proof={proof}
+        {/* Glass Box Execution Timeline */}
+        {activeTab === 'timeline' && (
+          <GlassBoxTimeline
+            events={run.events.slice(0, currentEventIndex + 1)}
+            toolCalls={run.toolCalls}
+            onOpenWhyFile={(file) => {
+              setWhyTargetFile(file);
+              setActiveTab('why');
+            }}
             onOpenDiff={() => setActiveTab('diff')}
-            onOpenProofGraph={() => setShowProofGraphModal(true)}
-            onOpenTerminalSnippet={(snippet) => setCustomTerminalLog(snippet)}
+            onOpenProof={() => setActiveTab('proof')}
           />
         )}
 
-        {activeTab === 'diff' && <DiffViewer onBackToRun={() => setActiveTab('proof')} />}
+        {/* Diff Viewer (Changes) */}
+        {activeTab === 'diff' && <DiffViewer onBackToRun={() => setActiveTab('timeline')} />}
 
+        {/* Recovery Trace */}
         {activeTab === 'recovery' && (
           <RecoveryTrace
             attempts={run.recoveryAttempts}
@@ -316,68 +403,52 @@ export function RunView({
           />
         )}
 
+        {/* Task Contract */}
         {activeTab === 'contract' && <TaskContractPanel />}
 
-        {activeTab === 'scope-security' && <ScopeSecurityPanel />}
-
-        {activeTab === 'regression' && <RegressionPanel runId={run.id} />}
-
-        {activeTab === 'checkpoints' && <CheckpointsPanel />}
-
-        {activeTab === 'branching' && <BranchingPanel />}
-
-        {activeTab === 'docs' && <DocsPanel />}
-
-        {activeTab === 'timeline' && (
-          <GlassBoxTimeline
-            events={run.events.slice(0, currentEventIndex + 1)}
-            toolCalls={run.toolCalls}
-            onOpenWhyFile={(file) => {
-              setWhyTargetFile(file);
-              setShowWhyModal(true);
-            }}
+        {/* Proof of Work */}
+        {activeTab === 'proof' && (
+          <ProofPanel
+            proof={proof}
             onOpenDiff={() => setActiveTab('diff')}
-            onOpenProof={() => setActiveTab('proof')}
+            onOpenProofGraph={() => setActiveTab('evidence-graph')}
+            onOpenTerminalSnippet={(snippet) => setCustomTerminalLog(snippet)}
           />
         )}
+
+        {/* Evidence Graph (Dedicated Workspace View) */}
+        {activeTab === 'evidence-graph' && (
+          <div className="flex-1 flex flex-col overflow-hidden bg-[var(--bg-panel)]">
+            <ProofGraph nodes={proof.graphNodes} edges={proof.graphEdges} />
+          </div>
+        )}
+
+        {/* Human Approval Gate (Dedicated Workspace View) */}
+        {activeTab === 'approval-gate' && <ApprovalGatePanel />}
+
+        {/* Why? Reasoning (Dedicated Workspace View) */}
+        {activeTab === 'why' && (
+          <WhyPanel
+            filePath={whyTargetFile}
+            onOpenDiff={() => setActiveTab('diff')}
+          />
+        )}
+
+        {/* Scope & Security */}
+        {activeTab === 'scope-security' && <ScopeSecurityPanel />}
+
+        {/* Regression Panel */}
+        {activeTab === 'regression' && <RegressionPanel runId={run.id} />}
+
+        {/* Checkpoints */}
+        {activeTab === 'checkpoints' && <CheckpointsPanel />}
+
+        {/* Branching */}
+        {activeTab === 'branching' && <BranchingPanel />}
+
+        {/* Docs */}
+        {activeTab === 'docs' && <DocsPanel />}
       </div>
-
-      {/* Proof Graph Drawer Modal */}
-      {showProofGraphModal && (
-        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="w-full max-w-4xl bg-[var(--bg-panel)] border border-[var(--border-subtle)] rounded-xl overflow-hidden shadow-2xl flex flex-col max-h-[85vh]">
-            <div className="p-3 bg-[var(--bg-elevated)] border-b border-[var(--border-subtle)] flex items-center justify-between font-mono text-xs">
-              <span className="font-bold text-[var(--text-primary)] uppercase">
-                14. Evidence Graph (Causal Traceability)
-              </span>
-              <button
-                onClick={() => setShowProofGraphModal(false)}
-                className="px-2 py-1 rounded bg-[var(--bg-subtle)] hover:bg-[var(--bg-active)] text-[var(--text-muted)] hover:text-[var(--text-primary)] border border-[var(--border-subtle)] cursor-pointer"
-              >
-                Close ✕
-              </button>
-            </div>
-            <div className="flex-1 overflow-y-auto">
-              <ProofGraph nodes={proof.graphNodes} edges={proof.graphEdges} />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Human Approval Gate Modal */}
-      <ApprovalModal
-        isOpen={showApprovalModal}
-        onClose={() => setShowApprovalModal(false)}
-      />
-
-      {/* Why Modal (Change Intelligence / "Why?") */}
-      {showWhyModal && (
-        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="w-full max-w-3xl bg-[var(--bg-panel)] border border-[var(--border-subtle)] rounded-xl overflow-hidden shadow-2xl flex flex-col">
-            <WhyDrawer filePath={whyTargetFile} onClose={() => setShowWhyModal(false)} />
-          </div>
-        </div>
-      )}
 
       {/* Terminal Output Docked at Bottom of Unified Container */}
       <div className="border-t border-[var(--border-subtle)] bg-[var(--bg-canvas)]">
