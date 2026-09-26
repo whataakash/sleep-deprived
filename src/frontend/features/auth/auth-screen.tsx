@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth/context';
 import {
   Flame,
@@ -9,10 +9,63 @@ import {
   User,
   Mail,
   Lock,
-  Sparkles,
   Zap,
-  CheckCircle2,
+  Sun,
+  Moon,
 } from 'lucide-react';
+
+type ThemeMode = 'light' | 'dark';
+
+/** Apply theme directly to the document (mirrors the auth context logic). */
+function applyTheme(theme: ThemeMode) {
+  if (typeof document === 'undefined') return;
+  document.documentElement.classList.toggle('dark', theme === 'dark');
+  document.documentElement.classList.toggle('light', theme === 'light');
+  document.documentElement.setAttribute('data-theme', theme);
+}
+
+/**
+ * Read persisted theme. Falls back to OS preference silently — no "System"
+ * option is exposed to the user.
+ */
+function getPersistedTheme(): ThemeMode {
+  if (typeof window === 'undefined') return 'dark';
+  try {
+    for (const key of ['parishram_user_profile', 'forge_user_profile']) {
+      const raw = localStorage.getItem(key);
+      if (raw) {
+        const profile = JSON.parse(raw);
+        const t = profile?.preferences?.theme as ThemeMode | undefined;
+        if (t === 'light' || t === 'dark') return t;
+      }
+    }
+    const pre = localStorage.getItem('parishram_preauththeme') as ThemeMode | null;
+    if (pre === 'light' || pre === 'dark') return pre;
+  } catch {}
+  // Silently honour OS preference when nothing is stored
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+
+/** Persist the chosen theme so the auth context picks it up after login. */
+function persistTheme(theme: ThemeMode) {
+  if (typeof window === 'undefined') return;
+  try {
+    for (const key of ['parishram_user_profile', 'forge_user_profile']) {
+      const raw = localStorage.getItem(key);
+      if (raw) {
+        const profile = JSON.parse(raw);
+        profile.preferences = { ...(profile.preferences || {}), theme };
+        localStorage.setItem(key, JSON.stringify(profile));
+      }
+    }
+    localStorage.setItem('parishram_preauththeme', theme);
+  } catch {}
+}
+
+const THEME_OPTIONS: { value: ThemeMode; icon: React.ReactNode; label: string }[] = [
+  { value: 'light', icon: <Sun className="w-3.5 h-3.5" />, label: 'Light' },
+  { value: 'dark', icon: <Moon className="w-3.5 h-3.5" />, label: 'Dark' },
+];
 
 export function AuthScreen() {
   const { login, signup, demoLogin } = useAuth();
@@ -21,6 +74,36 @@ export function AuthScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [theme, setTheme] = useState<ThemeMode>('dark');
+
+  // Initialise theme from persisted value on mount
+  useEffect(() => {
+    const persisted = getPersistedTheme();
+    setTheme(persisted);
+    applyTheme(persisted);
+  }, []);
+
+  // Silently track OS preference changes when no explicit user choice exists
+  useEffect(() => {
+    const media = window.matchMedia('(prefers-color-scheme: dark)');
+    const listener = () => {
+      // Only follow OS if the user hasn't manually overridden
+      const stored = localStorage.getItem('parishram_preauththeme');
+      if (!stored) {
+        const next: ThemeMode = media.matches ? 'dark' : 'light';
+        setTheme(next);
+        applyTheme(next);
+      }
+    };
+    media.addEventListener('change', listener);
+    return () => media.removeEventListener('change', listener);
+  }, []);
+
+  const handleThemeChange = (next: ThemeMode) => {
+    setTheme(next);
+    applyTheme(next);
+    persistTheme(next);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,6 +132,30 @@ export function AuthScreen() {
 
   return (
     <div className="fixed inset-0 z-50 bg-[var(--bg-canvas)] flex items-center justify-center p-4 select-none font-sans transition-colors">
+      {/* Theme switcher — top-right, quiet pill */}
+      <div
+        className="absolute top-4 right-4 flex items-center gap-0.5 p-0.5 rounded-lg bg-[var(--bg-elevated)] border border-[var(--border-subtle)] shadow-xs"
+        role="group"
+        aria-label="Theme"
+      >
+        {THEME_OPTIONS.map(({ value, icon, label }) => (
+          <button
+            key={value}
+            type="button"
+            onClick={() => handleThemeChange(value)}
+            title={label}
+            aria-label={`${label} theme`}
+            className={`p-1.5 rounded-md transition-all cursor-pointer ${
+              theme === value
+                ? 'bg-[#ea580c] text-white shadow-xs'
+                : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-subtle)]'
+            }`}
+          >
+            {icon}
+          </button>
+        ))}
+      </div>
+
       <div className="w-full max-w-md bg-[var(--bg-panel)] border border-[var(--border-subtle)] rounded-2xl p-6 sm:p-8 space-y-6 shadow-2xl relative overflow-hidden">
         {/* Glow decoration */}
         <div className="absolute top-0 right-0 w-48 h-48 bg-[#ea580c]/10 rounded-full blur-3xl pointer-events-none -mr-16 -mt-16" />
@@ -117,7 +224,7 @@ export function AuthScreen() {
                 <User className="w-4 h-4 text-[var(--text-muted)]" />
                 <input
                   type="text"
-                  placeholder="e.g. Aman Mishra"
+                  placeholder="e.g. name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="w-full bg-transparent text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none text-xs"
