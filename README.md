@@ -177,10 +177,11 @@ Tests verify:
 - **IDE Settings & Billing:**
   - 12 comprehensive categories: General, Appearance, Editor, AI & Models, Agent Policy, Repository, Terminal, Verification, Notifications, Privacy & Security, Account Profile, Plan & Billing.
   - Interactive search bar with instant progressive disclosure.
-- **Claude-Style Upgrade & Payment Flow:**
-  - **Step 1 ("Plans that grow with you"):** Editorial plans comparison with segmented audience switcher (`Individual` vs `Team & Enterprise`), 3-tier card grid (Free, Pro with Monthly/Yearly toggle and 17% savings, Max), and high-contrast conversion CTA.
-  - **Step 2 ("Configure your plan"):** 2-column checkout with radio billing selection, business details, Indian GST breakdown (Subtotal ₹2,033.05 + 18% GST ₹365.95 = ₹2,399.00), and verified instant UPI handoff to `shivansh.p@fam`.
-  - **Main Page Accessibility:** Instant access via Topbar `⚡ Upgrade` CTA, Sidebar growth card, Mission Control Overview banner, and Model Marketplace locked-tier unlock buttons.
+- **Authentic Subscription & Upgrade Flow:**
+  - **Authentic Hindi Tiers:** **आरम्भ** (Starter, ₹0), **प्रगति** (Builder, ₹999/mo or ₹799/mo yearly, Save 20%), **प्रवीण** (Professional, ₹2,499/mo), and **दल** (Team, ₹4,999/mo).
+  - **Dynamic Theme Invariance:** Modal and checkout flow dynamically respond to Light and Dark mode switching using semantic CSS variables.
+  - **Minimalist Dashboard Placements:** Subtle topbar indicator (`आरम्भ · Upgrade ↗`) and clean link near the left account section in the sidebar.
+  - **2-Column Indian GST Checkout:** Subtotal, 18% GST calculation, auto-renewal terms, and instant UPI handoff to `shivansh.p@fam`.
 
 ---
 

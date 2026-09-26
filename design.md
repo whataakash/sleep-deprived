@@ -132,23 +132,28 @@ Animations are built on `motion/react` with strict adherence to accessibility st
 
 ---
 
-## 7. Editorial Pricing & Upgrade Modal Design System
+## 7. Authentic Parishram Subscription & Upgrade Modal Design System
 
-Inspired by world-class software interfaces (Claude / Anthropic), the subscription and upgrade modal embodies an editorial, high-trust visual language:
+The subscription modal is engineered to reflect Parishram's distinct visual identity and deterministic engineering philosophy while fully responding to dynamic Light and Dark mode theme switching:
 
-### Step 1: "Plans that grow with you" (Plans Comparison Grid)
-- **Typography:** Refined editorial serif title (`"Plans that grow with you"`) paired with crisp sans-serif feature bullets.
-- **Segmented Audience Pill:** Centered toggle `[ Individual | Team and Enterprise ]` with smooth pill background transition.
+### Step 1: "योजनाएं जो आपके परिश्रम के साथ बढ़ें" (Plans Comparison Grid)
+- **Design Tokens & Theme Invariance:** Built strictly with semantic CSS variables (`var(--bg-panel)`, `var(--bg-canvas)`, `var(--bg-elevated)`, `var(--text-primary)`, `var(--text-secondary)`, `var(--border-subtle)`).
+  - In **Dark Mode**: Technical zinc canvas, deep elevated cards, flame accents, and high-legibility crisp text.
+  - In **Light Mode**: Pristine white panels, subtle cool-gray borders, graphite text, and vibrant orange action buttons.
+- **Unified Billing Frequency Toggle:** A single clean switcher `[ मासिक (Monthly) | वार्षिक (Yearly - बचत 20%) ]` centered at the top, avoiding duplicate or awkward audience pills.
 - **Card Hierarchy:**
-  - Standard cards have subtle `[var(--border-subtle)]` borders and muted badge elements.
-  - The **Pro (Hero)** card is bordered with `[var(--border-medium)]`, features an interactive Monthly/Yearly toggle with an emerald `"Save 17%"` badge, and a high-contrast solid white primary CTA (`"Get Pro plan"`).
-  - Micro-reassurance copy: `"No commitment · Cancel anytime"` placed directly under primary buttons.
+  - **आरम्भ (Starter)**: Clean elevated container, ₹0, clear developer scope.
+  - **प्रगति (Builder — Flagship Hero)**: Emphasized with `border-2 border-[#ea580c]`, prominent `⭐ सबसे लोकप्रिय (Most Popular)` pill, solid flame primary button, and 150 verified runs/mo.
+  - **प्रवीण (Professional)**: Dedicated power-user tier for complex architectural tasks, frontier models, and 1M context.
+  - **दल (Team Swarms)**: Streamlined team banner at the base of the grid for engineering organizations requiring seat governance and microVM sandboxes.
 
-### Step 2: "Configure your plan" (2-Column Checkout)
-- **2-Column Asymmetric Layout:**
-  - Left Column (60%): Interactive radio billing selector with active border state, comprehensive billing details (GSTIN, Company name, Street Address), and official payment tabs.
-  - Right Column (40%): Sticky Order Summary card featuring serif `Pro plan` header, clean subtotal breakdown (`₹2,033.05` + `18% GST ₹365.95` = `₹2,399.00`), auto-renewal terms notice, and agreement checkbox.
-- **Verified Payment Handoff:**
-  - Seamless instant UPI payment to verified recipient `shivansh.p@fam`.
-  - Zero custom card forms or raw credential harvesting.
+### Step 2: Plan Configuration & Indian GST Checkout
+- **2-Column Layout:**
+  - **Left Column:** Interactive radio options with active flame rings, complete billing information (Name, Country, GSTIN/Tax ID, Address), and payment methods (UPI/FamPay directly to verified recipient `shivansh.p@fam` or Card).
+  - **Right Column (Sticky Order Summary):** Dynamic tax calculation with exact 18% GST breakdown, auto-renewal notice, recurring agreement checkbox, and instant gateway handoff.
+- **Minimalist Triggers:**
+  - Clean plan pill in topbar (`आरम्भ · Upgrade ↗`).
+  - Minimal plan indicator right in the left account section at the bottom of the sidebar.
+  - Clean, unpolluted Mission Control overview with zero intrusive promotional popups.
+
 

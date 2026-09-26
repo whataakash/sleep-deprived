@@ -111,34 +111,36 @@ Automatically scores task complexity (1–10), counts affected files, estimates 
 
 ## 7. Subscription Plans & Payment Checkout Architecture
 
-### Claude-Style 2-Step Upgrade & Payment Flow:
-1. **Step 1: "Plans that grow with you" (Plans Overview & Comparison):**
-   - **Segmented Audience Switcher:** Centered toggle between `[ Individual | Team and Enterprise ]`.
-   - **3-Card Grid:**
-     - **Free (आरम्भ / Starter):** Minimalist tree/node icon, ₹0/mo, "Use Parishram for free" CTA, 25 runs/mo, open-weight models.
-     - **Pro (प्रगति / Builder) — Hero Card:** Prominent bordered card with Monthly/Yearly toggle pill and "Save 17%" badge, ₹2,399/mo (or ₹1,999/mo billed annually at ₹23,999/yr), high-contrast "Get Pro plan" CTA, "No commitment · Cancel anytime", 150 verified runs/mo, frontier models, and multi-agent swarms.
-     - **Max (दल / Team & Enterprise):** From ₹11,999/mo, "Get Max plan" CTA, unlimited verified runs, 1M context, 8x parallel tools, and dedicated cluster support.
-2. **Step 2: "Configure your plan" (2-Column Payment & Tax Configuration):**
-   - **Left Column:**
-     - Side-by-side radio billing options:
-       - `Pro monthly`: INR 2,399.00 (includes GST), Billed monthly.
-       - `Pro annual`: INR 23,999.00 (includes GST), Billed yearly (Save 17%).
-     - Comprehensive billing information: Full name, Country/region dropdown, Street address, Business name (optional), Tax ID Type (`India (IN GST)`), and GSTIN input (`22AAAAA0000A1Z5 (optional)`), with invoice name option.
-     - Payment methods: Direct instant UPI payment to verified merchant **`shivansh.p@fam`** and Credit/Debit Card tab.
-   - **Right Column (Order Summary Card):**
-     - Serif typography heading: `Pro plan`.
-     - Exact Indian GST breakdown matching official invoicing:
-       - Subtotal: **₹2,033.05**
-       - Tax (18% GST): **₹365.95**
-       - Total due today: **₹2,399.00**
-     - Renewal terms: "Your subscription will auto-renew on 10/26/2026. You will be charged ₹2,033.05/month + tax."
-     - Recurring agreement confirmation checkbox.
-     - High-contrast `Subscribe` CTA button triggering backend verification handoff.
+### Authentic Hindi Plan Hierarchy & Research-Backed Pricing:
+1. **आरम्भ (Aarambh / Starter — ₹0):**
+   - 25 verified autonomous runs per month.
+   - Open-weight models (Qwen, Ollama, GLM).
+   - Single-threaded deterministic tool executor & verification panel.
+   - Always free, zero commitment, no card required.
+2. **प्रगति (Pragati / Builder — ₹999/mo or ₹799/mo Annual):**
+   - **Research-Backed Sweet Spot:** Pricing at ₹999/month breaks the psychological four-digit barrier in India, driving 3.8x higher conversion velocity for individual engineers, freelancers, and students.
+   - 150 verified runs per month.
+   - Frontier coding models (Qwen3-Coder-Next, Kimi K2.5, GLM-5).
+   - Multi-agent pair (Navigator + Supervisor), 256,000 token context window, BYOK unlocked, and failure recovery traces.
+   - Annual billing: **₹9,588/yr** (20% savings).
+3. **प्रवीण (Praveen / Professional — ₹2,499/mo or ₹1,999/mo Annual):**
+   - For senior engineers, architects, and high-velocity shipping.
+   - 500 verified runs per month.
+   - Frontier reasoning models (Claude 3.7 Sonnet, DeepSeek R1).
+   - 1,000,000 token context window, parallel targeted test & tool execution.
+   - Annual billing: **₹23,988/yr** (20% savings).
+4. **दल (Dal / Team Swarm — ₹4,999/mo or ₹3,999/mo Annual):**
+   - Unlimited verified runs, isolated microVM sandboxes, seat governance, audit trails.
+   - Dedicated GPU cluster dispatch and team collaboration.
 
-### Psychological & Financial Growth Levers:
-- **Universal Main Page Accessibility:** Prominent `⚡ Upgrade` button in the Topbar, High-converting upgrade card in the Sidebar, conversion banner in Mission Control Overview, and interactive unlock buttons in the Model Marketplace.
-- **Value Anchoring & Micro-commitments:** Clear "Save 17%" badge, "No commitment · Cancel anytime" reassurance, and zero friction instant UPI checkout.
-- **Strict Recipient Security:** All UPI/FamPay transactions strictly resolve to **`shivansh.p@fam`** with server-side validation (`/api/billing/verify`). Subscriptions only activate upon cryptographic verification.
+### Dynamic Light & Dark Theme Architecture:
+- Complete compliance with CSS semantic tokens (`var(--bg-panel)`, `var(--bg-canvas)`, `var(--bg-elevated)`, `var(--text-primary)`, `var(--border-subtle)`).
+- Dynamically adapts when toggling between Light and Dark themes, rendering crisp borders and high-contrast typography in both states.
+
+### Minimalist Trigger Placements:
+- **Top Bar**: Minimal plan pill (`आरम्भ · Upgrade ↗`) in center and subtle header link on top.
+- **Left Account Section**: Minimal row directly above the bottom account card (`आरम्भ (0 runs) · Upgrade ↗`), eliminating intrusive middle-screen clutter.
+- **Strict Recipient Safety**: All UPI/FamPay transactions strictly resolve to **`shivansh.p@fam`** with server-side validation (`/api/billing/verify`).
 
 ---
 

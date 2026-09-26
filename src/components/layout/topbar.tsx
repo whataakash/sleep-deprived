@@ -21,6 +21,7 @@ import {
   LogOut,
   Zap,
   CheckCircle2,
+  Sparkles,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth/context';
 import { EvaluationModelAdapter } from '@/lib/models/evaluation-adapter';
@@ -147,38 +148,30 @@ export function Topbar({
           <span className="text-[var(--text-primary)] truncate max-w-[140px]">{selectedModelName}</span>
         </div>
 
-        {/* High-Converting Subscription Tier Badge & Upgrade Pill (ChatGPT/Claude psychology) */}
+        {/* Minimal Subscription Tier Badge & Upgrade Pill */}
         <button
           onClick={() => (onOpenUpgrade ? onOpenUpgrade() : onOpenAccount('billing'))}
-          className={`flex items-center gap-1.5 px-2.5 py-0.5 rounded text-[11px] font-bold border transition-all cursor-pointer ${
-            user?.plan === 'FREE'
-              ? 'bg-[#ea580c]/15 hover:bg-[#ea580c]/25 border-[#ea580c]/40 text-[#ea580c] shadow-xs'
-              : 'bg-[#10b981]/15 hover:bg-[#10b981]/25 border-[#10b981]/40 text-[#10b981]'
-          }`}
-          title="Click to view subscription tiers & upgrade"
+          className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-[var(--bg-elevated)] hover:bg-[var(--bg-subtle)] border border-[var(--border-subtle)] text-[11px] font-mono transition-colors cursor-pointer"
+          title="सदस्यता योजनाएं (Subscription Plans)"
         >
-          <span>{planInfo.hindiName}</span>
-          {user?.plan === 'FREE' && (
-            <>
-              <span className="text-[var(--text-muted)]">·</span>
-              <span className="text-[10px] font-extrabold flex items-center gap-1 text-[#ea580c] hover:underline">
-                <span>Upgrade</span>
-                <Zap className="w-3 h-3 fill-[#ea580c] text-[#ea580c]" />
-              </span>
-            </>
-          )}
+          <span className="text-[#ea580c] font-bold">{planInfo.hindiName}</span>
+          <span className="text-[var(--text-muted)]">·</span>
+          <span className="text-[10px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] flex items-center gap-0.5">
+            <span>Upgrade ↗</span>
+          </span>
         </button>
       </div>
 
-      {/* Right Actions: Upgrade CTA, Command Palette, Theme, Desktop, Run Demo, Account Avatar */}
+      {/* Right Actions: Minimal Upgrade Link, Command Palette, Theme, Desktop, Run Demo, Account Avatar */}
       <div className="flex items-center gap-1.5 sm:gap-2">
-        {/* Prominent High-Converting Upgrade Button */}
+        {/* Minimal Upgrade Action on Top */}
         <button
           onClick={() => (onOpenUpgrade ? onOpenUpgrade() : onOpenAccount('billing'))}
-          className="flex items-center gap-1 px-2.5 py-1 rounded bg-gradient-to-r from-[#ea580c] to-[#f97316] hover:brightness-110 text-white font-bold text-[11px] shadow-sm transition-all cursor-pointer active:scale-95"
-          title="Plans that grow with you - Upgrade"
+          className="hidden sm:flex items-center gap-1 px-2 py-1 rounded bg-[var(--bg-elevated)] hover:bg-[var(--bg-subtle)] border border-[var(--border-subtle)] text-[11px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
+          title="सदस्यता योजनाएं (Subscription Plans)"
         >
-          <span>⚡ Upgrade</span>
+          <Sparkles className="w-3 h-3 text-[#ea580c]" />
+          <span>योजना</span>
         </button>
 
         {/* Command Palette trigger */}

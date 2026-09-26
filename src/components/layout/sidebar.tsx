@@ -158,33 +158,25 @@ export function Sidebar({
         </div>
       </div>
 
-      {/* High-Converting Upgrade Card (Claude/ChatGPT style) */}
-      <div className="px-3 pb-1">
-        <div className="p-2.5 rounded-lg bg-gradient-to-br from-[#ea580c]/15 via-[var(--bg-elevated)] to-[var(--bg-elevated)] border border-[#ea580c]/30 text-xs shadow-xs">
-          <div className="flex items-center justify-between font-bold text-[var(--text-primary)] mb-1">
-            <span className="flex items-center gap-1.5 text-[#ea580c]">
-              <span>⚡</span>
-              <span>प्रगति (Pro)</span>
-            </span>
-            <span className="text-[9px] text-[#10b981] bg-[#10b981]/15 px-1.5 py-0.5 rounded font-extrabold border border-[#10b981]/30">
-              Save 17%
-            </span>
+      {/* Bottom Account Card & Minimal Upgrade Trigger */}
+      <div className="p-3 border-t border-[var(--border-subtle)] bg-[var(--bg-canvas)] space-y-2">
+        {/* Minimal Plan & Upgrade row right near left account */}
+        <div className="flex items-center justify-between px-1 text-[11px] font-mono">
+          <div className="flex items-center gap-1.5 text-[var(--text-muted)]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#ea580c]" />
+            <span className="text-[var(--text-secondary)] font-semibold">{planInfo.hindiName}</span>
+            <span className="text-[10px] text-[var(--text-muted)]">({user?.usage.runsUsedThisMonth || 0} runs)</span>
           </div>
-          <p className="text-[10px] text-[var(--text-secondary)] font-sans leading-tight mb-2">
-            Frontier models, 150 verified runs/mo & multi-agent swarms.
-          </p>
           <button
             onClick={() => (onOpenUpgrade ? onOpenUpgrade() : onOpenAccount())}
-            className="w-full py-1.5 px-2 rounded bg-[#ea580c] hover:bg-[#f97316] text-white font-bold text-[11px] flex items-center justify-center gap-1 shadow-sm transition-all cursor-pointer active:scale-95"
+            className="text-[10px] font-bold text-[#ea580c] hover:underline flex items-center gap-0.5 transition-colors cursor-pointer"
+            title="योजना अपग्रेड करें (Upgrade Plan)"
           >
-            <span>Upgrade plan</span>
-            <span>→</span>
+            <span>Upgrade</span>
+            <span>↗</span>
           </button>
         </div>
-      </div>
 
-      {/* Bottom Account Card */}
-      <div className="p-3 border-t border-[var(--border-subtle)] bg-[var(--bg-canvas)]">
         <button
           onClick={onOpenAccount}
           className="w-full p-2 rounded bg-[var(--bg-elevated)] hover:bg-[var(--bg-subtle)] border border-[var(--border-subtle)] flex items-center justify-between text-left transition-colors cursor-pointer group"
@@ -198,11 +190,8 @@ export function Sidebar({
               <div className="font-semibold text-[var(--text-primary)] truncate text-[11px]">
                 {user?.name || 'Evaluator Session'}
               </div>
-              <div className="text-[10px] text-[var(--text-muted)] flex items-center gap-1">
-                <span className="text-[#ea580c] font-bold">{planInfo.hindiName}</span>
-                <span className="text-[9px]">({planInfo.englishSubtitle})</span>
-                <span>·</span>
-                <span>{user?.usage.runsUsedThisMonth || 0} runs</span>
+              <div className="text-[10px] text-[var(--text-muted)] truncate">
+                {user?.email || 'evaluator@parishram.ai'}
               </div>
             </div>
           </div>

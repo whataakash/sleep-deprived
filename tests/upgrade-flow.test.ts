@@ -2,31 +2,34 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { PRICING_PLANS } from '../src/lib/billing/plans';
 
-test('Billing & Upgrade: Claude-Style Plans Configuration', () => {
+test('Billing & Upgrade: Authentic Parishram Plans Configuration', () => {
   const freePlan = PRICING_PLANS.find((p) => p.id === 'FREE');
-  const proPlan = PRICING_PLANS.find((p) => p.id === 'BUILDER'); // Pro / प्रगति
-  const maxPlan = PRICING_PLANS.find((p) => p.id === 'PRO' || p.id === 'TEAM'); // Max / दल
+  const builderPlan = PRICING_PLANS.find((p) => p.id === 'BUILDER'); // प्रगति
+  const proPlan = PRICING_PLANS.find((p) => p.id === 'PRO'); // प्रवीण
+  const teamPlan = PRICING_PLANS.find((p) => p.id === 'TEAM'); // दल
 
-  assert.ok(freePlan, 'Free plan should exist');
-  assert.ok(proPlan, 'Pro plan should exist');
-  assert.ok(maxPlan, 'Max plan should exist');
+  assert.ok(freePlan, 'Free plan (आरम्भ) should exist');
+  assert.ok(builderPlan, 'Builder plan (प्रगति) should exist');
+  assert.ok(proPlan, 'Pro plan (प्रवीण) should exist');
+  assert.ok(teamPlan, 'Team plan (दल) should exist');
 
-  // Verify Pro Plan prices match Screenshot 1 & 2
-  assert.equal(proPlan.monthlyPriceInr, 2399, 'Pro monthly price should be ₹2,399');
-  assert.equal(proPlan.yearlyPriceInr, 23999, 'Pro annual price should be ₹23,999');
+  // Verify Research-Backed Pricing Structure (WTP sweet spots in India)
+  assert.equal(builderPlan.monthlyPriceInr, 999, 'प्रगति monthly price should be ₹999 (under ₹1,000 threshold)');
+  assert.equal(builderPlan.yearlyPriceInr, 9588, 'प्रगति annual price should be ₹9,588 (₹799/mo, 20% savings)');
 
-  // Verify GST Breakdown (Screenshot 2: INR 2,033.05 + INR 365.95 = INR 2,399.00)
-  const monthlyTotal = 2399.0;
+  assert.equal(proPlan.monthlyPriceInr, 2499, 'प्रवीण monthly price should be ₹2,499');
+  assert.equal(proPlan.yearlyPriceInr, 23988, 'प्रवीण annual price should be ₹23,988');
+
+  assert.equal(teamPlan.monthlyPriceInr, 4999, 'दल monthly price should be ₹4,999');
+
+  // Verify GST Breakdown for Pragati (₹999 inclusive of 18% GST)
+  const monthlyTotal = 999.0;
   const monthlySubtotal = Math.round((monthlyTotal / 1.18) * 100) / 100;
   const monthlyGst = Math.round((monthlyTotal - monthlySubtotal) * 100) / 100;
 
-  assert.equal(monthlySubtotal, 2033.05, 'Subtotal should be exactly ₹2,033.05');
-  assert.equal(monthlyGst, 365.95, '18% GST should be exactly ₹365.95');
-  assert.equal(Math.round((monthlySubtotal + monthlyGst) * 100) / 100, 2399.0, 'Total should be ₹2,399.00');
-
-  // Verify Annual Savings (17% discount)
-  const monthlyEquivOnAnnual = Math.round(23999 / 12);
-  assert.ok(monthlyEquivOnAnnual <= 2000, 'Annual plan equivalent should be ~₹1,999/mo (Save 17%)');
+  assert.equal(monthlySubtotal, 846.61, 'Subtotal should be exactly ₹846.61');
+  assert.equal(monthlyGst, 152.39, '18% GST should be exactly ₹152.39');
+  assert.equal(Math.round((monthlySubtotal + monthlyGst) * 100) / 100, 999.0, 'Total should be ₹999.00');
 });
 
 test('Billing & Upgrade: Verified Recipient Safety', () => {
