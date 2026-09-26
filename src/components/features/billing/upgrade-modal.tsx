@@ -188,7 +188,7 @@ export function UpgradeModal({
         <div className="px-5 sm:px-6 py-3.5 border-b border-[var(--border-subtle)] bg-[var(--bg-panel)] flex items-center justify-between">
           <div className="flex items-center gap-3">
             <span className="text-xs font-mono font-bold tracking-wider text-[#ea580c] uppercase">
-              परिश्रम योजनाएं
+              Subscription Plans
             </span>
             {step === 'CONFIGURE' && (
               <button
@@ -196,7 +196,7 @@ export function UpgradeModal({
                 className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] flex items-center gap-1 transition-colors cursor-pointer font-mono"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
-                <span>योजना बदलें (Change plan)</span>
+                <span>Change Plan</span>
               </button>
             )}
           </div>
@@ -221,7 +221,7 @@ export function UpgradeModal({
                 <span>AUTONOMOUS ENGINEERING HARNESS</span>
               </div>
               <h2 className="text-2xl sm:text-3xl font-extrabold text-[var(--text-primary)] tracking-tight">
-                योजनाएं जो आपके परिश्रम के साथ बढ़ें
+                Plans that Scale with Your Engineering
               </h2>
               <p className="text-xs sm:text-sm text-[var(--text-secondary)] max-w-xl mx-auto">
                 Deterministic code repair, failure recovery, and frontier reasoning models tailored for developers and engineering teams.
@@ -238,7 +238,7 @@ export function UpgradeModal({
                         : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
                     }`}
                   >
-                    मासिक (Monthly)
+                    Monthly
                   </button>
                   <button
                     onClick={() => setBillingCycle('yearly')}
@@ -248,9 +248,9 @@ export function UpgradeModal({
                         : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
                     }`}
                   >
-                    <span>वार्षिक (Yearly)</span>
+                    <span>Yearly</span>
                     <span className="text-[10px] bg-[#10b981]/15 text-[#10b981] px-1.5 py-0.2 rounded font-bold border border-[#10b981]/25">
-                      बचत 20%
+                      Save 20%
                     </span>
                   </button>
                 </div>
@@ -285,7 +285,7 @@ export function UpgradeModal({
                     onClick={() => handleSelectPlan(PRICING_PLANS[0])}
                     className="w-full py-2 px-3 rounded-lg bg-[var(--bg-subtle)] hover:bg-[var(--bg-active)] border border-[var(--border-subtle)] text-[var(--text-primary)] font-semibold text-xs transition-colors cursor-pointer"
                   >
-                    {user?.plan === 'FREE' ? 'वर्तमान योजना (Current Plan)' : 'आरम्भ चुनें (Select Starter)'}
+                    {user?.plan === 'FREE' ? 'Current Plan' : 'Select Starter'}
                   </button>
 
                   <div className="pt-3 border-t border-[var(--border-subtle)] space-y-2 text-xs">
@@ -313,7 +313,7 @@ export function UpgradeModal({
                 {/* Popular Pill */}
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-[#ea580c] text-white font-mono text-[10px] font-extrabold uppercase tracking-wider shadow-sm flex items-center gap-1">
                   <Sparkles className="w-3 h-3" />
-                  <span>सबसे लोकप्रिय (Most Popular)</span>
+                  <span>Most Popular</span>
                 </div>
 
                 <div className="space-y-4 pt-1">
@@ -349,11 +349,11 @@ export function UpgradeModal({
                     onClick={() => handleSelectPlan(PRICING_PLANS[1])}
                     className="w-full py-2.5 px-3 rounded-lg bg-[#ea580c] hover:bg-[#f97316] text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-98 cursor-pointer"
                   >
-                    <span>प्रगति से अपग्रेड करें</span>
+                    <span>Upgrade to प्रगति</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </button>
                   <div className="text-[10px] text-center text-[var(--text-muted)] font-mono">
-                    बिना किसी प्रतिबद्धता के · कभी भी रद्द करें
+                    No commitment · Cancel anytime
                   </div>
 
                   <div className="pt-3 border-t border-[var(--border-subtle)] space-y-2 text-xs">
@@ -413,10 +413,10 @@ export function UpgradeModal({
                     onClick={() => handleSelectPlan(PRICING_PLANS[2])}
                     className="w-full py-2 px-3 rounded-lg bg-[var(--bg-subtle)] hover:bg-[var(--bg-active)] border border-[var(--border-subtle)] text-[var(--text-primary)] font-semibold text-xs transition-colors cursor-pointer"
                   >
-                    प्रवीण चुनें (Select Praveen)
+                    Upgrade to प्रवीण
                   </button>
                   <div className="text-[10px] text-center text-[var(--text-muted)] font-mono">
-                    बिना किसी प्रतिबद्धता के · कभी भी रद्द करें
+                    No commitment · Cancel anytime
                   </div>
 
                   <div className="pt-3 border-t border-[var(--border-subtle)] space-y-2 text-xs">
@@ -463,7 +463,7 @@ export function UpgradeModal({
                 onClick={() => handleSelectPlan(PRICING_PLANS[3])}
                 className="px-3.5 py-1.5 rounded-lg bg-[var(--bg-subtle)] hover:bg-[var(--bg-active)] border border-[var(--border-subtle)] text-[var(--text-primary)] font-semibold font-mono text-xs whitespace-nowrap cursor-pointer transition-colors"
               >
-                दल योजना देखें (View Team Plan) →
+                Explore दल Plan →
               </button>
             </div>
           </div>
@@ -479,7 +479,7 @@ export function UpgradeModal({
               <div className="lg:col-span-7 space-y-5">
                 <div>
                   <h2 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)] tracking-tight">
-                    {selectedPlan.name} योजना कॉन्फ़िगर करें
+                    Configure {selectedPlan.name} Plan
                   </h2>
                   <p className="text-xs text-[var(--text-secondary)] font-mono mt-0.5">
                     {selectedPlan.englishSubtitle} tier · Choose your billing frequency & enter details
@@ -499,7 +499,7 @@ export function UpgradeModal({
                   >
                     <div className="flex items-center justify-between mb-1">
                       <span className="font-bold text-xs text-[var(--text-primary)]">
-                        {selectedPlan.name} मासिक (Monthly)
+                        {selectedPlan.name} Monthly
                       </span>
                       <div
                         className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center ${
@@ -530,7 +530,7 @@ export function UpgradeModal({
                   >
                     <div className="flex items-center justify-between mb-1">
                       <span className="font-bold text-xs text-[var(--text-primary)]">
-                        {selectedPlan.name} वार्षिक (Yearly)
+                        {selectedPlan.name} Yearly
                       </span>
                       <span className="text-[9px] bg-[#10b981]/15 text-[#10b981] px-1.5 py-0.2 rounded font-bold border border-[#10b981]/25">
                         Save 20%
@@ -548,7 +548,7 @@ export function UpgradeModal({
                 {/* Billing Information Form */}
                 <div className="space-y-3 font-mono text-xs">
                   <div className="text-[11px] font-bold text-[var(--text-secondary)] uppercase tracking-wider">
-                    बिलिंग जानकारी (Billing Information)
+                    Billing Information
                   </div>
 
                   <div className="space-y-2.5">
@@ -605,7 +605,7 @@ export function UpgradeModal({
                 {/* Payment Method Selector */}
                 <div className="space-y-3 font-mono text-xs">
                   <div className="text-[11px] font-bold text-[var(--text-secondary)] uppercase tracking-wider">
-                    भुगतान विधि (Payment Method)
+                    Payment Method
                   </div>
 
                   <div className="flex items-center gap-2">
@@ -778,7 +778,7 @@ export function UpgradeModal({
             </div>
             <div>
               <h3 className="text-2xl font-bold text-[var(--text-primary)]">
-                {selectedPlan.name} सदस्यता सक्रिय है!
+                {selectedPlan.name} Subscription Active!
               </h3>
               <p className="text-xs text-[var(--text-secondary)] font-mono mt-1">
                 Subscription successfully activated. 150 verified runs & frontier models unlocked.
@@ -806,7 +806,7 @@ export function UpgradeModal({
               onClick={onClose}
               className="px-6 py-2.5 rounded-xl bg-[#ea580c] hover:bg-[#f97316] text-white font-bold text-xs shadow-md transition-all active:scale-98 cursor-pointer"
             >
-              Start Building with परिश्रम →
+              Start Building with Parishram →
             </button>
           </div>
         )}

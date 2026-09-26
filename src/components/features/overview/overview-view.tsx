@@ -231,7 +231,7 @@ export function OverviewView({ onStartRun, onOpenRun, onOpenBilling, onOpenUpgra
               onClick={() => onStartRun(taskPrompt, selectedModelId, selectedAgentMode)}
               className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#ea580c] hover:bg-[#f97316] text-white font-semibold text-xs transition-all shadow-xs active:scale-[0.98] cursor-pointer"
             >
-              <span>Run with परिश्रम</span>
+              <span>Run with Parishram</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>

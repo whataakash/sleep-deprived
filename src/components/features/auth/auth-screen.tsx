@@ -57,11 +57,11 @@ export function AuthScreen() {
         <div className="text-center space-y-1.5 relative">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#ea580c]/12 border border-[#ea580c]/30 text-[#ea580c] text-xs font-mono font-bold mb-1">
             <Flame className="w-3.5 h-3.5" />
-            <span>परिश्रम · PARISHRAM</span>
+            <span>PARISHRAM</span>
           </div>
 
           <h2 className="text-2xl font-black tracking-tight text-[var(--text-primary)]">
-            {mode === 'signup' ? 'Create your Harness Account' : 'Sign in to परिश्रम'}
+            {mode === 'signup' ? 'Create your Harness Account' : 'Sign in to Parishram'}
           </h2>
           <p className="text-xs text-[var(--text-secondary)] font-mono">
             Autonomous software engineering with deterministic proof.

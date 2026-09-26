@@ -152,7 +152,7 @@ export function Topbar({
         <button
           onClick={() => (onOpenUpgrade ? onOpenUpgrade() : onOpenAccount('billing'))}
           className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-[var(--bg-elevated)] hover:bg-[var(--bg-subtle)] border border-[var(--border-subtle)] text-[11px] font-mono transition-colors cursor-pointer"
-          title="सदस्यता योजनाएं (Subscription Plans)"
+          title="Subscription Plans"
         >
           <span className="text-[#ea580c] font-bold">{planInfo.hindiName}</span>
           <span className="text-[var(--text-muted)]">·</span>
@@ -168,10 +168,10 @@ export function Topbar({
         <button
           onClick={() => (onOpenUpgrade ? onOpenUpgrade() : onOpenAccount('billing'))}
           className="hidden sm:flex items-center gap-1 px-2 py-1 rounded bg-[var(--bg-elevated)] hover:bg-[var(--bg-subtle)] border border-[var(--border-subtle)] text-[11px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
-          title="सदस्यता योजनाएं (Subscription Plans)"
+          title="Subscription Plans"
         >
           <Sparkles className="w-3 h-3 text-[#ea580c]" />
-          <span>योजना</span>
+          <span>Plans</span>
         </button>
 
         {/* Command Palette trigger */}

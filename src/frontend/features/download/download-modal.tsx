@@ -18,13 +18,13 @@ export function DownloadModal({ isOpen, onClose }: DownloadModalProps) {
         <div className="flex items-center justify-between pb-4 border-b border-[var(--border-subtle)]">
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-base font-extrabold text-[var(--text-primary)]">परिश्रम Desktop</span>
+              <span className="text-base font-extrabold text-[var(--text-primary)]">Parishram Desktop</span>
               <span className="text-[10px] px-2 py-0.5 rounded bg-[#38bdf8]/15 text-[#38bdf8] font-bold border border-[#38bdf8]/30">
                 Tauri v2 Shell
               </span>
             </div>
             <p className="text-[11px] text-[var(--text-muted)] mt-1">
-              Run परिश्रम where your code lives. Direct local filesystem access with sandboxed isolation.
+              Run Parishram where your code lives. Direct local filesystem access with sandboxed isolation.
             </p>
           </div>
 

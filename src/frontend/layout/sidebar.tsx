@@ -143,11 +143,11 @@ export function Sidebar({
           <button
             onClick={() => onOpenDownload && onOpenDownload()}
             className="w-full flex items-center justify-between px-2.5 py-1.5 rounded transition-colors cursor-pointer text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)] hover:text-[var(--text-primary)] group"
-            title="Download परिश्रम desktop runtime (macOS, Linux, Windows)"
+            title="Download Parishram desktop runtime (macOS, Linux, Windows)"
           >
             <div className="flex items-center gap-2.5">
               <Download className="w-3.5 h-3.5 text-[#38bdf8] group-hover:scale-110 transition-transform" />
-              <span>Download परिश्रम</span>
+              <span>Download Parishram</span>
             </div>
             <span className="text-[9px] px-1.5 py-0.2 rounded bg-[#38bdf8]/10 text-[#38bdf8] font-bold">
               Tauri
