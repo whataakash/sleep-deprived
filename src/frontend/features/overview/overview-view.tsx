@@ -1,9 +1,8 @@
 'use client';
 
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { motion } from 'motion/react';
 import {
-  FolderGit2,
   Cpu,
   ArrowRight,
   ShieldCheck,
@@ -14,6 +13,8 @@ import {
   TrendingUp,
   CreditCard,
   Lock,
+  Mic,
+  MicOff,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth/context';
 import { getPlanDisplay } from '@/lib/billing/plans';
@@ -106,6 +107,107 @@ export function OverviewView({ onStartRun, onOpenRun, onOpenBilling }: OverviewV
       autoResize(e.target);
     },
     [autoResize]
+  );
+
+  const [isListening, setIsListening] = useState(false);
+  const [isSpeechSupported, setIsSpeechSupported] = useState(true);
+  const recognitionRef = useRef<any>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const SpeechRecognition =
+        (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        setIsSpeechSupported(false);
+      }
+    }
+    return () => {
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.abort();
+        } catch (_) {}
+      }
+    };
+  }, []);
+
+  const toggleListening = useCallback(() => {
+    if (!isSpeechSupported) return;
+
+    if (isListening) {
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.stop();
+        } catch (_) {}
+      }
+      setIsListening(false);
+      return;
+    }
+
+    try {
+      const SpeechRecognition =
+        (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        setIsSpeechSupported(false);
+        return;
+      }
+
+      const recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
+
+      recognition.onstart = () => {
+        setIsListening(true);
+      };
+
+      recognition.onresult = (event: any) => {
+        let newTranscript = '';
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            newTranscript += event.results[i][0].transcript;
+          }
+        }
+        if (newTranscript.trim()) {
+          setTaskPrompt((prev) => {
+            const separator = prev && !prev.endsWith(' ') ? ' ' : '';
+            const next = (prev || '') + separator + newTranscript.trim();
+            setTimeout(() => {
+              if (textareaRef.current) {
+                autoResize(textareaRef.current);
+              }
+            }, 0);
+            return next;
+          });
+        }
+      };
+
+      recognition.onerror = (event: any) => {
+        console.warn('Speech recognition error/denial:', event.error);
+        setIsListening(false);
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognitionRef.current = recognition;
+      recognition.start();
+    } catch (err) {
+      console.warn('Failed to start speech recognition:', err);
+      setIsListening(false);
+    }
+  }, [isSpeechSupported, isListening, autoResize]);
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        if (taskPrompt.trim()) {
+          onStartRun(taskPrompt, selectedModelId, selectedAgentMode);
+        }
+      }
+    },
+    [taskPrompt, selectedModelId, selectedAgentMode, onStartRun]
   );
 
   const runsUsed = user?.usage.runsUsedThisMonth || 14;
@@ -202,6 +304,7 @@ export function OverviewView({ onStartRun, onOpenRun, onOpenBilling }: OverviewV
             ref={textareaRef}
             value={taskPrompt}
             onChange={handlePromptChange}
+            onKeyDown={handleKeyDown}
             placeholder="How can I help you today?"
             aria-label="Task prompt"
             style={{
@@ -214,13 +317,8 @@ export function OverviewView({ onStartRun, onOpenRun, onOpenBilling }: OverviewV
           />
 
           <div className="pt-3 mt-1 border-t border-[var(--border-subtle)] flex flex-wrap items-center justify-between gap-3 font-mono text-xs">
-            {/* Repository & Model Pickers */}
+            {/* Model Picker */}
             <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1 px-2.5 py-1 rounded bg-[var(--bg-elevated)] border border-[var(--border-subtle)] text-[11px] text-[var(--text-secondary)]">
-                <FolderGit2 className="w-3 h-3 text-[#ea580c]" />
-                <span className="text-[var(--text-primary)] font-medium">auth-gateway-service</span>
-              </div>
-
               <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-[var(--bg-elevated)] border border-[var(--border-subtle)] text-[11px]">
                 <Cpu className="w-3 h-3 text-[#38bdf8]" />
                 <select
@@ -250,14 +348,53 @@ export function OverviewView({ onStartRun, onOpenRun, onOpenBilling }: OverviewV
               </div>
             </div>
 
-            {/* Submit Action Button */}
-            <button
-              onClick={() => onStartRun(taskPrompt, selectedModelId, selectedAgentMode)}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#ea580c] hover:bg-[#f97316] text-white font-semibold text-xs transition-all shadow-xs active:scale-[0.98] cursor-pointer"
-            >
-              <span>Run</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
+            {/* Action Buttons: Functional Microphone & Send Arrow */}
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={toggleListening}
+                disabled={!isSpeechSupported}
+                aria-label={
+                  !isSpeechSupported
+                    ? 'Voice input is not supported in this browser'
+                    : isListening
+                    ? 'Stop voice input'
+                    : 'Start voice input'
+                }
+                title={
+                  !isSpeechSupported
+                    ? 'Voice input is not supported in this browser'
+                    : isListening
+                    ? 'Stop voice input'
+                    : 'Start voice input'
+                }
+                className={`p-2 rounded-lg border transition-all flex items-center justify-center min-w-[36px] min-h-[36px] ${
+                  !isSpeechSupported
+                    ? 'opacity-40 cursor-not-allowed bg-[var(--bg-elevated)] border-[var(--border-subtle)] text-[var(--text-muted)]'
+                    : isListening
+                    ? 'bg-[#ea580c]/15 border-[#ea580c]/50 text-[#ea580c] shadow-xs animate-pulse motion-reduce:animate-none cursor-pointer'
+                    : 'bg-[var(--bg-elevated)] border-[var(--border-subtle)] hover:border-[var(--border-medium)] text-[var(--text-muted)] hover:text-[var(--text-primary)] cursor-pointer'
+                }`}
+              >
+                {isListening ? (
+                  <Mic className="w-4 h-4 text-[#ea580c]" />
+                ) : !isSpeechSupported ? (
+                  <MicOff className="w-4 h-4" />
+                ) : (
+                  <Mic className="w-4 h-4" />
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => onStartRun(taskPrompt, selectedModelId, selectedAgentMode)}
+                aria-label="Run task"
+                title="Run task"
+                className="flex items-center justify-center w-9 h-9 rounded-lg bg-[#ea580c] hover:bg-[#f97316] text-white transition-all shadow-xs active:scale-[0.98] motion-reduce:active:scale-100 cursor-pointer min-w-[36px] min-h-[36px]"
+              >
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </motion.div>
 
