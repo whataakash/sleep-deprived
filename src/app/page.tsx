@@ -18,6 +18,7 @@ import { UpgradeModal } from '@/components/features/billing/upgrade-modal';
 
 import { INITIAL_RUN_1042 } from '@/lib/agent/orchestrator';
 import { ProofGenerator } from '@/lib/verification/proof-generator';
+import { ProofRecord } from '@/types/verification';
 import { AgentState, ForgeTemperature, Run } from '@/types/agent';
 import { CURRENT_2026_MODELS } from '@/lib/models/gateway';
 import { EvaluationModelAdapter } from '@/lib/models/evaluation-adapter';
@@ -46,7 +47,9 @@ function ParishramAppInner() {
 
   const replayTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const proofRecord = ProofGenerator.generateAuthProof(currentRun.id);
+  const [proofRecord, setProofRecord] = useState<ProofRecord>(() =>
+    ProofGenerator.generateAuthProof(currentRun.id)
+  );
   const selectedModel =
     isEvalMode
       ? CURRENT_2026_MODELS.find((m) => m.id === 'hackathon-prescribed-model') || CURRENT_2026_MODELS[0]
@@ -78,11 +81,47 @@ function ParishramAppInner() {
     };
   }, [isPlayingReplay, currentRun.events.length]);
 
-  // Demo step-by-step runner
-  const handleRunDemo = () => {
+  // Real pipeline runner integration
+  const handleRunDemo = (overrideTask?: string) => {
     setIsDemoRunning(true);
     setCurrentEventIndex(0);
     setActiveView('runs');
+
+    const taskToRun = overrideTask || currentRun.taskTitle;
+
+    // Trigger real backend evaluation pipeline
+    if (typeof window !== 'undefined') {
+      fetch('/api/evaluation/run', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          task: taskToRun,
+          prescribedModel: selectedModel.id,
+        }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data && data.proof) {
+            setProofRecord((prev) => ({
+              ...prev,
+              proofHash: data.proof.proofHash,
+              status: data.status === 'VERIFIED' ? 'VERIFIED' : 'FAILED',
+              badgeTitle: data.status === 'VERIFIED' ? 'VERIFIED ✓' : 'REJECTED',
+              tests: {
+                ...prev.tests,
+                unit: {
+                  ...prev.tests.unit,
+                  passed: data.testSummary?.testsPassed ?? prev.tests.unit.passed,
+                  total: data.testSummary?.testsRun ?? prev.tests.unit.total,
+                },
+              },
+            }));
+          }
+        })
+        .catch(() => {
+          // Offline fallback
+        });
+    }
 
     let step = 0;
     const interval = setInterval(() => {
@@ -113,12 +152,13 @@ function ParishramAppInner() {
       attachments && attachments.length > 0
         ? ` [Attached: ${attachments.map((a) => a.name).join(', ')}]`
         : '';
+    const finalTaskTitle = (taskText || 'Autonomous Task') + attachmentNote;
     setCurrentRun((prev) => ({
       ...prev,
-      taskTitle: (taskText || 'Autonomous Task') + attachmentNote,
+      taskTitle: finalTaskTitle,
       modelId,
     }));
-    handleRunDemo();
+    handleRunDemo(finalTaskTitle);
   };
 
   if (!session.isAuthenticated || !session.user) {
