@@ -22,7 +22,12 @@ async function main() {
   console.log('============================================================\n');
 
   const apiKey = process.env.AI_API_KEY;
-  const prescribedModel = process.env.PARISHRAM_EVAL_MODEL || process.env.FORGE_EVAL_MODEL || 'hackathon-prescribed-text-v1';
+  const prescribedModel =
+    process.env.AI_MODEL ||
+    process.env.PRESCRIBED_MODEL ||
+    process.env.PARISHRAM_EVAL_MODEL ||
+    process.env.FORGE_EVAL_MODEL ||
+    'hackathon-prescribed-text-v1';
 
   console.log(`[CONFIG] Mode: STRICT EVALUATION MODE`);
   console.log(`[CONFIG] Prescribed Model: ${prescribedModel} (Locked)`);

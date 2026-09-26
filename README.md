@@ -39,7 +39,7 @@ make evaluate
 |---|---|---|
 | **Root Makefile** | Exposes `make setup`, `make run`, `make test`, `make evaluate`, `make clean` | 🟢 Verified |
 | **`AI_API_KEY` Support** | Consumes `process.env.AI_API_KEY` directly; zero manual UI key entry | 🟢 Verified |
-| **Prescribed Model Lock** | In evaluation mode, locks to `hackathon-prescribed-text-v1` (or `PARISHRAM_EVAL_MODEL`); model substitution & fallback disabled | 🟢 Verified |
+| **Prescribed Model Lock** | In evaluation mode, locks to prescribed model (`AI_MODEL`, `PARISHRAM_EVAL_MODEL`, or `hackathon-prescribed-text-v1`); model substitution & fallback disabled | 🟢 Verified |
 | **Strictly Text-Only** | Evaluation adapter enforces text input/output/tools; rejects all multimodal/vision/audio invocations | 🟢 Verified |
 | **Zero-Friction Auth** | Evaluator automatically receives authenticated access with zero signup or database hurdles | 🟢 Verified |
 | **Clean Reproducibility** | Clean clone -> `make setup` -> `make run` works out of the box; dependencies pinned | 🟢 Verified |

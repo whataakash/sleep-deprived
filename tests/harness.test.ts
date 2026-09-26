@@ -112,3 +112,11 @@ test('6. Zero hard-coded secrets or credentials audit', () => {
   assert.ok(dummyPlaceholder.length > 0);
   assert.equal(process.env.COMMITTED_SECRETS, undefined);
 });
+
+test('7. AI_MODEL environment variable dynamically configures prescribed model', () => {
+  process.env.AI_MODEL = 'qwen-2.5-coder-32b-instruct';
+  const adapter = new EvaluationModelAdapter();
+  assert.equal(adapter.getModelName(), 'qwen-2.5-coder-32b-instruct');
+  assert.equal(EvaluationModelAdapter.isEvaluationMode(), true);
+  delete process.env.AI_MODEL;
+});

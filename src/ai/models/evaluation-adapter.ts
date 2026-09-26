@@ -59,10 +59,10 @@ export class EvaluationModelAdapter implements EvaluationModel {
       (typeof process !== 'undefined' && process.env?.AI_API_KEY) ||
       '';
 
-    // 2. Prescribed model lock: read PARISHRAM_EVAL_MODEL / FORGE_EVAL_MODEL or locked standard
+    // 2. Prescribed model lock: read AI_MODEL / PRESCRIBED_MODEL / PARISHRAM_EVAL_MODEL or locked standard
     this.modelName =
       customConfig?.modelName ||
-      (typeof process !== 'undefined' && (process.env?.PARISHRAM_EVAL_MODEL || process.env?.FORGE_EVAL_MODEL)) ||
+      (typeof process !== 'undefined' && (process.env?.AI_MODEL || process.env?.PRESCRIBED_MODEL || process.env?.PARISHRAM_EVAL_MODEL || process.env?.FORGE_EVAL_MODEL)) ||
       'hackathon-prescribed-text-v1';
   }
 
@@ -79,6 +79,7 @@ export class EvaluationModelAdapter implements EvaluationModel {
     return (
       process.env.PARISHRAM_EVALUATION_MODE === 'true' ||
       process.env.FORGE_EVALUATION_MODE === 'true' ||
+      Boolean(process.env.AI_MODEL && process.env.AI_MODEL.trim().length > 0) ||
       Boolean(process.env.AI_API_KEY && process.env.AI_API_KEY.trim().length > 0)
     );
   }
@@ -87,7 +88,7 @@ export class EvaluationModelAdapter implements EvaluationModel {
     const hasKey = typeof process !== 'undefined' && Boolean(process.env.AI_API_KEY);
     const rawKey = (typeof process !== 'undefined' && process.env.AI_API_KEY) || '';
     const masked = rawKey.length > 8 ? `${rawKey.slice(0, 4)}...${rawKey.slice(-4)}` : (hasKey ? 'configured' : 'not_set');
-    const model = (typeof process !== 'undefined' && (process.env.PARISHRAM_EVAL_MODEL || process.env.FORGE_EVAL_MODEL)) || 'hackathon-prescribed-text-v1';
+    const model = (typeof process !== 'undefined' && (process.env.AI_MODEL || process.env.PRESCRIBED_MODEL || process.env.PARISHRAM_EVAL_MODEL || process.env.FORGE_EVAL_MODEL)) || 'hackathon-prescribed-text-v1';
 
     return {
       isEvaluationMode: this.isEvaluationMode(),

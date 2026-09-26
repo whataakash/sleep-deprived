@@ -32,24 +32,38 @@ setup:
 
 # 2. RUN: Start परिश्रम server in evaluation or product mode
 run:
-	@echo "==> Starting परिश्रम Harness (AI_API_KEY: $${AI_API_KEY:0:4}...$${AI_API_KEY: -4})..."
+	@echo "==> Initializing परिश्रम AI Harness in Evaluation Mode..."
+	@echo "    • AI_API_KEY: $${AI_API_KEY:+'Configured'} $${AI_API_KEY:-'Standby/Mock Evaluator Mode'}"
+	@echo "    • AI_MODEL:   $${AI_MODEL:-'hackathon-prescribed-text-v1 (Locked Default)'}"
+	@echo "    • Modality:   Strictly TEXT-ONLY (Zero multimodal)"
+	@echo "    • Web UI:     http://localhost:3000 (Zero-click evaluator auto-auth)"
+	@echo "    • API Run:    http://localhost:3000/api/evaluation/run"
+	@echo "    • Headless:   make evaluate (Terminal-only CLI)"
+	@echo ""
 	@if [ -d ".next" ]; then \
-		npm run start; \
+		AI_API_KEY="$${AI_API_KEY}" AI_MODEL="$${AI_MODEL}" npm run start; \
 	else \
-		npm run dev; \
+		AI_API_KEY="$${AI_API_KEY}" AI_MODEL="$${AI_MODEL}" npm run dev; \
 	fi
 
 # 3. TEST: Automated compliance and harness verification suite
 test:
 	@echo "==> Running automated evaluation & verification suite..."
-	npm test
+	AI_API_KEY="$${AI_API_KEY}" AI_MODEL="$${AI_MODEL}" npm test
 
 # 4. EVALUATE: Headless CLI evaluation against prescribed test case
 evaluate:
 	@echo "==> Running headless autonomous evaluation harness..."
-	npx tsx scripts/evaluate-harness.ts
+	AI_API_KEY="$${AI_API_KEY}" AI_MODEL="$${AI_MODEL}" npx tsx scripts/evaluate-harness.ts
 
-# 5. CLEAN: Remove compilation caches and generated output
+# 5. SYNC: Fast-forward team rebase & verification helper
+sync:
+	@echo "==> Syncing branch with main..."
+	git fetch origin
+	git rebase origin/main
+	npm test
+
+# 6. CLEAN: Remove compilation caches and generated output
 clean:
 	@echo "==> Cleaning build artifacts..."
 	rm -rf .next out build node_modules/.cache
