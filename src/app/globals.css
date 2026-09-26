@@ -1,26 +1,133 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+:root,
+html.dark {
+  --bg-canvas: #090a0d;
+  --bg-panel: #111418;
+  --bg-elevated: #161b21;
+  --bg-subtle: #1c222a;
+  --bg-active: #242c36;
+  --border-subtle: #232a32;
+  --border-medium: #2e3742;
+  --border-active: #3e4a59;
+
+  --text-primary: #f4f5f7;
+  --text-secondary: #9da6b3;
+  --text-muted: #647080;
+
+  --forge-flame: #ea580c;
+  --forge-flame-light: #f97316;
+  --forge-glow: rgba(234, 88, 12, 0.15);
+
+  --status-verified: #10b981;
+  --status-verified-glow: rgba(16, 185, 129, 0.18);
+  --status-failure: #ef4444;
+  --status-failure-glow: rgba(239, 68, 68, 0.18);
+  --status-warning: #f59e0b;
+  --status-active: #3b82f6;
+}
+
+html.light {
+  --bg-canvas: #f8fafc;
+  --bg-panel: #ffffff;
+  --bg-elevated: #f1f5f9;
+  --bg-subtle: #e2e8f0;
+  --bg-active: #cbd5e1;
+  --border-subtle: #e2e8f0;
+  --border-medium: #cbd5e1;
+  --border-active: #94a3b8;
+
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+
+  --forge-flame: #ea580c;
+  --forge-flame-light: #f97316;
+  --forge-glow: rgba(234, 88, 12, 0.12);
+
+  --status-verified: #059669;
+  --status-verified-glow: rgba(5, 150, 105, 0.15);
+  --status-failure: #dc2626;
+  --status-failure-glow: rgba(220, 38, 38, 0.15);
+  --status-warning: #d97706;
+  --status-active: #2563eb;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-canvas: var(--bg-canvas);
+  --color-panel: var(--bg-panel);
+  --color-elevated: var(--bg-elevated);
+  --color-subtle: var(--bg-subtle);
+  --color-border-subtle: var(--border-subtle);
+  --color-border-medium: var(--border-medium);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  background-color: var(--bg-canvas);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+code,
+pre,
+kbd,
+samp {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+}
+
+/* Custom minimal scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #252c36;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #343e4d;
+}
+
+/* The signature Forge Line animation */
+@keyframes forgePulse {
+  0% {
+    opacity: 0.6;
+    transform: scaleX(0.98);
+  }
+  50% {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+  100% {
+    opacity: 0.6;
+    transform: scaleX(0.98);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+.forge-line-glow {
+  box-shadow: 0 0 12px rgba(249, 115, 22, 0.45);
 }
+
+.verified-stamp-glow {
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.25);
+}
+
+
