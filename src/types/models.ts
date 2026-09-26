@@ -7,12 +7,15 @@ export type ModelCategory =
   | 'LOCAL';
 
 export type ModelProvider =
+  | 'ParishramAI'
   | 'Qwen'
   | 'Moonshot'
   | 'Z.ai'
   | 'DeepSeek'
   | 'Anthropic'
   | 'OpenAI'
+  | 'Google'
+  | 'Groq'
   | 'xAI'
   | 'OpenRouter'
   | 'Ollama'

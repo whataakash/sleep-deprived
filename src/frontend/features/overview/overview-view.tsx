@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { motion } from 'motion/react';
 import {
   Cpu,
@@ -13,16 +13,28 @@ import {
   TrendingUp,
   CreditCard,
   Lock,
+  Play,
+  RotateCcw,
   Mic,
   MicOff,
+  Sliders,
+  Bot,
+  Link2,
+  FolderGit2,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth/context';
 import { getPlanDisplay } from '@/lib/billing/plans';
+import { ParishramAIRouter } from '@/lib/models/gateway';
 
 interface OverviewViewProps {
   onStartRun: (taskText: string, modelId: string, agentMode?: string) => void;
   onOpenRun: (runNumber: number) => void;
   onOpenBilling?: () => void;
+  onOpenUpgrade?: () => void;
+  onRunDemo?: () => void;
+  isDemoRunning?: boolean;
+  onResetDemo?: () => void;
+  onNavigateToModels?: () => void;
 }
 
 interface RecentRunItem {
@@ -84,7 +96,16 @@ const RECENT_RUNS: RecentRunItem[] = [
   },
 ];
 
-export function OverviewView({ onStartRun, onOpenRun, onOpenBilling }: OverviewViewProps) {
+export function OverviewView({
+  onStartRun,
+  onOpenRun,
+  onOpenBilling,
+  onOpenUpgrade,
+  onRunDemo,
+  isDemoRunning,
+  onResetDemo,
+  onNavigateToModels,
+}: OverviewViewProps) {
   const { session } = useAuth();
   const user = session.user;
   const currentPlan = user?.plan || 'FREE';
@@ -94,10 +115,28 @@ export function OverviewView({ onStartRun, onOpenRun, onOpenBilling }: OverviewV
   const [selectedModelId, setSelectedModelId] = useState('qwen3-coder-next');
   const [selectedAgentMode, setSelectedAgentMode] = useState<'dual' | 'navigator' | 'supervisor'>('dual');
 
+  const liveDifficulty = useMemo(() => {
+    if (!taskPrompt.trim()) return null;
+    return ParishramAIRouter.evaluateDifficulty(taskPrompt, 2, 0);
+  }, [taskPrompt]);
+
+  const detectedRepo = useMemo(() => {
+    const match = taskPrompt.match(/https?:\/\/(?:www\.)?github\.com\/([^\s\/]+)\/([^\s\/]+)(?:\/issues\/(\d+))?/i);
+    if (!match) return null;
+    return {
+      fullUrl: match[0],
+      owner: match[1],
+      repo: match[2].replace(/\.git$/, ''),
+      issueNum: match[3],
+    };
+  }, [taskPrompt]);
+
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  // Instantly resize the textarea to fit content — no debounce so typing feels immediate.
+  // The outer motion.div picks up the layout shift and animates it smoothly.
   const autoResize = useCallback((el: HTMLTextAreaElement) => {
-    el.style.height = 'auto';
+    el.style.height = 'auto'; // collapse first so shrink works
     el.style.height = `${el.scrollHeight}px`;
   }, []);
 
@@ -215,16 +254,43 @@ export function OverviewView({ onStartRun, onOpenRun, onOpenBilling }: OverviewV
   const usagePercent = Math.min(100, Math.round((runsUsed / maxRuns) * 100));
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-start overflow-y-auto px-4 py-6 select-none font-sans transition-colors">
-      <div className="w-full max-w-2xl space-y-6">
-        {/* Simple Header */}
-        <div className="space-y-1 text-center sm:text-left">
-          <h1 className="text-2xl font-bold tracking-tight text-[var(--text-primary)]">
-            What are we building?
-          </h1>
-          <p className="text-xs text-[var(--text-secondary)] font-mono">
-            Autonomous software engineering with deterministic proof of work.
-          </p>
+    <div className="flex-1 flex flex-col items-center justify-start overflow-y-auto px-4 sm:px-6 lg:px-8 py-6 select-none font-sans transition-colors">
+      <div className="w-full max-w-4xl lg:max-w-5xl space-y-6">
+        {/* ENLARGED HERO SECTION: "What are you thinking to build?" */}
+        <div className="p-6 sm:p-7 rounded-2xl bg-gradient-to-br from-[var(--bg-elevated)] via-[var(--bg-panel)] to-[var(--bg-canvas)] border border-[var(--border-subtle)] space-y-3.5 shadow-sm relative overflow-hidden">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-2">
+                <span className="p-1 rounded-md bg-[#ea580c]/15 text-[#ea580c] border border-[#ea580c]/30">
+                  <Sparkles className="w-4 h-4" />
+                </span>
+                <span className="text-[11px] font-mono font-bold tracking-wider uppercase text-[#ea580c]">
+                  PARISHRAM AI CORE DISPATCHER
+                </span>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#10b981]/15 text-[#10b981] font-mono font-bold">
+                  AUTONOMOUS SMART ROUTING
+                </span>
+              </div>
+              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[var(--text-primary)]">
+                What are you thinking to build?
+              </h1>
+              <p className="text-xs text-[var(--text-secondary)] font-mono max-w-2xl leading-relaxed">
+                Describe any feature, bug, or refactor. Parishram AI dynamically evaluates task difficulty: low-level atomic tasks route to free open-source models, while hard architectural problems dispatch to frontier models.
+              </p>
+            </div>
+
+            {onNavigateToModels && (
+              <button
+                type="button"
+                onClick={onNavigateToModels}
+                className="self-start sm:self-center shrink-0 px-4 py-2.5 rounded-xl bg-[var(--bg-canvas)] hover:bg-[var(--bg-elevated)] border border-[#ea580c]/40 text-xs font-mono font-bold text-[var(--text-primary)] hover:text-[#ea580c] transition-all cursor-pointer flex items-center gap-2 shadow-xs group"
+              >
+                <Sliders className="w-3.5 h-3.5 text-[#ea580c] group-hover:rotate-45 transition-transform" />
+                <span>Configure AI Models</span>
+                <ArrowRight className="w-3.5 h-3.5 text-[var(--text-muted)] group-hover:translate-x-0.5 transition-transform" />
+              </button>
+            )}
+          </div>
         </div>
 
         {/* AI Agent Selection Bar (Above Chat) */}
@@ -300,16 +366,37 @@ export function OverviewView({ onStartRun, onOpenRun, onOpenBilling }: OverviewV
           transition={{ duration: 0.18, ease: [0.25, 0.1, 0.25, 1] }}
           className="bg-[var(--bg-panel)] border border-[var(--border-subtle)] rounded-xl p-4 shadow-sm transition-colors flex flex-col gap-0"
         >
+          {detectedRepo && (
+            <div className="mb-2.5 px-3 py-1.5 rounded-lg bg-[#ea580c]/12 border border-[#ea580c]/30 flex items-center justify-between text-xs font-mono">
+              <div className="flex items-center gap-2">
+                <Link2 className="w-3.5 h-3.5 text-[#ea580c]" />
+                <span className="text-[var(--text-muted)] text-[11px]">TARGET REPO DETECTED:</span>
+                <span className="font-bold text-[var(--text-primary)]">
+                  {detectedRepo.owner}/{detectedRepo.repo} {detectedRepo.issueNum ? `(Issue #${detectedRepo.issueNum})` : ''}
+                </span>
+              </div>
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 font-bold border border-emerald-500/30">
+                Ready to Clone & Fix
+              </span>
+            </div>
+          )}
+
+          {/*
+           * The textarea itself is sized by scrollHeight (via autoResize).
+           * min-height keeps it compact when empty (~2 lines of text).
+           * max-height caps growth; overflow-y:auto then handles internal scroll.
+           * The outer motion.div animates the resulting height change.
+           */}
           <textarea
             ref={textareaRef}
             value={taskPrompt}
             onChange={handlePromptChange}
             onKeyDown={handleKeyDown}
-            placeholder="How can I help you today?"
+            placeholder="Paste a faulty GitHub repository URL or describe any bug (e.g. https://github.com/org/repo)..."
             aria-label="Task prompt"
             style={{
-              minHeight: '3rem',
-              maxHeight: '13rem',
+              minHeight: '3rem',     /* ~2 lines — compact when empty */
+              maxHeight: '13rem',    /* ~8 lines — then scroll internally */
               height: 'auto',
               overflowY: taskPrompt ? 'auto' : 'hidden',
             }}
@@ -396,43 +483,135 @@ export function OverviewView({ onStartRun, onOpenRun, onOpenBilling }: OverviewV
               </button>
             </div>
           </div>
+
+          {/* Dynamic Live Difficulty Evaluation Badge */}
+          {liveDifficulty && (
+            <div className="mt-3 pt-3 border-t border-[var(--border-subtle)] flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
+              <div className="flex items-center gap-2">
+                <span className="text-[var(--text-muted)] text-[10px] uppercase font-bold">Parishram AI:</span>
+                <span
+                  className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                    liveDifficulty.tier === 'FRONTIER'
+                      ? 'bg-purple-500/15 text-purple-400 border border-purple-500/30'
+                      : 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                  }`}
+                >
+                  Score {liveDifficulty.score}/10 — {liveDifficulty.tier === 'FRONTIER' ? 'Frontier Reasoning Engine' : 'Free/Local Open-Source Model'}
+                </span>
+              </div>
+              <div className="text-[11px] text-[var(--text-muted)] truncate max-w-sm sm:max-w-md">
+                {liveDifficulty.signals.join(' • ')}
+              </div>
+            </div>
+          )}
         </motion.div>
 
-        {/* PSYCHOLOGY & FINANCE UPGRADE CARD (ChatGPT Plus / Claude Pro Style) */}
-        {currentPlan === 'FREE' && (
-          <div className="p-3.5 rounded-xl bg-gradient-to-r from-[#ea580c]/10 via-[var(--bg-panel)] to-[var(--bg-panel)] border border-[#ea580c]/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
-            <div className="space-y-1 font-mono">
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] px-1.5 py-0.2 rounded bg-[#ea580c]/20 text-[#ea580c] font-extrabold uppercase">
-                  {planInfo.name} Plan
-                </span>
-                <span className="text-[11px] text-[var(--text-secondary)]">
-                  {runsUsed} / {maxRuns} runs used this month ({usagePercent}%)
-                </span>
-              </div>
+        {/* Secondary Contextual Action: Run Demo */}
+        <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-[var(--text-muted)] font-mono px-1">
+          <div className="flex items-center gap-2">
+            {onRunDemo && (
+              <button
+                type="button"
+                onClick={onRunDemo}
+                disabled={isDemoRunning}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--bg-panel)] hover:bg-[var(--bg-elevated)] border border-[var(--border-subtle)] hover:border-[var(--border-medium)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all cursor-pointer shadow-xs disabled:opacity-50 text-[11px] font-semibold"
+                title="Run step-by-step benchmark demo"
+              >
+                <Play className={`w-3 h-3 text-[#ea580c] ${isDemoRunning ? 'animate-spin' : ''}`} />
+                <span>{isDemoRunning ? 'Running Demo...' : 'Run Demo'}</span>
+              </button>
+            )}
 
-              {/* Progress Bar */}
-              <div className="w-48 sm:w-64 h-1.5 bg-[var(--bg-elevated)] rounded-full overflow-hidden mt-1">
-                <div
-                  className="h-full bg-[#ea580c] rounded-full transition-all"
-                  style={{ width: `${usagePercent}%` }}
-                />
-              </div>
+            {onResetDemo && (
+              <button
+                type="button"
+                onClick={onResetDemo}
+                className="p-1.5 rounded-lg bg-[var(--bg-panel)] hover:bg-[var(--bg-elevated)] border border-[var(--border-subtle)] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
+                title="Reset to benchmark Run #1042"
+              >
+                <RotateCcw className="w-3 h-3" />
+              </button>
+            )}
+          </div>
 
-              <p className="text-[11px] text-[var(--text-secondary)] font-sans pt-1">
-                Upgrade to <strong className="text-[var(--text-primary)]">Pro</strong> for ₹999/mo to unlock Kimi K2, GLM 4.5, 256k context, and 150 runs/mo.
-              </p>
-            </div>
+          <div className="hidden sm:flex items-center gap-3 text-[11px] text-[var(--text-muted)]">
+            <span className="flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#10b981]" />
+              <span>Zero prompt leakage</span>
+            </span>
+            <span>·</span>
+            <span>Deterministic verification</span>
+          </div>
+        </div>
+
+        {/* Faulty Repository Quick Preset Chips */}
+        <div className="space-y-2 font-mono text-xs">
+          <div className="text-[11px] text-[var(--text-muted)] font-semibold uppercase tracking-wider flex items-center justify-between">
+            <span className="flex items-center gap-1.5">
+              <FolderGit2 className="w-3.5 h-3.5 text-[#ea580c]" />
+              <span>Or click a faulty repository benchmark to fix:</span>
+            </span>
+            <span className="text-[10px] text-[var(--text-muted)] lowercase">1-click clone & run</span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                const text = 'Fix https://github.com/parishram-ai/auth-gateway-service: forward session token in client';
+                setTaskPrompt(text);
+                if (textareaRef.current) setTimeout(() => autoResize(textareaRef.current!), 0);
+              }}
+              className="p-2.5 rounded-lg bg-[var(--bg-panel)] hover:bg-[var(--bg-elevated)] border border-[var(--border-subtle)] hover:border-[#ea580c]/50 text-left transition-colors cursor-pointer group shadow-xs"
+            >
+              <div className="flex items-center gap-1.5 text-[var(--text-primary)] group-hover:text-[#ea580c] font-semibold text-xs">
+                <Link2 className="w-3 h-3 text-[#ea580c]" />
+                <span className="truncate">auth-gateway-service</span>
+              </div>
+              <div className="text-[10px] text-[var(--text-muted)] mt-0.5 truncate font-sans">
+                Token split null pointer bug
+              </div>
+            </button>
 
             <button
-              onClick={onOpenBilling}
-              className="px-3.5 py-2 rounded-lg bg-[#ea580c] hover:bg-[#f97316] text-white font-bold text-xs flex items-center gap-1.5 transition-all shadow-md active:scale-95 shrink-0 cursor-pointer"
+              type="button"
+              onClick={() => {
+                const text = 'Fix https://github.com/parishram-ai/redis-token-bucket: race condition deadlock on mutex retry';
+                setTaskPrompt(text);
+                if (textareaRef.current) setTimeout(() => autoResize(textareaRef.current!), 0);
+              }}
+              className="p-2.5 rounded-lg bg-[var(--bg-panel)] hover:bg-[var(--bg-elevated)] border border-[var(--border-subtle)] hover:border-[#38bdf8]/50 text-left transition-colors cursor-pointer group shadow-xs"
             >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Upgrade to Pro ⚡</span>
+              <div className="flex items-center gap-1.5 text-[var(--text-primary)] group-hover:text-[#38bdf8] font-semibold text-xs">
+                <Link2 className="w-3 h-3 text-[#38bdf8]" />
+                <span className="truncate">redis-token-bucket</span>
+              </div>
+              <div className="text-[10px] text-[var(--text-muted)] mt-0.5 truncate font-sans">
+                Concurrency mutex deadlock
+              </div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                const text = 'Fix https://github.com/parishram-ai/database-migrator: schema invariant violation on audit logs';
+                setTaskPrompt(text);
+                if (textareaRef.current) setTimeout(() => autoResize(textareaRef.current!), 0);
+              }}
+              className="p-2.5 rounded-lg bg-[var(--bg-panel)] hover:bg-[var(--bg-elevated)] border border-[var(--border-subtle)] hover:border-[#10b981]/50 text-left transition-colors cursor-pointer group shadow-xs"
+            >
+              <div className="flex items-center gap-1.5 text-[var(--text-primary)] group-hover:text-[#10b981] font-semibold text-xs">
+                <Link2 className="w-3 h-3 text-[#10b981]" />
+                <span className="truncate">database-migrator</span>
+              </div>
+              <div className="text-[10px] text-[var(--text-muted)] mt-0.5 truncate font-sans">
+                Schema invariant violation
+              </div>
             </button>
           </div>
-        )}
+        </div>
+
+
 
         {/* Recent Runs List */}
         <div className="space-y-3 font-mono text-xs">

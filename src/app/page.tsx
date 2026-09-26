@@ -193,6 +193,7 @@ function ParishramAppInner() {
               onRunDemo={handleRunDemo}
               isDemoRunning={isDemoRunning}
               onResetDemo={handleResetDemo}
+              onNavigateToModels={() => setActiveView('models')}
             />
           )}
 
@@ -210,7 +211,18 @@ function ParishramAppInner() {
             />
           )}
 
-          {activeView === 'repositories' && <RepoExplorer />}
+          {activeView === 'repositories' && (
+            <RepoExplorer
+              onLaunchFix={(repoUrl, issueText) => {
+                handleStartRunFromOverview(
+                  issueText || `Fix faulty repository: ${repoUrl}`,
+                  selectedModel.id,
+                  'dual'
+                );
+                setActiveView('runs');
+              }}
+            />
+          )}
 
           {activeView === 'models' && (
             <ModelMarketplace

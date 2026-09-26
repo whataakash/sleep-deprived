@@ -429,4 +429,98 @@ export class ModelRouter {
   }
 }
 
+export interface TaskDifficultyEvaluation {
+  score: number; // 0 to 10
+  tier: 'LOW_LEVEL' | 'FRONTIER';
+  signals: string[];
+  explanation: string;
+  recommendedModelId: string;
+}
+
+export interface UserAIConfig {
+  lowLevelModelId: string;
+  frontierModelId: string;
+  autoEscalateOnFailure: boolean;
+  consecutiveFailureThreshold: number;
+  customApiKeys: Record<string, string>;
+}
+
+export const DEFAULT_USER_AI_CONFIG: UserAIConfig = {
+  lowLevelModelId: 'qwen3-coder-next',
+  frontierModelId: 'claude-3-7-sonnet',
+  autoEscalateOnFailure: true,
+  consecutiveFailureThreshold: 2,
+  customApiKeys: {},
+};
+
+export class ParishramAIRouter {
+  /**
+   * Evaluates task difficulty on a scale from 0 to 10 based on keywords, AST impact, and error severity.
+   */
+  public static evaluateDifficulty(
+    taskDescription: string,
+    filesAffected: number = 1,
+    priorFailures: number = 0
+  ): TaskDifficultyEvaluation {
+    let score = 2; // base score for simple task
+    const signals: string[] = [];
+    const text = (taskDescription || '').toLowerCase();
+
+    // Frontier signals
+    if (text.includes('auth') || text.includes('jwt') || text.includes('security') || text.includes('credential') || text.includes('token')) {
+      score += 3;
+      signals.push('Security & Auth Flow (+3)');
+    }
+    if (text.includes('race condition') || text.includes('deadlock') || text.includes('concurrency') || text.includes('mutex') || text.includes('thread')) {
+      score += 4;
+      signals.push('Concurrency & Race Conditions (+4)');
+    }
+    if (text.includes('architect') || text.includes('refactor') || text.includes('distributed') || text.includes('database migration')) {
+      score += 3;
+      signals.push('System Architecture & Refactoring (+3)');
+    }
+    if (text.includes('merkle') || text.includes('cryptographic') || text.includes('formal verification')) {
+      score += 3;
+      signals.push('Cryptographic Invariants (+3)');
+    }
+
+    // Low-level / atomic signals
+    if (text.includes('typo') || text.includes('rename') || text.includes('docstring') || text.includes('comment') || text.includes('readme')) {
+      score = Math.max(1, score - 2);
+      signals.push('Cosmetic / Documentation Reduction (-2)');
+    }
+    if (text.includes('syntax') || text.includes('import') || text.includes('linter') || text.includes('format')) {
+      score = Math.min(score, 3);
+      signals.push('Isolated Syntax Edit');
+    }
+
+    // Multi-file scaling
+    if (filesAffected > 3) {
+      score += Math.min(3, filesAffected - 1);
+      signals.push(`Cross-File Scope (${filesAffected} files affected)`);
+    }
+
+    // Stuck loop / prior failure escalation
+    if (priorFailures >= 2) {
+      score = Math.max(score, 8);
+      signals.push(`Auto-Escalation: ${priorFailures} consecutive test failures detected`);
+    }
+
+    score = Math.min(10, Math.max(1, score));
+
+    const isFrontier = score >= 5;
+    const tier: 'LOW_LEVEL' | 'FRONTIER' = isFrontier ? 'FRONTIER' : 'LOW_LEVEL';
+
+    return {
+      score,
+      tier,
+      signals,
+      explanation: isFrontier
+        ? `Parishram AI evaluated difficulty at ${score}/10 (Complex). Dispatched to Frontier Model for multi-step reasoning, test-driven recovery, and invariant preservation.`
+        : `Parishram AI evaluated difficulty at ${score}/10 (Low-Level / Atomic). Dispatched to Free/Local Open-Source model for high-throughput, low-cost execution.`,
+      recommendedModelId: isFrontier ? 'claude-3-7-sonnet' : 'qwen3-coder-next',
+    };
+  }
+}
+
 export type { ModelCategory, DynamicCodingModel, DynamicCodingModel as ModelManifest };

@@ -4,7 +4,7 @@
 # ==============================================================================
 
 SHELL := /bin/bash
-.PHONY: all setup run test evaluate clean help
+.PHONY: all setup run web test evaluate clean help
 
 all: setup test
 
@@ -13,15 +13,19 @@ help:
 	@echo ""
 	@echo "Standard Evaluation Targets:"
 	@echo "  make setup     - Install dependencies and build project (clean reproduction)"
-	@echo "  make run       - Launch परिश्रम application (consumes AI_API_KEY from environment)"
+	@echo "  make run       - Launch परिश्रम Terminal User Interface (TUI) evaluation harness"
+	@echo "  make web       - Launch Next.js Glass-Box Web Dashboard at http://localhost:3000"
 	@echo "  make test      - Run automated evaluation compliance & verification tests"
 	@echo "  make evaluate  - Run headless CLI evaluation against prescribed test issue"
 	@echo "  make clean     - Remove build artifacts and caches"
 	@echo ""
-	@echo "Evaluation Workflow:"
+	@echo "Terminal Evaluation Workflow:"
 	@echo "  export AI_API_KEY=\"<PROVIDED_KEY>\""
 	@echo "  make setup"
 	@echo "  make run"
+	@echo ""
+	@echo "Web Dashboard Workflow:"
+	@echo "  make web"
 
 # 1. SETUP: Clean installation and project compilation
 setup:
@@ -30,16 +34,14 @@ setup:
 	@echo "==> Compiling परिश्रम Next.js production build..."
 	npm run build
 
-# 2. RUN: Start परिश्रम server in evaluation or product mode
+# 2. RUN: Launch परिश्रम AI Harness Terminal User Interface (TUI) & Evaluation CLI
 run:
-	@echo "==> Initializing परिश्रम AI Harness in Evaluation Mode..."
-	@echo "    • AI_API_KEY: $${AI_API_KEY:+'Configured'} $${AI_API_KEY:-'Standby/Mock Evaluator Mode'}"
-	@echo "    • AI_MODEL:   $${AI_MODEL:-'hackathon-prescribed-text-v1 (Locked Default)'}"
-	@echo "    • Modality:   Strictly TEXT-ONLY (Zero multimodal)"
-	@echo "    • Web UI:     http://localhost:3000 (Zero-click evaluator auto-auth)"
-	@echo "    • API Run:    http://localhost:3000/api/evaluation/run"
-	@echo "    • Headless:   make evaluate (Terminal-only CLI)"
-	@echo ""
+	@echo "==> Initializing परिश्रम AI Harness Terminal Interface..."
+	@AI_API_KEY="$${AI_API_KEY}" AI_MODEL="$${AI_MODEL}" ISSUE="$${ISSUE:-$(ISSUE)}" npx tsx scripts/terminal-harness.ts $(filter-out $@,$(MAKECMDGOALS)) $(ARGS)
+
+# 2b. WEB: Launch Next.js Glass-Box Web Dashboard
+web:
+	@echo "==> Launching परिश्रम Glass-Box Web Dashboard at http://localhost:3000..."
 	@if [ -d ".next" ]; then \
 		AI_API_KEY="$${AI_API_KEY}" AI_MODEL="$${AI_MODEL}" npm run start; \
 	else \
@@ -67,3 +69,7 @@ sync:
 clean:
 	@echo "==> Cleaning build artifacts..."
 	rm -rf .next out build node_modules/.cache
+
+# Catch-all rule to allow arbitrary arguments passed to make run (e.g. make run "fix issue")
+%:
+	@:

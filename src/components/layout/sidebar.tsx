@@ -114,7 +114,7 @@ export function Sidebar({
           >
             <div className="flex items-center gap-2.5">
               <Cpu className="w-4 h-4 text-[#a78bfa]" />
-              <span className="text-[12px]">Models & Arena</span>
+              <span className="text-[12px]">Configure AI Models</span>
             </div>
             {isEvalMode && (
               <span className="text-[9px] px-1.5 py-0.2 rounded bg-[#ea580c]/15 text-[#ea580c] font-bold">
