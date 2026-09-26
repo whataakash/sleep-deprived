@@ -11,6 +11,7 @@ import {
   Download,
   ShieldAlert,
   Activity,
+  Home,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth/context';
 import { EvaluationModelAdapter } from '@/lib/models/evaluation-adapter';
@@ -56,8 +57,8 @@ export function Sidebar({
                 : 'text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)] hover:text-[var(--text-primary)]'
             }`}
           >
-            <Activity className="w-4 h-4 text-[#ea580c]" />
-            <span className="text-[12px]">Mission Control</span>
+            <Home className="w-4 h-4 text-[#ea580c]" />
+            <span className="text-[12px]">Home</span>
           </button>
 
           <button
@@ -112,7 +113,7 @@ export function Sidebar({
           >
             <div className="flex items-center gap-2.5">
               <Cpu className="w-4 h-4 text-[#a78bfa]" />
-              <span className="text-[12px]">Configure AI Models</span>
+              <span className="text-[12px]">Models & Arena</span>
             </div>
             {isEvalMode && (
               <span className="text-[9px] px-1.5 py-0.2 rounded bg-[#ea580c]/15 text-[#ea580c] font-bold">

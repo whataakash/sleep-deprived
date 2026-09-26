@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import {
   Cpu,
   ArrowRight,
@@ -21,14 +21,41 @@ import {
   Bot,
   Link2,
   FolderGit2,
+  Paperclip,
+  X,
+  FileText,
+  FileCode,
+  Image as ImageIcon,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth/context';
 import { getPlanDisplay } from '@/lib/billing/plans';
 import { ParishramAIRouter } from '@/lib/models/gateway';
 
+export interface AttachmentItem {
+  id: string;
+  name: string;
+  size: number;
+  formattedSize: string;
+  type: string;
+  isImage: boolean;
+  previewUrl?: string;
+  file: File;
+}
+
+function formatFileSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function sanitizeFileName(name: string): string {
+  const parts = name.split(/[/\\]/);
+  return parts[parts.length - 1] || name;
+}
+
 interface OverviewViewProps {
-  onStartRun: (taskText: string, modelId: string, agentMode?: string) => void;
-  onOpenRun: (runNumber: number) => void;
+  onStartRun: (taskText: string, modelId: string, agentMode?: string, attachments?: AttachmentItem[]) => void;
+  onOpenRun?: (runNumber: number) => void;
   onOpenBilling?: () => void;
   onOpenUpgrade?: () => void;
   onRunDemo?: () => void;
@@ -36,65 +63,6 @@ interface OverviewViewProps {
   onResetDemo?: () => void;
   onNavigateToModels?: () => void;
 }
-
-interface RecentRunItem {
-  id: string;
-  number: number;
-  title: string;
-  status: 'VERIFIED' | 'FAILED';
-  duration: string;
-  timestamp: string;
-  filesCount: number;
-  modelUsed: string;
-  agentMode: string;
-}
-
-const RECENT_RUNS: RecentRunItem[] = [
-  {
-    id: 'run-1042',
-    number: 1042,
-    title: 'Fix auth-gateway-service: forward session token in client',
-    status: 'VERIFIED',
-    duration: '42s',
-    timestamp: '12m ago',
-    filesCount: 1,
-    modelUsed: 'Qwen3-Coder-Next',
-    agentMode: 'Dual Agent (Nav + Sup)',
-  },
-  {
-    id: 'run-1041',
-    number: 1041,
-    title: 'Inject rate-limiter middleware into redis token bucket',
-    status: 'VERIFIED',
-    duration: '1m 18s',
-    timestamp: '2h ago',
-    filesCount: 3,
-    modelUsed: 'DeepSeek-V3-Coder',
-    agentMode: 'Supervisor AI',
-  },
-  {
-    id: 'run-1040',
-    number: 1040,
-    title: 'Handle malformed JWT signature without unhandled rejection',
-    status: 'VERIFIED',
-    duration: '34s',
-    timestamp: '5h ago',
-    filesCount: 2,
-    modelUsed: 'Kimi-K2.5-Agent',
-    agentMode: 'Navigating AI',
-  },
-  {
-    id: 'run-1039',
-    number: 1039,
-    title: 'Update database migration schema for user audit logs',
-    status: 'VERIFIED',
-    duration: '58s',
-    timestamp: 'Yesterday',
-    filesCount: 4,
-    modelUsed: 'GLM-5-MoE',
-    agentMode: 'Dual Agent (Nav + Sup)',
-  },
-];
 
 export function OverviewView({
   onStartRun,
@@ -237,16 +205,94 @@ export function OverviewView({
     }
   }, [isSpeechSupported, isListening, autoResize]);
 
+  const [attachments, setAttachments] = useState<AttachmentItem[]>([]);
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const addFiles = useCallback((files: FileList | File[] | null) => {
+    if (!files || files.length === 0) return;
+    const fileArray = Array.from(files);
+
+    const newAttachments: AttachmentItem[] = fileArray.map((f) => {
+      const cleanName = sanitizeFileName(f.name);
+      const isImg = f.type.startsWith('image/') || /\.(png|jpe?g|gif|webp|svg)$/i.test(cleanName);
+      let previewUrl: string | undefined = undefined;
+      if (isImg && typeof window !== 'undefined' && typeof URL !== 'undefined' && URL.createObjectURL) {
+        try {
+          previewUrl = URL.createObjectURL(f);
+        } catch {
+          // ignore
+        }
+      }
+      return {
+        id: `att-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        name: cleanName,
+        size: f.size,
+        formattedSize: formatFileSize(f.size),
+        type: f.type,
+        isImage: isImg,
+        previewUrl,
+        file: f,
+      };
+    });
+
+    setAttachments((prev) => [...prev, ...newAttachments]);
+  }, []);
+
+  const handleFileSelect = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (e.target.files && e.target.files.length > 0) {
+        addFiles(e.target.files);
+        e.target.value = '';
+      }
+    },
+    [addFiles]
+  );
+
+  const removeAttachment = useCallback((id: string) => {
+    setAttachments((prev) => {
+      const target = prev.find((a) => a.id === id);
+      if (target?.previewUrl) {
+        try {
+          URL.revokeObjectURL(target.previewUrl);
+        } catch {
+          // ignore
+        }
+      }
+      return prev.filter((a) => a.id !== id);
+    });
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      attachments.forEach((a) => {
+        if (a.previewUrl) {
+          try {
+            URL.revokeObjectURL(a.previewUrl);
+          } catch {
+            // ignore
+          }
+        }
+      });
+    };
+  }, [attachments]);
+
+  const handleSubmitTask = useCallback(() => {
+    if (taskPrompt.trim() || attachments.length > 0) {
+      onStartRun(taskPrompt, selectedModelId, selectedAgentMode, attachments);
+      setTaskPrompt('');
+      setAttachments([]);
+    }
+  }, [taskPrompt, attachments, selectedModelId, selectedAgentMode, onStartRun]);
+
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault();
-        if (taskPrompt.trim()) {
-          onStartRun(taskPrompt, selectedModelId, selectedAgentMode);
-        }
+        handleSubmitTask();
       }
     },
-    [taskPrompt, selectedModelId, selectedAgentMode, onStartRun]
+    [handleSubmitTask]
   );
 
   const runsUsed = user?.usage.runsUsedThisMonth || 14;
@@ -272,10 +318,10 @@ export function OverviewView({
                 </span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[var(--text-primary)]">
-                What are you thinking to build?
+                What are we building?
               </h1>
               <p className="text-xs text-[var(--text-secondary)] font-mono max-w-2xl leading-relaxed">
-                Describe any feature, bug, or refactor. Parishram AI dynamically evaluates task difficulty: low-level atomic tasks route to free open-source models, while hard architectural problems dispatch to frontier models.
+                Autonomous software engineering with deterministic proof of work. Describe any feature, bug, or refactor to route dynamically across free open models and frontier reasoning engines.
               </p>
             </div>
 
@@ -286,7 +332,7 @@ export function OverviewView({
                 className="self-start sm:self-center shrink-0 px-4 py-2.5 rounded-xl bg-[var(--bg-canvas)] hover:bg-[var(--bg-elevated)] border border-[#ea580c]/40 text-xs font-mono font-bold text-[var(--text-primary)] hover:text-[#ea580c] transition-all cursor-pointer flex items-center gap-2 shadow-xs group"
               >
                 <Sliders className="w-3.5 h-3.5 text-[#ea580c] group-hover:rotate-45 transition-transform" />
-                <span>Configure AI Models</span>
+                <span>Models & Arena</span>
                 <ArrowRight className="w-3.5 h-3.5 text-[var(--text-muted)] group-hover:translate-x-0.5 transition-transform" />
               </button>
             )}
@@ -364,7 +410,23 @@ export function OverviewView({
         <motion.div
           layout
           transition={{ duration: 0.18, ease: [0.25, 0.1, 0.25, 1] }}
-          className="bg-[var(--bg-panel)] border border-[var(--border-subtle)] rounded-xl p-4 shadow-sm transition-colors flex flex-col gap-0"
+          onDragOver={(e) => {
+            e.preventDefault();
+            setIsDragging(true);
+          }}
+          onDragLeave={() => setIsDragging(false)}
+          onDrop={(e) => {
+            e.preventDefault();
+            setIsDragging(false);
+            if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+              addFiles(e.dataTransfer.files);
+            }
+          }}
+          className={`bg-[var(--bg-panel)] border rounded-xl p-4 shadow-sm transition-all flex flex-col gap-0 ${
+            isDragging
+              ? 'border-[#ea580c] ring-2 ring-[#ea580c]/30 bg-[#ea580c]/5'
+              : 'border-[var(--border-subtle)]'
+          }`}
         >
           {detectedRepo && (
             <div className="mb-2.5 px-3 py-1.5 rounded-lg bg-[#ea580c]/12 border border-[#ea580c]/30 flex items-center justify-between text-xs font-mono">
@@ -392,10 +454,10 @@ export function OverviewView({
             value={taskPrompt}
             onChange={handlePromptChange}
             onKeyDown={handleKeyDown}
-            placeholder="Paste a faulty GitHub repository URL or describe any bug (e.g. https://github.com/org/repo)..."
+            placeholder="How can I help you today?"
             aria-label="Task prompt"
             style={{
-              minHeight: '3rem',     /* ~2 lines — compact when empty */
+              minHeight: '3.5rem',     /* ~2 lines — compact and substantial */
               maxHeight: '13rem',    /* ~8 lines — then scroll internally */
               height: 'auto',
               overflowY: taskPrompt ? 'auto' : 'hidden',
@@ -403,9 +465,72 @@ export function OverviewView({
             className="w-full bg-transparent text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none resize-none leading-relaxed font-sans"
           />
 
+          {/* Attachment Chips Area inside composer */}
+          {attachments.length > 0 && (
+            <div className="flex flex-wrap items-center gap-1.5 pt-2 pb-1 border-t border-[var(--border-subtle)] mt-2">
+              <AnimatePresence mode="popLayout">
+                {attachments.map((att) => (
+                  <motion.div
+                    key={att.id}
+                    layout
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    transition={{ duration: 0.15 }}
+                    className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-[var(--bg-elevated)] border border-[var(--border-subtle)] text-[11px] font-mono text-[var(--text-secondary)] shadow-2xs max-w-[220px]"
+                  >
+                    {att.isImage && att.previewUrl ? (
+                      <img
+                        src={att.previewUrl}
+                        alt=""
+                        className="w-3.5 h-3.5 object-cover rounded shrink-0 border border-[var(--border-subtle)]"
+                      />
+                    ) : /\.(ts|tsx|js|jsx|py|go|rs|c|cpp|java|html|css|sql|json|ya?ml)$/i.test(att.name) ? (
+                      <FileCode className="w-3.5 h-3.5 text-[#38bdf8] shrink-0" />
+                    ) : (
+                      <FileText className="w-3.5 h-3.5 text-[#10b981] shrink-0" />
+                    )}
+                    <span className="truncate" title={att.name}>{att.name}</span>
+                    <span className="text-[9px] text-[var(--text-muted)] shrink-0">({att.formattedSize})</span>
+                    <button
+                      type="button"
+                      onClick={() => removeAttachment(att.id)}
+                      className="p-0.5 hover:bg-[var(--bg-subtle)] text-[var(--text-muted)] hover:text-[#ef4444] rounded transition-colors cursor-pointer shrink-0"
+                      aria-label={`Remove attachment ${att.name}`}
+                      title="Remove attachment"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+          )}
+
           <div className="pt-3 mt-1 border-t border-[var(--border-subtle)] flex flex-wrap items-center justify-between gap-3 font-mono text-xs">
-            {/* Model Picker */}
+            {/* Left Controls: File Attachment Button + Model Picker */}
             <div className="flex items-center gap-2">
+              <input
+                ref={fileInputRef}
+                type="file"
+                multiple
+                accept="*/*"
+                onChange={handleFileSelect}
+                className="hidden"
+                aria-label="Attach local files"
+              />
+
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                aria-label="Attach local files"
+                title="Attach local files, code, or media"
+                className="flex items-center justify-center w-8 h-8 rounded-lg bg-[var(--bg-elevated)] hover:bg-[var(--bg-subtle)] border border-[var(--border-subtle)] hover:border-[var(--border-medium)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all cursor-pointer shadow-2xs group"
+              >
+                <Paperclip className="w-3.5 h-3.5 text-[var(--text-muted)] group-hover:text-[var(--text-primary)]" />
+              </button>
+
+              {/* Model Picker */}
               <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-[var(--bg-elevated)] border border-[var(--border-subtle)] text-[11px]">
                 <Cpu className="w-3 h-3 text-[#38bdf8]" />
                 <select
@@ -435,7 +560,7 @@ export function OverviewView({
               </div>
             </div>
 
-            {/* Action Buttons: Functional Microphone & Send Arrow */}
+            {/* Right Controls: Functional Microphone & Send Arrow */}
             <div className="flex items-center gap-2">
               <button
                 type="button"
@@ -474,7 +599,7 @@ export function OverviewView({
 
               <button
                 type="button"
-                onClick={() => onStartRun(taskPrompt, selectedModelId, selectedAgentMode)}
+                onClick={handleSubmitTask}
                 aria-label="Run task"
                 title="Run task"
                 className="flex items-center justify-center w-9 h-9 rounded-lg bg-[#ea580c] hover:bg-[#f97316] text-white transition-all shadow-xs active:scale-[0.98] motion-reduce:active:scale-100 cursor-pointer min-w-[36px] min-h-[36px]"
@@ -612,63 +737,6 @@ export function OverviewView({
         </div>
 
 
-
-        {/* Recent Runs List */}
-        <div className="space-y-3 font-mono text-xs">
-          <div className="flex items-center justify-between text-[11px] text-[var(--text-muted)] uppercase tracking-wider font-semibold">
-            <span>Recent Runs</span>
-            <span>All Tasks Persisted</span>
-          </div>
-
-          <div className="space-y-1.5">
-            {RECENT_RUNS.map((run) => (
-              <button
-                key={run.id}
-                onClick={() => onOpenRun(run.number)}
-                className="w-full p-3 rounded-lg bg-[var(--bg-panel)] hover:bg-[var(--bg-elevated)] border border-[var(--border-subtle)] hover:border-[var(--border-medium)] flex items-center justify-between text-left transition-colors cursor-pointer group"
-              >
-                <div className="flex items-center gap-3">
-                  <div
-                    className={`w-2 h-2 rounded-full ${
-                      run.status === 'VERIFIED' ? 'bg-[#10b981]' : 'bg-[#ef4444]'
-                    }`}
-                  />
-                  <div>
-                    <div className="font-semibold text-[var(--text-primary)] group-hover:text-[#ea580c] transition-colors">
-                      {run.title}
-                    </div>
-                    <div className="text-[11px] text-[var(--text-muted)] flex items-center gap-2 mt-0.5">
-                      <span>Run #{run.number}</span>
-                      <span>·</span>
-                      <span>{run.agentMode}</span>
-                      <span>·</span>
-                      <span>{run.filesCount} file changed</span>
-                      <span>·</span>
-                      <span>{run.duration}</span>
-                      <span>·</span>
-                      <span>{run.modelUsed}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <span
-                    className={`text-[10px] px-2 py-0.5 rounded font-bold ${
-                      run.status === 'VERIFIED'
-                        ? 'bg-[#10b981]/15 text-[#10b981]'
-                        : 'bg-[#ef4444]/15 text-[#ef4444]'
-                    }`}
-                  >
-                    {run.status}
-                  </span>
-                  <span className="text-[11px] text-[var(--text-muted)] hidden sm:inline">
-                    {run.timestamp}
-                  </span>
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
 
         {/* Minimal System Status Footer */}
         <div className="pt-4 border-t border-[var(--border-subtle)] flex flex-wrap items-center justify-between gap-3 text-[11px] text-[var(--text-muted)] font-mono">

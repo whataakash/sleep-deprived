@@ -102,11 +102,20 @@ function ParishramAppInner() {
     setCurrentEventIndex(INITIAL_RUN_1042.events.length - 1);
   };
 
-  const handleStartRunFromOverview = (taskText: string, modelId: string, agentMode?: string) => {
+  const handleStartRunFromOverview = (
+    taskText: string,
+    modelId: string,
+    agentMode?: string,
+    attachments?: Array<{ name: string }>
+  ) => {
     setSelectedModelId(modelId);
+    const attachmentNote =
+      attachments && attachments.length > 0
+        ? ` [Attached: ${attachments.map((a) => a.name).join(', ')}]`
+        : '';
     setCurrentRun((prev) => ({
       ...prev,
-      taskTitle: taskText,
+      taskTitle: (taskText || 'Autonomous Task') + attachmentNote,
       modelId,
     }));
     handleRunDemo();

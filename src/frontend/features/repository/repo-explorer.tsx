@@ -145,7 +145,7 @@ export function RepoExplorer({ onSelectWhyFile, onLaunchFix }: RepoExplorerProps
         {/* Inputs row */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-2 pt-1">
           <div className="md:col-span-6 flex items-center gap-2 px-3 py-2 rounded-lg bg-[var(--bg-canvas)] border border-[var(--border-subtle)]">
-            <Github className="w-4 h-4 text-[var(--text-muted)] shrink-0" />
+            <FolderGit2 className="w-4 h-4 text-[var(--text-muted)] shrink-0" />
             <input
               type="text"
               value={repoUrlInput}

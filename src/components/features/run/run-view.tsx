@@ -19,6 +19,7 @@ import { ApprovalGatePanel } from './approval-gate-panel';
 import { WhyPanel } from './why-panel';
 import { MultiAgentSystem } from '@/lib/agent/multi-agent-system';
 import { StuckAgentDetector } from '@/lib/agent/stuck-detector';
+import { RECENT_RUNS } from '@/lib/runs/run-history';
 
 import {
   ShieldCheck,
@@ -62,7 +63,8 @@ export type RunViewTab =
   | 'regression'
   | 'checkpoints'
   | 'branching'
-  | 'docs';
+  | 'docs'
+  | 'history';
 
 export function RunView({
   run,
@@ -91,6 +93,19 @@ export function RunView({
       <div className="p-3 bg-[var(--bg-elevated)] border-b border-[var(--border-subtle)] flex flex-wrap items-center justify-between gap-3 font-mono text-xs select-none">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setActiveTab('history')}
+              className={`flex items-center gap-1.5 px-2 py-0.5 rounded transition-all cursor-pointer text-xs ${
+                activeTab === 'history'
+                  ? 'bg-[#ea580c] text-white font-bold shadow-xs'
+                  : 'bg-[var(--bg-panel)] hover:bg-[var(--bg-elevated)] border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+              }`}
+              title="View all persisted task runs"
+            >
+              <History className="w-3.5 h-3.5 text-[#38bdf8]" />
+              <span>Recent Runs ({RECENT_RUNS.length})</span>
+            </button>
             <div className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-[var(--bg-panel)] border border-[var(--border-subtle)] text-[#ea580c] font-semibold text-xs shadow-2xs">
               <Layers className="w-3.5 h-3.5" />
               <span className="font-bold text-[var(--text-primary)]">Run Details</span>
@@ -252,6 +267,21 @@ export function RunView({
 
       {/* SEGMENTED NAVIGATION TABS */}
       <div className="px-3 py-2 bg-[var(--bg-panel)] border-b border-[var(--border-subtle)] flex flex-wrap items-center gap-1.5 font-mono text-xs select-none">
+        {/* RECENT RUNS & PERSISTED HISTORY */}
+        <button
+          onClick={() => setActiveTab('history')}
+          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md transition-colors cursor-pointer shrink-0 text-xs ${
+            activeTab === 'history'
+              ? 'bg-[#ea580c] text-white font-bold shadow-xs'
+              : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] border border-transparent'
+          }`}
+        >
+          <History className="w-3.5 h-3.5 text-[#38bdf8]" />
+          <span>Recent Runs ({RECENT_RUNS.length})</span>
+        </button>
+
+        <div className="h-3.5 w-[1px] bg-[var(--border-subtle)] mx-0.5 hidden sm:block shrink-0" />
+
         {/* EXECUTION & OBSERVABILITY */}
         <button
           onClick={() => setActiveTab('timeline')}
@@ -448,6 +478,93 @@ export function RunView({
 
         {/* Docs */}
         {activeTab === 'docs' && <DocsPanel />}
+
+        {/* Run History & Persisted Tasks View */}
+        {activeTab === 'history' && (
+          <div className="flex-1 flex flex-col overflow-y-auto p-4 sm:p-6 space-y-4 bg-[var(--bg-canvas)]">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[var(--border-subtle)] font-mono text-xs">
+              <div>
+                <div className="flex items-center gap-2">
+                  <History className="w-4 h-4 text-[#ea580c]" />
+                  <h2 className="text-sm font-bold uppercase tracking-wider text-[var(--text-primary)]">
+                    Recent Runs & Persisted Tasks
+                  </h2>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#10b981]/15 text-[#10b981] font-bold">
+                    All Tasks Persisted
+                  </span>
+                </div>
+                <p className="text-[11px] text-[var(--text-secondary)] font-sans mt-1">
+                  Historical autonomous software engineering executions with deterministic proof of work and verification statuses.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] text-[var(--text-muted)]">
+                  Total: <strong className="text-[var(--text-primary)]">{RECENT_RUNS.length} runs</strong>
+                </span>
+                <span>·</span>
+                <span className="text-[11px] text-[#10b981]">100% Verified</span>
+              </div>
+            </div>
+
+            <div className="space-y-2 font-mono text-xs">
+              {RECENT_RUNS.map((r) => (
+                <button
+                  key={r.id}
+                  type="button"
+                  onClick={() => setActiveTab('timeline')}
+                  className={`w-full p-3.5 rounded-xl border text-left transition-all cursor-pointer group flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs ${
+                    r.number === run.runNumber
+                      ? 'bg-[var(--bg-elevated)] border-[#ea580c]/50 ring-1 ring-[#ea580c]/30'
+                      : 'bg-[var(--bg-panel)] hover:bg-[var(--bg-elevated)] border-[var(--border-subtle)] hover:border-[var(--border-medium)]'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={`w-2.5 h-2.5 rounded-full shrink-0 ${
+                        r.status === 'VERIFIED' ? 'bg-[#10b981]' : 'bg-[#ef4444]'
+                      }`}
+                    />
+                    <div>
+                      <div className="font-semibold text-xs text-[var(--text-primary)] group-hover:text-[#ea580c] transition-colors">
+                        {r.title}
+                      </div>
+                      <div className="text-[11px] text-[var(--text-muted)] flex flex-wrap items-center gap-2 mt-1">
+                        <span className="font-bold text-[var(--text-secondary)]">Run #{r.number}</span>
+                        <span>·</span>
+                        <span>{r.agentMode}</span>
+                        <span>·</span>
+                        <span>{r.filesCount} {r.filesCount === 1 ? 'file' : 'files'} changed</span>
+                        <span>·</span>
+                        <span>{r.duration}</span>
+                        <span>·</span>
+                        <span className="text-[#38bdf8]">{r.modelUsed}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 self-end sm:self-center shrink-0">
+                    <span
+                      className={`text-[10px] px-2 py-0.5 rounded font-bold ${
+                        r.status === 'VERIFIED'
+                          ? 'bg-[#10b981]/15 text-[#10b981] border border-[#10b981]/30'
+                          : 'bg-[#ef4444]/15 text-[#ef4444] border border-[#ef4444]/30'
+                      }`}
+                    >
+                      {r.status}
+                    </span>
+                    <span className="text-[11px] text-[var(--text-muted)]">
+                      {r.timestamp}
+                    </span>
+                    <span className="text-[11px] font-bold text-[#ea580c] group-hover:translate-x-0.5 transition-transform flex items-center gap-0.5">
+                      Inspect →
+                    </span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Terminal Output Docked at Bottom of Unified Container */}
