@@ -36,7 +36,7 @@ function ParishramAppInner() {
 
   // Modals
   const [isAccountOpen, setIsAccountOpen] = useState<boolean>(false);
-  const [accountInitialCategory, setAccountInitialCategory] = useState<string>('general');
+  const [accountInitialCategory, setAccountInitialCategory] = useState<string>('appearance');
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState<boolean>(false);
 
   const isEvalMode = EvaluationModelAdapter.isEvaluationMode();
@@ -170,7 +170,7 @@ function ParishramAppInner() {
         selectedModelName={selectedModel.displayName}
         onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
         onOpenAccount={(cat) => {
-          setAccountInitialCategory(cat || 'general');
+          setAccountInitialCategory(cat || 'appearance');
           setIsAccountOpen(true);
         }}
         onRunDemo={handleRunDemo}
@@ -214,7 +214,7 @@ function ParishramAppInner() {
           activeView={activeView}
           onSelectView={setActiveView}
           onOpenAccount={() => {
-            setAccountInitialCategory('general');
+            setAccountInitialCategory('appearance');
             setIsAccountOpen(true);
           }}
           runStatus={isVerified ? 'VERIFIED' : 'RUNNING'}

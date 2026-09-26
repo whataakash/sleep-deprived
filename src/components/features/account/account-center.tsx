@@ -30,14 +30,22 @@ interface SettingCategory {
 
 export function AccountCenter({ isOpen, onClose, initialCategory = 'appearance' }: AccountCenterProps) {
   const { session, updateProfile, updatePreferences, logout } = useAuth();
-  const [activeCategory, setActiveCategory] = useState<string>(
-    initialCategory === 'billing' || initialCategory === 'ai' ? 'appearance' : initialCategory
-  );
+  const [activeCategory, setActiveCategory] = useState<string>('appearance');
 
   // Profile Form states
   const [nameInput, setNameInput] = useState(session.user?.name || '');
   const [emailInput, setEmailInput] = useState(session.user?.email || '');
   const [savedNotice, setSavedNotice] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      if (initialCategory && ['appearance', 'editor', 'shortcuts', 'account'].includes(initialCategory)) {
+        setActiveCategory(initialCategory);
+      } else {
+        setActiveCategory('appearance');
+      }
+    }
+  }, [isOpen, initialCategory]);
 
   useEffect(() => {
     if (session.user) {

@@ -34,10 +34,9 @@ setup:
 	@echo "==> Compiling PARISHRAM Next.js production build..."
 	npm run build
 
-# 2. RUN: Launch PARISHRAM AI Harness Terminal Interface
+# 2. RUN: Launch PARISHRAM AI Harness Terminal User Interface (TUI)
 run:
-	@echo "==> Initializing PARISHRAM AI Harness Terminal Interface..."
-	@AI_API_KEY="$${AI_API_KEY}" AI_MODEL="$${AI_MODEL}" ISSUE="$${ISSUE:-$(ISSUE)}" npx tsx scripts/cli.ts run $(filter-out $@,$(MAKECMDGOALS)) $(ARGS)
+	@AI_API_KEY="$${AI_API_KEY}" AI_MODEL="$${AI_MODEL}" ISSUE="$${ISSUE:-$(ISSUE)}" npx tsx scripts/terminal-harness.ts $(filter-out $@,$(MAKECMDGOALS)) $(ARGS)
 
 # 2b. WEB: Launch Next.js Glass-Box Web Dashboard
 web:
