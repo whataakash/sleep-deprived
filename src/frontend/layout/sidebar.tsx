@@ -172,8 +172,7 @@ export function Sidebar({
                 {user?.name || 'Evaluator Session'}
               </div>
               <div className="text-[10px] text-[var(--text-muted)] flex items-center gap-1">
-                <span className="text-[#ea580c] font-bold">{planInfo.hindiName}</span>
-                <span className="text-[9px]">({planInfo.englishSubtitle})</span>
+                <span className="text-[#ea580c] font-bold">{planInfo.name}</span>
                 <span>·</span>
                 <span>{user?.usage.runsUsedThisMonth || 0} runs</span>
               </div>

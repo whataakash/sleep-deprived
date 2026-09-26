@@ -19,14 +19,24 @@ export function PricingView() {
   const currentPlan = session.user?.plan || 'BUILDER';
   const [currency, setCurrency] = useState<'INR' | 'USD'>('INR');
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
+  const [tierCategory, setTierCategory] = useState<'individual' | 'team'>('individual');
   const [selectedPlanForCheckout, setSelectedPlanForCheckout] = useState<PricingPlan | null>(null);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
 
   const handleOpenCheckout = (plan: PricingPlan) => {
     if (plan.id === 'FREE') return;
+    if (plan.id === 'ENTERPRISE') {
+      window.open('mailto:enterprise@parishram.dev?subject=Parishram%20Enterprise%20Inquiry', '_blank');
+      return;
+    }
     setSelectedPlanForCheckout(plan);
     setIsCheckoutOpen(true);
   };
+
+  const displayedPlans =
+    tierCategory === 'individual'
+      ? PRICING_PLANS.filter((p) => ['FREE', 'BUILDER', 'PRO'].includes(p.id))
+      : PRICING_PLANS.filter((p) => ['TEAM', 'ENTERPRISE'].includes(p.id));
 
   return (
     <div className="flex-1 flex flex-col bg-[var(--bg-panel)] border border-[var(--border-subtle)] rounded-lg overflow-hidden transition-colors">
@@ -78,32 +88,67 @@ export function PricingView() {
                 billingCycle === 'yearly' ? 'bg-[#ea580c] text-white font-bold' : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
               }`}
             >
-              Yearly (Save 17%)
+              Yearly (Save 20%)
             </button>
           </div>
         </div>
       </div>
 
       <div className="flex-1 overflow-y-auto p-6 space-y-6">
-        <div className="text-center max-w-xl mx-auto space-y-2">
-          <h2 className="text-xl font-bold text-[var(--text-primary)] tracking-tight">
-            Predictable engineering compute for autonomous agents
+        <div className="text-center max-w-xl mx-auto space-y-3">
+          <div className="text-[10px] font-mono tracking-widest uppercase text-[#ea580c] font-bold">
+            SUBSCRIPTION PLANS
+          </div>
+          <h2 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)] tracking-tight">
+            Plans that fit your work
           </h2>
           <p className="text-xs text-[var(--text-secondary)] font-sans">
             Every plan includes our deterministic verification harness, glass box observability, and failure recovery engine.
           </p>
+
+          {/* Individual vs Team & Enterprise Segmented Control */}
+          <div className="inline-flex p-1 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-subtle)] shadow-inner text-xs font-medium">
+            <button
+              onClick={() => setTierCategory('individual')}
+              className={`px-4 py-1.5 rounded-lg transition-all cursor-pointer ${
+                tierCategory === 'individual'
+                  ? 'bg-[var(--bg-canvas)] text-[var(--text-primary)] font-bold shadow-xs border border-[var(--border-subtle)]'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+              }`}
+            >
+              Individual
+            </button>
+            <button
+              onClick={() => setTierCategory('team')}
+              className={`px-4 py-1.5 rounded-lg transition-all cursor-pointer ${
+                tierCategory === 'team'
+                  ? 'bg-[var(--bg-canvas)] text-[var(--text-primary)] font-bold shadow-xs border border-[var(--border-subtle)]'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+              }`}
+            >
+              Team & Enterprise
+            </button>
+          </div>
         </div>
 
         {/* Plans Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 font-mono text-xs">
-          {PRICING_PLANS.map((plan) => {
+        <div
+          className={`grid gap-4 font-mono text-xs ${
+            tierCategory === 'individual'
+              ? 'grid-cols-1 md:grid-cols-3 max-w-5xl mx-auto'
+              : 'grid-cols-1 md:grid-cols-2 max-w-3xl mx-auto'
+          }`}
+        >
+          {displayedPlans.map((plan) => {
             const price =
-              currency === 'INR'
+              plan.id === 'ENTERPRISE'
+                ? 'Custom'
+                : currency === 'INR'
                 ? billingCycle === 'yearly'
-                  ? `₹${plan.yearlyPriceInr.toLocaleString()}`
+                  ? `₹${Math.round(plan.yearlyPriceInr / 12).toLocaleString()}`
                   : `₹${plan.monthlyPriceInr.toLocaleString()}`
                 : billingCycle === 'yearly'
-                ? `$${plan.yearlyPriceUsd}`
+                ? `$${Math.round(plan.yearlyPriceUsd / 12)}`
                 : `$${plan.monthlyPriceUsd}`;
 
             const isCurrent = currentPlan === plan.id;
@@ -114,7 +159,7 @@ export function PricingView() {
                 className={`p-5 rounded-lg border transition-all flex flex-col justify-between space-y-4 ${
                   plan.recommended
                     ? 'bg-[var(--bg-elevated)] border-[#ea580c] ring-1 ring-[#ea580c]/50 relative'
-                    : 'bg-[var(--bg-canvas)] border-[var(--border-subtle)]'
+                    : 'bg-[var(--bg-canvas)] border-[var(--border-subtle)] hover:border-[var(--border-medium)]'
                 }`}
               >
                 {plan.recommended && (
@@ -125,20 +170,32 @@ export function PricingView() {
 
                 <div className="space-y-3">
                   <div>
-                    <div className="flex items-baseline gap-2">
+                    <div className="flex items-baseline justify-between">
                       <span className="text-lg font-black text-[var(--text-primary)]">
                         {plan.name}
                       </span>
-                      <span className="text-[11px] text-[var(--text-secondary)]">
-                        ({plan.englishSubtitle})
-                      </span>
+                      {plan.id === 'TEAM' && (
+                        <span className="text-[10px] bg-[#38bdf8]/15 text-[#38bdf8] px-2 py-0.5 rounded font-mono font-bold">
+                          Collaborative
+                        </span>
+                      )}
+                      {plan.id === 'ENTERPRISE' && (
+                        <span className="text-[10px] bg-[var(--bg-subtle)] text-[var(--text-secondary)] px-2 py-0.5 rounded font-mono font-semibold border border-[var(--border-subtle)]">
+                          Custom
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-[11px] text-[var(--text-muted)] font-mono mt-0.5">
+                      {plan.englishSubtitle}
                     </div>
 
-                    <div className="text-2xl font-black text-[var(--text-primary)] mt-1">
+                    <div className="text-2xl font-black text-[var(--text-primary)] mt-2">
                       {price}
-                      <span className="text-xs font-normal text-[var(--text-muted)]">
-                        /{billingCycle === 'yearly' ? 'yr' : 'mo'}
-                      </span>
+                      {plan.id !== 'ENTERPRISE' && (
+                        <span className="text-xs font-normal text-[var(--text-muted)]">
+                          /mo
+                        </span>
+                      )}
                     </div>
                     <p className="text-[11px] text-[var(--text-secondary)] font-sans mt-1">
                       {plan.tagline}
@@ -183,6 +240,10 @@ export function PricingView() {
                   className={`w-full py-2.5 rounded-md font-semibold text-xs transition-colors cursor-pointer ${
                     isCurrent
                       ? 'bg-[var(--bg-subtle)] text-[var(--text-muted)] border border-[var(--border-subtle)] cursor-default'
+                      : plan.id === 'ENTERPRISE'
+                      ? 'bg-[var(--bg-elevated)] hover:bg-[var(--bg-subtle)] text-[var(--text-primary)] border border-[var(--border-subtle)]'
+                      : plan.id === 'TEAM'
+                      ? 'bg-[#38bdf8] hover:bg-[#0ea5e9] text-black shadow-xs font-bold'
                       : plan.recommended
                       ? 'bg-[#ea580c] hover:bg-[#f97316] text-white shadow-xs'
                       : 'bg-[var(--bg-elevated)] hover:bg-[var(--bg-subtle)] text-[var(--text-primary)] border border-[var(--border-subtle)]'
@@ -192,7 +253,11 @@ export function PricingView() {
                     ? 'CURRENT ACTIVE PLAN'
                     : plan.id === 'FREE'
                     ? 'GET STARTED FREE'
-                    : `UPGRADE TO ${plan.name} (${plan.englishSubtitle.toUpperCase()})`}
+                    : plan.id === 'ENTERPRISE'
+                    ? 'CONTACT SALES'
+                    : plan.id === 'TEAM'
+                    ? 'CHOOSE TEAM'
+                    : `UPGRADE TO ${plan.name.toUpperCase()}`}
                 </button>
               </div>
             );

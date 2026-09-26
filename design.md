@@ -12,7 +12,7 @@ Modern AI interfaces have fallen into a trap of generic templates: neon purple g
 
 ### Core Tenets:
 1. **Developer-First Precision:** High information density, monospace-first metrics, subtle borders, and intentional whitespace.
-2. **Subtle Indian/Hindi Heritage:** The product wordmark (`परिश्रम`) and subscription plan tiers (`आरम्भ`, `उत्कर्ष`, `शिखर`, `दल`) introduce an intentional cultural identity, while technical developer concepts (Repository, Diffs, Proofs, Tests, Terminal) remain in standard English.
+2. **Subtle Cultural Heritage & Professional SaaS Ergonomics:** The product wordmark (`परिश्रम`) honors its cultural roots, while technical developer concepts, terminal commands, and subscription tiers (`Free`, `Pro`, `Max`, `Team`, `Enterprise`) adhere to industry-standard developer tool ergonomics.
 3. **Glass-Box Observability:** The UI never conceals what the agent is doing. Every AST search, test execution, error stack trace, and git patch is inspectable and verifiable.
 4. **Restrained Color & Contrast:** Colors carry strict semantic meaning (Flame for active work, Green for verified proof, Amber for diagnostics, Red for failure). No decorative rainbow gradients.
 
@@ -132,27 +132,29 @@ Animations are built on `motion/react` with strict adherence to accessibility st
 
 ---
 
-## 7. Authentic Parishram Subscription & Upgrade Modal Design System
-
+## 7. Parishram Subscription & Upgrade Modal Design System
+ 
 The subscription modal is engineered to reflect Parishram's distinct visual identity and deterministic engineering philosophy while fully responding to dynamic Light and Dark mode theme switching:
-
-### Step 1: "योजनाएं जो आपके परिश्रम के साथ बढ़ें" (Plans Comparison Grid)
+ 
+### Step 1: "Plans that fit your work" (Comparison Architecture)
 - **Design Tokens & Theme Invariance:** Built strictly with semantic CSS variables (`var(--bg-panel)`, `var(--bg-canvas)`, `var(--bg-elevated)`, `var(--text-primary)`, `var(--text-secondary)`, `var(--border-subtle)`).
   - In **Dark Mode**: Technical zinc canvas, deep elevated cards, flame accents, and high-legibility crisp text.
   - In **Light Mode**: Pristine white panels, subtle cool-gray borders, graphite text, and vibrant orange action buttons.
-- **Unified Billing Frequency Toggle:** A single clean switcher `[ मासिक (Monthly) | वार्षिक (Yearly - बचत 20%) ]` centered at the top, avoiding duplicate or awkward audience pills.
-- **Card Hierarchy:**
-  - **आरम्भ (Free)**: Clean elevated container, ₹0, clear developer scope.
-  - **उत्कर्ष (Pro — Flagship Hero)**: Emphasized with `border-2 border-[#ea580c]`, prominent `Most Popular` pill, solid flame primary button, and 150 verified runs/mo.
-  - **शिखर (Max)**: Dedicated power-user tier for complex architectural tasks, frontier models, and 1M context.
-  - **दल (Team)**: Streamlined team banner at the base of the grid for engineering organizations requiring seat governance and microVM sandboxes.
-
+- **Segmented Audience Toggle:** A clean segment control `[ Individual | Team & Enterprise ]` separates single-developer usage from team and organizational infrastructure.
+- **Individual Plans:**
+  - **Free**: Clean container, ₹0, 25 verified runs/mo for personal exploration.
+  - **Pro (Flagship Hero)**: Emphasized with `border-2 border-[#ea580c]`, prominent `Most Popular` pill, solid flame primary button, and 150 verified runs/mo.
+  - **Max**: Dedicated power-user tier for complex architectural tasks, frontier models (Claude 3.7 Sonnet, DeepSeek R1), and 1M context.
+- **Team & Enterprise Plans:**
+  - **Team**: Dedicated card with unlimited team runs, isolated microVM sandboxes, seat governance, and SOC2 audit trails.
+  - **Enterprise**: Dedicated card for custom deployment, air-gapped private VPCs, dedicated compute clusters, and 99.99% uptime SLAs with Contact Sales action.
+ 
 ### Step 2: Plan Configuration & Unified Indian Checkout
 - **2-Column Layout:**
   - **Left Column:** Interactive radio options with active flame rings, complete billing information (Name, Country, GSTIN/Tax ID, Address), and payment methods (UPI AutoPay / QR or Card).
   - **Right Column (Sticky Order Summary):** Single clear final amount with taxes included, auto-renewal notice, recurring agreement checkbox, and instant gateway handoff.
 - **Minimalist Triggers:**
-  - Clean plan pill in topbar (`आरम्भ · Upgrade ↗`).
+  - Clean plan pill in topbar (`Free · Upgrade ↗`).
   - Minimal plan indicator right in the left account section at the bottom of the sidebar.
   - Clean, unpolluted Mission Control overview with zero intrusive promotional popups.
 

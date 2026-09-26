@@ -4,34 +4,34 @@ import { PRICING_PLANS } from '../src/lib/billing/plans';
 
 test('Billing & Upgrade: Authentic Parishram Plans Configuration', () => {
   const freePlan = PRICING_PLANS.find((p) => p.id === 'FREE');
-  const builderPlan = PRICING_PLANS.find((p) => p.id === 'BUILDER'); // उत्कर्ष (Pro)
-  const proPlan = PRICING_PLANS.find((p) => p.id === 'PRO'); // शिखर (Max)
-  const teamPlan = PRICING_PLANS.find((p) => p.id === 'TEAM'); // दल (Team)
+  const builderPlan = PRICING_PLANS.find((p) => p.id === 'BUILDER'); // Pro
+  const proPlan = PRICING_PLANS.find((p) => p.id === 'PRO'); // Max
+  const teamPlan = PRICING_PLANS.find((p) => p.id === 'TEAM'); // Team
+  const enterprisePlan = PRICING_PLANS.find((p) => p.id === 'ENTERPRISE'); // Enterprise
 
-  assert.ok(freePlan, 'Free plan (आरम्भ) should exist');
-  assert.equal(freePlan.name, 'आरम्भ');
-  assert.equal(freePlan.englishSubtitle, 'Free');
+  assert.ok(freePlan, 'Free plan should exist');
+  assert.equal(freePlan.name, 'Free');
 
-  assert.ok(builderPlan, 'Pro plan (उत्कर्ष) should exist');
-  assert.equal(builderPlan.name, 'उत्कर्ष');
-  assert.equal(builderPlan.englishSubtitle, 'Pro');
+  assert.ok(builderPlan, 'Pro plan should exist');
+  assert.equal(builderPlan.name, 'Pro');
 
-  assert.ok(proPlan, 'Max plan (शिखर) should exist');
-  assert.equal(proPlan.name, 'शिखर');
-  assert.equal(proPlan.englishSubtitle, 'Max');
+  assert.ok(proPlan, 'Max plan should exist');
+  assert.equal(proPlan.name, 'Max');
 
-  assert.ok(teamPlan, 'Team plan (दल) should exist');
-  assert.equal(teamPlan.name, 'दल');
-  assert.equal(teamPlan.englishSubtitle, 'Team');
+  assert.ok(teamPlan, 'Team plan should exist');
+  assert.equal(teamPlan.name, 'Team');
+
+  assert.ok(enterprisePlan, 'Enterprise plan should exist');
+  assert.equal(enterprisePlan.name, 'Enterprise');
 
   // Verify Research-Backed Pricing Structure (WTP sweet spots in India)
-  assert.equal(builderPlan.monthlyPriceInr, 999, 'उत्कर्ष monthly price should be ₹999 (under ₹1,000 threshold)');
-  assert.equal(builderPlan.yearlyPriceInr, 9588, 'उत्कर्ष annual price should be ₹9,588 (₹799/mo, 20% savings)');
+  assert.equal(builderPlan.monthlyPriceInr, 999, 'Pro monthly price should be ₹999 (under ₹1,000 threshold)');
+  assert.equal(builderPlan.yearlyPriceInr, 9588, 'Pro annual price should be ₹9,588 (₹799/mo, 20% savings)');
 
-  assert.equal(proPlan.monthlyPriceInr, 2499, 'शिखर monthly price should be ₹2,499');
-  assert.equal(proPlan.yearlyPriceInr, 23988, 'शिखर annual price should be ₹23,988');
+  assert.equal(proPlan.monthlyPriceInr, 2499, 'Max monthly price should be ₹2,499');
+  assert.equal(proPlan.yearlyPriceInr, 23988, 'Max annual price should be ₹23,988');
 
-  assert.equal(teamPlan.monthlyPriceInr, 4999, 'दल monthly price should be ₹4,999');
+  assert.equal(teamPlan.monthlyPriceInr, 4999, 'Team monthly price should be ₹4,999');
 
   // Verify GST Breakdown for Pragati (₹999 inclusive of 18% GST)
   const monthlyTotal = 999.0;

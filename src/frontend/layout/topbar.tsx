@@ -155,7 +155,7 @@ export function Topbar({
           }`}
           title="Click to view subscription tiers & quotas"
         >
-          <span>{planInfo.hindiName}</span>
+          <span>{planInfo.name}</span>
           {user?.plan === 'FREE' && (
             <>
               <span className="text-[var(--text-muted)]">·</span>
@@ -250,8 +250,8 @@ export function Topbar({
                   {user?.email || ''}
                 </div>
                 <div className="text-[10px] text-[var(--text-muted)] flex items-center gap-1.5 mt-0.5">
-                  <span className="text-[#ea580c] font-bold">{planInfo.hindiName}</span>
-                  <span>({planInfo.englishSubtitle})</span>
+                  <span className="text-[#ea580c] font-bold">{planInfo.name}</span>
+                  <span>Plan</span>
                 </div>
               </div>
 

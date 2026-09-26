@@ -3,8 +3,8 @@ import { PricingPlan } from '@/types/billing';
 export const PRICING_PLANS: PricingPlan[] = [
   {
     id: 'FREE',
-    name: 'आरम्भ',
-    englishSubtitle: 'Free',
+    name: 'Free',
+    englishSubtitle: 'For personal coding and exploration',
     tagline: 'For developers experimenting with open-weight autonomous agents.',
     monthlyPriceInr: 0,
     monthlyPriceUsd: 0,
@@ -25,8 +25,8 @@ export const PRICING_PLANS: PricingPlan[] = [
   },
   {
     id: 'BUILDER',
-    name: 'उत्कर्ष',
-    englishSubtitle: 'Pro',
+    name: 'Pro',
+    englishSubtitle: 'For individual developers and engineers',
     tagline: 'For engineers shipping features and squashing bugs autonomously.',
     monthlyPriceInr: 999,
     monthlyPriceUsd: 12,
@@ -49,8 +49,8 @@ export const PRICING_PLANS: PricingPlan[] = [
   },
   {
     id: 'PRO',
-    name: 'शिखर',
-    englishSubtitle: 'Max',
+    name: 'Max',
+    englishSubtitle: 'For high-frequency reasoning and complex refactoring',
     tagline: 'For senior engineers tackling complex multi-file architectural tasks.',
     monthlyPriceInr: 2499,
     monthlyPriceUsd: 29,
@@ -72,8 +72,8 @@ export const PRICING_PLANS: PricingPlan[] = [
   },
   {
     id: 'TEAM',
-    name: 'दल',
-    englishSubtitle: 'Team',
+    name: 'Team',
+    englishSubtitle: 'For collaborative engineering teams',
     tagline: 'For engineering teams requiring centralized governance and private sandboxes.',
     monthlyPriceInr: 4999,
     monthlyPriceUsd: 59,
@@ -86,21 +86,44 @@ export const PRICING_PLANS: PricingPlan[] = [
     features: [
       'Unlimited verified team runs',
       'Isolated microVM container sandbox per run',
-      'Centralized team billing & seat management',
+      'Centralized team billing & seat governance',
       'Role-based human-in-the-loop approval gates',
       'SOC2 audit trails and secret isolation',
       'Custom repository indexing & private models',
       'Dedicated Slack / Discord alert bridge',
     ],
   },
+  {
+    id: 'ENTERPRISE',
+    name: 'Enterprise',
+    englishSubtitle: 'For organizations with custom security and scale',
+    tagline: 'Custom deployment, private VPCs, dedicated compute, and enterprise SLA.',
+    monthlyPriceInr: 0,
+    monthlyPriceUsd: 0,
+    yearlyPriceInr: 0,
+    yearlyPriceUsd: 0,
+    runsLimitMonthly: 'Unlimited',
+    contextLimitTokens: 4_000_000,
+    maxParallelTools: 32,
+    modelsIncluded: ['Air-Gapped Private Infrastructure & Custom Fine-Tuned Models'],
+    features: [
+      'Custom deployment & dedicated GPU clusters',
+      'Air-gapped VPC and on-premise execution',
+      'SSO / SAML 2.0 & SCIM directory sync',
+      'Custom model fine-tuning & domain adapters',
+      'Dedicated solutions architect & 99.99% uptime SLA',
+      'Custom procurement, MSAs, and invoicing',
+    ],
+  },
 ];
 
-export function getPlanDisplay(planId: string): { hindiName: string; englishSubtitle: string; label: string } {
+export function getPlanDisplay(planId: string): { hindiName: string; englishSubtitle: string; label: string; name: string } {
   const plan = PRICING_PLANS.find((p) => p.id === planId) || PRICING_PLANS[1];
   return {
     hindiName: plan.name,
     englishSubtitle: plan.englishSubtitle,
-    label: `${plan.name} (${plan.englishSubtitle})`,
+    label: plan.name,
+    name: plan.name,
   };
 }
 

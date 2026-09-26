@@ -1,4 +1,4 @@
-export type PlanTier = 'FREE' | 'BUILDER' | 'PRO' | 'TEAM';
+export type PlanTier = 'FREE' | 'BUILDER' | 'PRO' | 'TEAM' | 'ENTERPRISE';
 
 export type PaymentStatus =
   | 'CHECKOUT_CREATED'
@@ -15,8 +15,8 @@ export interface PlanFeature {
 
 export interface PricingPlan {
   id: PlanTier;
-  name: string; // Hindi primary name (e.g. 'आरम्भ', 'उत्कर्ष', 'शिखर', 'दल')
-  englishSubtitle: string; // English descriptor (e.g. 'Free', 'Pro', 'Max', 'Team')
+  name: string; // Conventional plan name: 'Free', 'Pro', 'Max', 'Team', 'Enterprise'
+  englishSubtitle: string;
   tagline: string;
   monthlyPriceInr: number;
   monthlyPriceUsd: number;

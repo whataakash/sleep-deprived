@@ -13,6 +13,7 @@ export class EntitlementService {
     BUILDER: 1,
     PRO: 2,
     TEAM: 3,
+    ENTERPRISE: 4,
   };
 
   /**

@@ -154,7 +154,7 @@ export function Topbar({
           className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-[var(--bg-elevated)] hover:bg-[var(--bg-subtle)] border border-[var(--border-subtle)] text-[11px] font-mono transition-colors cursor-pointer"
           title="Subscription Plans"
         >
-          <span className="text-[#ea580c] font-bold">{planInfo.hindiName}</span>
+          <span className="text-[#ea580c] font-bold">{planInfo.name}</span>
           <span className="text-[var(--text-muted)]">·</span>
           <span className="text-[10px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] flex items-center gap-0.5">
             <span>Upgrade ↗</span>
@@ -254,8 +254,8 @@ export function Topbar({
                   {user?.email || ''}
                 </div>
                 <div className="text-[10px] text-[var(--text-muted)] flex items-center gap-1.5 mt-0.5">
-                  <span className="text-[#ea580c] font-bold">{planInfo.hindiName}</span>
-                  <span>({planInfo.englishSubtitle})</span>
+                  <span className="text-[#ea580c] font-bold">{planInfo.name}</span>
+                  <span>Plan</span>
                 </div>
               </div>
 

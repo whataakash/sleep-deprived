@@ -60,7 +60,7 @@ export function UpgradeModal({
 
   // Plan & Billing Cycle selection
   const [selectedPlan, setSelectedPlan] = useState<PricingPlan>(
-    activeInitialPlan || PRICING_PLANS[1] // Default to उत्कर्ष (Pro)
+    activeInitialPlan || PRICING_PLANS[1] // Default to Pro
   );
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>(defaultCycle);
 
@@ -214,21 +214,46 @@ export function UpgradeModal({
         {/* ========================================================================= */}
         {step === 'PLANS' && (
           <div className="p-5 sm:p-7 space-y-6">
-            {/* Header with Title and Unified Billing Switcher */}
+            {/* Header with Title and Segmented Switcher */}
             <div className="text-center space-y-3">
               <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#ea580c]/10 text-[#ea580c] text-[11px] font-mono font-bold">
                 <Sparkles className="w-3 h-3" />
-                <span>AUTONOMOUS ENGINEERING HARNESS</span>
+                <span>SUBSCRIPTION PLANS</span>
               </div>
               <h2 className="text-2xl sm:text-3xl font-extrabold text-[var(--text-primary)] tracking-tight">
-                Plans that Scale with Your Engineering
+                Plans that fit your work
               </h2>
               <p className="text-xs sm:text-sm text-[var(--text-secondary)] max-w-xl mx-auto">
                 Deterministic code repair, failure recovery, and frontier reasoning models tailored for developers and engineering teams.
               </p>
 
-              {/* Minimal Billing Cycle Switcher */}
-              <div className="pt-2 flex items-center justify-center gap-2">
+              {/* Toggles: Audience Segment and Billing Frequency */}
+              <div className="pt-2 flex flex-wrap items-center justify-center gap-2.5">
+                {/* Individual vs Team & Enterprise Segment */}
+                <div className="inline-flex items-center p-1 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-subtle)] text-xs font-mono">
+                  <button
+                    onClick={() => setTierView('individual')}
+                    className={`px-3.5 py-1.5 rounded-lg transition-all cursor-pointer ${
+                      tierView === 'individual'
+                        ? 'bg-[var(--bg-panel)] text-[var(--text-primary)] font-bold shadow-xs border border-[var(--border-subtle)]'
+                        : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+                    }`}
+                  >
+                    Individual
+                  </button>
+                  <button
+                    onClick={() => setTierView('team')}
+                    className={`px-3.5 py-1.5 rounded-lg transition-all cursor-pointer ${
+                      tierView === 'team'
+                        ? 'bg-[var(--bg-panel)] text-[var(--text-primary)] font-bold shadow-xs border border-[var(--border-subtle)]'
+                        : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+                    }`}
+                  >
+                    Team & Enterprise
+                  </button>
+                </div>
+
+                {/* Minimal Billing Cycle Switcher */}
                 <div className="inline-flex items-center p-1 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-subtle)] text-xs font-mono">
                   <button
                     onClick={() => setBillingCycle('monthly')}
@@ -257,216 +282,327 @@ export function UpgradeModal({
               </div>
             </div>
 
-            {/* 3-Card Developer Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-5 items-stretch pt-1">
-              {/* 1. आरम्भ (Aarambh / Free) */}
-              <div className="bg-[var(--bg-elevated)] border border-[var(--border-subtle)] rounded-2xl p-5 flex flex-col justify-between space-y-5 hover:border-[var(--border-medium)] transition-colors">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="text-xl font-bold text-[var(--text-primary)]">आरम्भ</h3>
-                      <div className="text-[11px] font-mono text-[var(--text-muted)]">Free</div>
-                    </div>
-                    <span className="text-xs font-mono font-semibold px-2 py-0.5 rounded bg-[var(--bg-subtle)] text-[var(--text-secondary)] border border-[var(--border-subtle)]">
-                      ₹0
-                    </span>
-                  </div>
-
-                  <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
-                    Open-weight autonomous coding and deterministic verification for individual developers.
-                  </p>
-
-                  <div className="pt-2">
-                    <div className="text-2xl font-black text-[var(--text-primary)]">₹0</div>
-                    <div className="text-[10px] text-[var(--text-muted)] font-mono">Forever free · No card required</div>
-                  </div>
-
-                  <button
-                    onClick={() => handleSelectPlan(PRICING_PLANS[0])}
-                    className="w-full py-2 px-3 rounded-lg bg-[var(--bg-subtle)] hover:bg-[var(--bg-active)] border border-[var(--border-subtle)] text-[var(--text-primary)] font-semibold text-xs transition-colors cursor-pointer"
-                  >
-                    {user?.plan === 'FREE' ? 'Current Plan' : 'Select Free'}
-                  </button>
-
-                  <div className="pt-3 border-t border-[var(--border-subtle)] space-y-2 text-xs">
-                    <div className="text-[10px] uppercase tracking-wider font-mono font-semibold text-[var(--text-muted)]">
-                      Included in आरम्भ:
-                    </div>
-                    {[
-                      '25 autonomous runs per month',
-                      'Open-weight models (Qwen, Ollama, GLM)',
-                      'Deterministic verification & proof panel',
-                      'Unified AST diff inspector',
-                      'Public & local repository support',
-                    ].map((feat, i) => (
-                      <div key={i} className="flex items-start gap-2 text-[var(--text-secondary)]">
-                        <Check className="w-3.5 h-3.5 text-[#10b981] shrink-0 mt-0.5" />
-                        <span className="text-[11px]">{feat}</span>
+            {/* Individual Plans View: Free, Pro, Max */}
+            {tierView === 'individual' && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-5 items-stretch pt-1">
+                {/* 1. Free */}
+                <div className="bg-[var(--bg-elevated)] border border-[var(--border-subtle)] rounded-2xl p-5 flex flex-col justify-between space-y-5 hover:border-[var(--border-medium)] transition-colors">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="text-xl font-bold text-[var(--text-primary)]">Free</h3>
+                        <div className="text-[11px] font-mono text-[var(--text-muted)]">Personal exploration</div>
                       </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* 2. उत्कर्ष (Utkarsh / Pro) — HERO CARD */}
-              <div className="bg-[var(--bg-canvas)] border-2 border-[#ea580c] rounded-2xl p-5 flex flex-col justify-between space-y-5 shadow-xl relative ring-1 ring-[#ea580c]/20">
-                {/* Popular Pill */}
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-[#ea580c] text-white font-mono text-[10px] font-extrabold uppercase tracking-wider shadow-sm flex items-center gap-1">
-                  <Sparkles className="w-3 h-3" />
-                  <span>Most Popular</span>
-                </div>
-
-                <div className="space-y-4 pt-1">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="text-xl font-bold text-[#ea580c]">उत्कर्ष</h3>
-                      <div className="text-[11px] font-mono text-[var(--text-muted)]">Pro</div>
-                    </div>
-                    <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-[#ea580c]/15 text-[#ea580c] border border-[#ea580c]/30">
-                      ₹{billingCycle === 'yearly' ? '799' : '999'}/mo
-                    </span>
-                  </div>
-
-                  <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
-                    Frontier coding models, multi-agent pairs, and failure recovery traces for shipping features autonomously.
-                  </p>
-
-                  <div className="pt-2">
-                    <div className="flex items-baseline gap-1.5">
-                      <span className="text-3xl font-black text-[var(--text-primary)]">
-                        ₹{billingCycle === 'yearly' ? '799' : '999'}
+                      <span className="text-xs font-mono font-semibold px-2 py-0.5 rounded bg-[var(--bg-subtle)] text-[var(--text-secondary)] border border-[var(--border-subtle)]">
+                        ₹0
                       </span>
-                      <span className="text-xs text-[var(--text-muted)] font-mono">/ mo</span>
                     </div>
-                    <div className="text-[10px] text-[var(--text-muted)] font-mono">
-                      {billingCycle === 'yearly'
-                        ? 'Billed annually at ₹9,588/yr · Taxes included'
-                        : 'Billed monthly · Taxes included'}
-                    </div>
-                  </div>
 
-                  <button
-                    onClick={() => handleSelectPlan(PRICING_PLANS[1])}
-                    className="w-full py-2.5 px-3 rounded-lg bg-[#ea580c] hover:bg-[#f97316] text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-98 cursor-pointer"
-                  >
-                    <span>Upgrade to उत्कर्ष</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
-                  <div className="text-[10px] text-center text-[var(--text-muted)] font-mono">
-                    No commitment · Cancel anytime
-                  </div>
+                    <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+                      Open-weight autonomous coding and deterministic verification for individual developers.
+                    </p>
 
-                  <div className="pt-3 border-t border-[var(--border-subtle)] space-y-2 text-xs">
-                    <div className="text-[10px] uppercase tracking-wider font-mono font-semibold text-[#ea580c]">
-                      Everything in आरम्भ, plus:
+                    <div className="pt-2">
+                      <div className="text-2xl font-black text-[var(--text-primary)]">₹0</div>
+                      <div className="text-[10px] text-[var(--text-muted)] font-mono">Forever free · No card required</div>
                     </div>
-                    {[
-                      '150 verified runs per month',
-                      'Qwen3-Coder-Next & Kimi K2.5 models',
-                      'Multi-agent pair (Navigator + Supervisor)',
-                      'Automatic failure trace fingerprinting',
-                      '256,000 token context window',
-                      'Bring Your Own Key (BYOK) enabled',
-                      'Persistent engineering memory store',
-                    ].map((feat, i) => (
-                      <div key={i} className="flex items-start gap-2 text-[var(--text-primary)] font-medium">
-                        <Check className="w-3.5 h-3.5 text-[#ea580c] shrink-0 mt-0.5" />
-                        <span className="text-[11px]">{feat}</span>
+
+                    <button
+                      onClick={() => handleSelectPlan(PRICING_PLANS[0])}
+                      className="w-full py-2 px-3 rounded-lg bg-[var(--bg-subtle)] hover:bg-[var(--bg-active)] border border-[var(--border-subtle)] text-[var(--text-primary)] font-semibold text-xs transition-colors cursor-pointer"
+                    >
+                      {user?.plan === 'FREE' ? 'Current Plan' : 'Select Free'}
+                    </button>
+
+                    <div className="pt-3 border-t border-[var(--border-subtle)] space-y-2 text-xs">
+                      <div className="text-[10px] uppercase tracking-wider font-mono font-semibold text-[var(--text-muted)]">
+                        Included in Free:
                       </div>
-                    ))}
+                      {[
+                        '25 autonomous runs per month',
+                        'Open-weight models (Qwen, Ollama, GLM)',
+                        'Deterministic verification & proof panel',
+                        'Unified AST diff inspector',
+                        'Public & local repository support',
+                      ].map((feat, i) => (
+                        <div key={i} className="flex items-start gap-2 text-[var(--text-secondary)]">
+                          <Check className="w-3.5 h-3.5 text-[#10b981] shrink-0 mt-0.5" />
+                          <span className="text-[11px]">{feat}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* 3. शिखर (Shikhar / Max) */}
-              <div className="bg-[var(--bg-elevated)] border border-[var(--border-subtle)] rounded-2xl p-5 flex flex-col justify-between space-y-5 hover:border-[var(--border-medium)] transition-colors">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="text-xl font-bold text-[var(--text-primary)]">शिखर</h3>
-                      <div className="text-[11px] font-mono text-[var(--text-muted)]">Max</div>
-                    </div>
-                    <span className="text-xs font-mono font-semibold px-2 py-0.5 rounded bg-[var(--bg-subtle)] text-[var(--text-secondary)] border border-[var(--border-subtle)]">
-                      ₹{billingCycle === 'yearly' ? '1,999' : '2,499'}/mo
-                    </span>
+                {/* 2. Pro — HERO CARD */}
+                <div className="bg-[var(--bg-canvas)] border-2 border-[#ea580c] rounded-2xl p-5 flex flex-col justify-between space-y-5 shadow-xl relative ring-1 ring-[#ea580c]/20">
+                  {/* Popular Pill */}
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-[#ea580c] text-white font-mono text-[10px] font-extrabold uppercase tracking-wider shadow-sm flex items-center gap-1">
+                    <Sparkles className="w-3 h-3" />
+                    <span>Most Popular</span>
                   </div>
 
-                  <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
-                    Frontier reasoning models and 1,000,000 token context for complex multi-file architectural refactoring.
-                  </p>
-
-                  <div className="pt-2">
-                    <div className="flex items-baseline gap-1.5">
-                      <span className="text-3xl font-black text-[var(--text-primary)]">
-                        ₹{billingCycle === 'yearly' ? '1,999' : '2,499'}
+                  <div className="space-y-4 pt-1">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="text-xl font-bold text-[#ea580c]">Pro</h3>
+                        <div className="text-[11px] font-mono text-[var(--text-muted)]">Individual Pro</div>
+                      </div>
+                      <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-[#ea580c]/15 text-[#ea580c] border border-[#ea580c]/30">
+                        ₹{billingCycle === 'yearly' ? '799' : '999'}/mo
                       </span>
-                      <span className="text-xs text-[var(--text-muted)] font-mono">/ mo</span>
                     </div>
-                    <div className="text-[10px] text-[var(--text-muted)] font-mono">
-                      {billingCycle === 'yearly'
-                        ? 'Billed annually at ₹23,988/yr · Taxes included'
-                        : 'Billed monthly · Taxes included'}
-                    </div>
-                  </div>
 
-                  <button
-                    onClick={() => handleSelectPlan(PRICING_PLANS[2])}
-                    className="w-full py-2 px-3 rounded-lg bg-[var(--bg-subtle)] hover:bg-[var(--bg-active)] border border-[var(--border-subtle)] text-[var(--text-primary)] font-semibold text-xs transition-colors cursor-pointer"
-                  >
-                    Upgrade to शिखर
-                  </button>
-                  <div className="text-[10px] text-center text-[var(--text-muted)] font-mono">
-                    No commitment · Cancel anytime
-                  </div>
+                    <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+                      Frontier coding models, multi-agent pairs, and failure recovery traces for shipping features autonomously.
+                    </p>
 
-                  <div className="pt-3 border-t border-[var(--border-subtle)] space-y-2 text-xs">
-                    <div className="text-[10px] uppercase tracking-wider font-mono font-semibold text-[var(--text-muted)]">
-                      Everything in उत्कर्ष, plus:
-                    </div>
-                    {[
-                      '500 verified runs per month',
-                      'Claude 3.7 Sonnet & DeepSeek R1 models',
-                      '1,000,000 token context window',
-                      'Parallel targeted test & tool execution',
-                      'Continuous verification CI/CD webhooks',
-                      'Proof graph export & audit log signatures',
-                    ].map((feat, i) => (
-                      <div key={i} className="flex items-start gap-2 text-[var(--text-secondary)]">
-                        <Check className="w-3.5 h-3.5 text-[#10b981] shrink-0 mt-0.5" />
-                        <span className="text-[11px]">{feat}</span>
+                    <div className="pt-2">
+                      <div className="flex items-baseline gap-1.5">
+                        <span className="text-3xl font-black text-[var(--text-primary)]">
+                          ₹{billingCycle === 'yearly' ? '799' : '999'}
+                        </span>
+                        <span className="text-xs text-[var(--text-muted)] font-mono">/ mo</span>
                       </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
+                      <div className="text-[10px] text-[var(--text-muted)] font-mono">
+                        {billingCycle === 'yearly'
+                          ? 'Billed annually at ₹9,588/yr · Taxes included'
+                          : 'Billed monthly · Taxes included'}
+                      </div>
+                    </div>
 
-            {/* Team Tier Card Banner (Uncluttered, Single Location) */}
-            <div className="p-4 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-subtle)] flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-[#38bdf8]/10 text-[#38bdf8] flex items-center justify-center shrink-0">
-                  <Users className="w-4 h-4" />
-                </div>
-                <div>
-                  <div className="font-bold text-[var(--text-primary)] flex items-center gap-2">
-                    <span>दल</span>
-                    <span className="text-[11px] font-mono text-[var(--text-muted)] font-normal">Team</span>
-                    <span className="text-[10px] bg-[#38bdf8]/15 text-[#38bdf8] px-1.5 py-0.2 rounded font-mono font-bold">
-                      ₹4,999/mo
-                    </span>
+                    <button
+                      onClick={() => handleSelectPlan(PRICING_PLANS[1])}
+                      className="w-full py-2.5 px-3 rounded-lg bg-[#ea580c] hover:bg-[#f97316] text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-98 cursor-pointer"
+                    >
+                      <span>Upgrade to Pro</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                    <div className="text-[10px] text-center text-[var(--text-muted)] font-mono">
+                      No commitment · Cancel anytime
+                    </div>
+
+                    <div className="pt-3 border-t border-[var(--border-subtle)] space-y-2 text-xs">
+                      <div className="text-[10px] uppercase tracking-wider font-mono font-semibold text-[#ea580c]">
+                        Everything in Free, plus:
+                      </div>
+                      {[
+                        '150 verified runs per month',
+                        'Qwen3-Coder-Next & Kimi K2.5 models',
+                        'Multi-agent pair (Navigator + Supervisor)',
+                        'Automatic failure trace fingerprinting',
+                        '256,000 token context window',
+                        'Bring Your Own Key (BYOK) enabled',
+                        'Persistent engineering memory store',
+                      ].map((feat, i) => (
+                        <div key={i} className="flex items-start gap-2 text-[var(--text-primary)] font-medium">
+                          <Check className="w-3.5 h-3.5 text-[#ea580c] shrink-0 mt-0.5" />
+                          <span className="text-[11px]">{feat}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  <div className="text-[11px] text-[var(--text-secondary)]">
-                    Unlimited verified team runs, isolated microVM sandboxes, seat governance, and SOC2 audit trails.
+                </div>
+
+                {/* 3. Max */}
+                <div className="bg-[var(--bg-elevated)] border border-[var(--border-subtle)] rounded-2xl p-5 flex flex-col justify-between space-y-5 hover:border-[var(--border-medium)] transition-colors">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h3 className="text-xl font-bold text-[var(--text-primary)]">Max</h3>
+                        <div className="text-[11px] font-mono text-[var(--text-muted)]">Senior / Power User</div>
+                      </div>
+                      <span className="text-xs font-mono font-semibold px-2 py-0.5 rounded bg-[var(--bg-subtle)] text-[var(--text-secondary)] border border-[var(--border-subtle)]">
+                        ₹{billingCycle === 'yearly' ? '1,999' : '2,499'}/mo
+                      </span>
+                    </div>
+
+                    <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+                      Frontier reasoning models and 1,000,000 token context for complex multi-file architectural refactoring.
+                    </p>
+
+                    <div className="pt-2">
+                      <div className="flex items-baseline gap-1.5">
+                        <span className="text-3xl font-black text-[var(--text-primary)]">
+                          ₹{billingCycle === 'yearly' ? '1,999' : '2,499'}
+                        </span>
+                        <span className="text-xs text-[var(--text-muted)] font-mono">/ mo</span>
+                      </div>
+                      <div className="text-[10px] text-[var(--text-muted)] font-mono">
+                        {billingCycle === 'yearly'
+                          ? 'Billed annually at ₹23,988/yr · Taxes included'
+                          : 'Billed monthly · Taxes included'}
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => handleSelectPlan(PRICING_PLANS[2])}
+                      className="w-full py-2 px-3 rounded-lg bg-[var(--bg-subtle)] hover:bg-[var(--bg-active)] border border-[var(--border-subtle)] text-[var(--text-primary)] font-semibold text-xs transition-colors cursor-pointer"
+                    >
+                      Upgrade to Max
+                    </button>
+                    <div className="text-[10px] text-center text-[var(--text-muted)] font-mono">
+                      No commitment · Cancel anytime
+                    </div>
+
+                    <div className="pt-3 border-t border-[var(--border-subtle)] space-y-2 text-xs">
+                      <div className="text-[10px] uppercase tracking-wider font-mono font-semibold text-[var(--text-muted)]">
+                        Everything in Pro, plus:
+                      </div>
+                      {[
+                        '500 verified runs per month',
+                        'Claude 3.7 Sonnet & DeepSeek R1 models',
+                        '1,000,000 token context window',
+                        'Parallel targeted test & tool execution',
+                        'Continuous verification CI/CD webhooks',
+                        'Proof graph export & audit log signatures',
+                      ].map((feat, i) => (
+                        <div key={i} className="flex items-start gap-2 text-[var(--text-secondary)]">
+                          <Check className="w-3.5 h-3.5 text-[#10b981] shrink-0 mt-0.5" />
+                          <span className="text-[11px]">{feat}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
-              <button
-                onClick={() => handleSelectPlan(PRICING_PLANS[3])}
-                className="px-3.5 py-1.5 rounded-lg bg-[var(--bg-subtle)] hover:bg-[var(--bg-active)] border border-[var(--border-subtle)] text-[var(--text-primary)] font-semibold font-mono text-xs whitespace-nowrap cursor-pointer transition-colors"
-              >
-                Explore दल Plan →
-              </button>
-            </div>
+            )}
+
+            {/* Team & Enterprise Plans View */}
+            {tierView === 'team' && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-stretch pt-1 max-w-4xl mx-auto">
+                {/* 1. Team Card */}
+                <div className="bg-[var(--bg-elevated)] border-2 border-[#38bdf8]/40 hover:border-[#38bdf8] rounded-2xl p-6 flex flex-col justify-between space-y-5 transition-colors">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-xl font-bold text-[var(--text-primary)]">Team</h3>
+                          <span className="text-[10px] bg-[#38bdf8]/15 text-[#38bdf8] px-2 py-0.5 rounded font-mono font-bold">
+                            Collaborative
+                          </span>
+                        </div>
+                        <div className="text-[11px] font-mono text-[var(--text-muted)] mt-0.5">
+                          For engineering teams & swarms
+                        </div>
+                      </div>
+                      <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-[var(--bg-subtle)] text-[#38bdf8] border border-[var(--border-subtle)]">
+                        ₹{billingCycle === 'yearly' ? '3,999' : '4,999'}/mo
+                      </span>
+                    </div>
+
+                    <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+                      Unlimited verified team runs, isolated microVM sandboxes, seat governance, and SOC2 audit trails.
+                    </p>
+
+                    <div className="pt-2">
+                      <div className="flex items-baseline gap-1.5">
+                        <span className="text-3xl font-black text-[var(--text-primary)]">
+                          ₹{billingCycle === 'yearly' ? '3,999' : '4,999'}
+                        </span>
+                        <span className="text-xs text-[var(--text-muted)] font-mono">/ mo</span>
+                      </div>
+                      <div className="text-[10px] text-[var(--text-muted)] font-mono">
+                        {billingCycle === 'yearly'
+                          ? 'Billed annually at ₹47,988/yr · Taxes included'
+                          : 'Billed monthly · Taxes included'}
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => handleSelectPlan(PRICING_PLANS[3])}
+                      className="w-full py-2.5 px-3 rounded-lg bg-[#38bdf8] hover:bg-[#0ea5e9] text-black font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-98 cursor-pointer"
+                    >
+                      <span>Choose Team</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                    <div className="text-[10px] text-center text-[var(--text-muted)] font-mono">
+                      Includes 5 developer seats · Cancel anytime
+                    </div>
+
+                    <div className="pt-3 border-t border-[var(--border-subtle)] space-y-2 text-xs">
+                      <div className="text-[10px] uppercase tracking-wider font-mono font-semibold text-[#38bdf8]">
+                        Included in Team:
+                      </div>
+                      {[
+                        'Unlimited verified team runs',
+                        'Isolated microVM container sandbox per run',
+                        'Centralized team billing & seat governance',
+                        'Role-based human-in-the-loop approval gates',
+                        'SOC2 audit trails and secret isolation',
+                        'Custom repository indexing & private models',
+                        'Dedicated Slack / Discord alert bridge',
+                      ].map((feat, i) => (
+                        <div key={i} className="flex items-start gap-2 text-[var(--text-primary)] font-medium">
+                          <Check className="w-3.5 h-3.5 text-[#38bdf8] shrink-0 mt-0.5" />
+                          <span className="text-[11px]">{feat}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* 2. Enterprise Card */}
+                <div className="bg-[var(--bg-canvas)] border border-[var(--border-subtle)] hover:border-[var(--border-medium)] rounded-2xl p-6 flex flex-col justify-between space-y-5 transition-colors">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-xl font-bold text-[var(--text-primary)]">Enterprise</h3>
+                          <span className="text-[10px] bg-[var(--bg-subtle)] text-[var(--text-secondary)] px-2 py-0.5 rounded font-mono font-semibold border border-[var(--border-subtle)]">
+                            Custom
+                          </span>
+                        </div>
+                        <div className="text-[11px] font-mono text-[var(--text-muted)] mt-0.5">
+                          For scale & strict governance
+                        </div>
+                      </div>
+                    </div>
+
+                    <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+                      Custom deployments, air-gapped private VPCs, dedicated compute clusters, and 99.99% uptime SLAs.
+                    </p>
+
+                    <div className="pt-2">
+                      <div className="text-3xl font-black text-[var(--text-primary)]">Custom</div>
+                      <div className="text-[10px] text-[var(--text-muted)] font-mono">Tailored pricing & enterprise contract</div>
+                    </div>
+
+                    <button
+                      onClick={() => {
+                        window.open('mailto:enterprise@parishram.dev?subject=Parishram%20Enterprise%20Inquiry', '_blank');
+                      }}
+                      className="w-full py-2.5 px-3 rounded-lg bg-[var(--bg-elevated)] hover:bg-[var(--bg-subtle)] border border-[var(--border-subtle)] text-[var(--text-primary)] font-bold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                    >
+                      <span>Contact Sales</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                    <div className="text-[10px] text-center text-[var(--text-muted)] font-mono">
+                      Custom MSAs, procurement & pilot support
+                    </div>
+
+                    <div className="pt-3 border-t border-[var(--border-subtle)] space-y-2 text-xs">
+                      <div className="text-[10px] uppercase tracking-wider font-mono font-semibold text-[var(--text-muted)]">
+                        Enterprise Capabilities:
+                      </div>
+                      {[
+                        'Custom deployment & dedicated GPU clusters',
+                        'Air-gapped VPC and on-premise execution',
+                        'SSO / SAML 2.0 & SCIM directory sync',
+                        'Custom model fine-tuning & domain adapters',
+                        'Dedicated solutions architect & 99.99% SLA',
+                        'Custom procurement, MSAs, and invoicing',
+                      ].map((feat, i) => (
+                        <div key={i} className="flex items-start gap-2 text-[var(--text-secondary)]">
+                          <Check className="w-3.5 h-3.5 text-[#10b981] shrink-0 mt-0.5" />
+                          <span className="text-[11px]">{feat}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 

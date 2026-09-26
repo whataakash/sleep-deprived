@@ -32,7 +32,7 @@
 | **Observability** | Terminal & Process Drawer | Live ANSI-colored command execution logs, sandbox stdout/stderr, and exit code telemetry | 🟢 Production |
 | **Model Gateway** | Dynamic 2026 Model Catalog | Qwen3-Coder-Next, Kimi K2.5, GLM-5, DeepSeek V3, Grok 3, Claude 3.7 Sonnet, and Local Ollama | 🟢 Production |
 | **Model Routing** | Autonomous Model Router | Analyzes task complexity, estimated token budget, and user plan entitlements to select optimal model | 🟢 Production |
-| **Billing & Plans** | Hindi Identity Subscription System | Multi-tier plans (**आरम्भ**, **उत्कर्ष**, **शिखर**, **दल**) with quotas, limits, and server-side tracking | 🟢 Production |
+| **Billing & Plans** | Structured SaaS Subscription System | Individual (**Free**, **Pro**, **Max**) & Team/Org (**Team**, **Enterprise**) with quotas and tracking | 🟢 Production |
 | **Payments** | Official Hosted Checkout | Direct verified gateway checkout, single final amount with taxes included, zero custom card inputs | 🟢 Production |
 | **Configuration** | IDE-Grade Settings & Account | 12 structured settings domains, appearance switching, BYOK key store, and compact avatar menu | 🟢 Production |
 | **Evaluation Mode** | Hackathon Compliance Mode | Headless CLI runner, locked prescribed text-only model, root Makefile targets, and zero-friction evaluator setup | 🟢 Production |
@@ -111,35 +111,43 @@ Automatically scores task complexity (1–10), counts affected files, estimates 
 
 ## 7. Subscription Plans & Payment Checkout Architecture
 
-### Authentic Hindi Plan Hierarchy & Research-Backed Pricing:
-1. **आरम्भ (Aarambh / Free — ₹0):**
+### Structured Plan Hierarchy & Research-Backed Pricing:
+
+#### Individual Plans
+1. **Free (₹0):**
    - 25 verified autonomous runs per month.
    - Open-weight models (Qwen, Ollama, GLM).
    - Single-threaded deterministic tool executor & verification panel.
    - Always free, zero commitment, no card required.
-2. **उत्कर्ष (Utkarsh / Pro — ₹999/mo or ₹799/mo Annual):**
+2. **Pro (₹999/mo or ₹799/mo Annual):**
    - **Research-Backed Sweet Spot:** Pricing at ₹999/month breaks the psychological four-digit barrier in India, driving 3.8x higher conversion velocity for individual engineers, freelancers, and students.
    - 150 verified runs per month.
    - Frontier coding models (Qwen3-Coder-Next, Kimi K2.5, GLM-5).
    - Multi-agent pair (Navigator + Supervisor), 256,000 token context window, BYOK unlocked, and failure recovery traces.
    - Annual billing: **₹9,588/yr** (20% savings, taxes included).
-3. **शिखर (Shikhar / Max — ₹2,499/mo or ₹1,999/mo Annual):**
+3. **Max (₹2,499/mo or ₹1,999/mo Annual):**
    - For senior engineers, architects, and high-velocity shipping.
    - 500 verified runs per month.
    - Frontier reasoning models (Claude 3.7 Sonnet, DeepSeek R1).
    - 1,000,000 token context window, parallel targeted test & tool execution.
    - Annual billing: **₹23,988/yr** (20% savings, taxes included).
-4. **दल (Dal / Team — ₹4,999/mo or ₹3,999/mo Annual):**
+
+#### Team & Enterprise Plans
+4. **Team (₹4,999/mo or ₹3,999/mo Annual):**
    - Unlimited verified runs, isolated microVM sandboxes, seat governance, audit trails.
    - Dedicated GPU cluster dispatch and team collaboration.
+   - Annual billing: **₹47,988/yr** (20% savings, taxes included).
+5. **Enterprise (Custom / Contact Sales):**
+   - Custom deployment, air-gapped private VPCs, dedicated compute clusters, and 99.99% uptime SLAs.
+   - Custom procurement, MSAs, and invoicing.
 
 ### Dynamic Light & Dark Theme Architecture:
 - Complete compliance with CSS semantic tokens (`var(--bg-panel)`, `var(--bg-canvas)`, `var(--bg-elevated)`, `var(--text-primary)`, `var(--border-subtle)`).
 - Dynamically adapts when toggling between Light and Dark themes, rendering crisp borders and high-contrast typography in both states.
 
 ### Minimalist Trigger Placements:
-- **Top Bar**: Minimal plan pill (`आरम्भ · Upgrade ↗`) in center and subtle header link on top.
-- **Left Account Section**: Minimal row directly above the bottom account card (`आरम्भ (0 runs) · Upgrade ↗`), eliminating intrusive middle-screen clutter.
+- **Top Bar**: Minimal plan pill (`Free · Upgrade ↗`) in center and subtle header link on top.
+- **Left Account Section**: Minimal row directly above the bottom account card (`Free (0 runs) · Upgrade ↗`), eliminating intrusive middle-screen clutter.
 - **Strict Recipient Safety**: All transactions strictly resolve via server-side validation (`/api/billing/verify`) with zero client-side leakage.
 
 ---

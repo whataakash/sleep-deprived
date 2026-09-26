@@ -92,11 +92,14 @@ make evaluate
   - **xAI Grok 2 Coder & Grok 3 Hybrid Reasoning** (Frontier reasoning)
   - **Claude 3.7 Sonnet** (Hybrid reasoning token budgets)
   - **Local Ollama** (Completely air-gapped zero-data-egress execution)
-- **Hindi Identity Subscription Plans:**
-  - **आरम्भ** (Free) — Free tier, 25 verified runs/mo
-  - **उत्कर्ष** (Pro) — ₹999/mo (or ₹799/mo yearly), 150 verified runs/mo, taxes included
-  - **शिखर** (Max) — ₹2,499/mo (or ₹1,999/mo yearly), 500 verified runs/mo, taxes included
-  - **दल** (Team) — ₹4,999/mo, unlimited verified team runs
+- **Subscription Plans & Tier Architecture:**
+  - **Individual:**
+    - **Free** — Free tier, 25 verified runs/mo
+    - **Pro** — ₹999/mo (or ₹799/mo yearly, Save 20%), 150 verified runs/mo, taxes included
+    - **Max** — ₹2,499/mo (or ₹1,999/mo yearly, Save 20%), 500 verified runs/mo, taxes included
+  - **Team & Enterprise:**
+    - **Team** — ₹4,999/mo (or ₹3,999/mo yearly), unlimited verified team runs, shared usage & governance
+    - **Enterprise** — Custom deployment, air-gapped VPC, dedicated GPU clusters, Contact Sales
 - **Payment Architecture:**
   - Official hosted checkout with single final amount and taxes included.
   - Zero custom card forms on Parishram UI with cryptographically signed invoice IDs.
@@ -177,10 +180,11 @@ Tests verify:
 - **IDE Settings & Billing:**
   - 12 comprehensive categories: General, Appearance, Editor, AI & Models, Agent Policy, Repository, Terminal, Verification, Notifications, Privacy & Security, Account Profile, Plan & Billing.
   - Interactive search bar with instant progressive disclosure.
-- **Authentic Subscription & Upgrade Flow:**
-  - **Authentic Hindi Tiers:** **आरम्भ** (Free, ₹0), **उत्कर्ष** (Pro, ₹999/mo or ₹799/mo yearly, Save 20%), **शिखर** (Max, ₹2,499/mo), and **दल** (Team, ₹4,999/mo).
+- **Subscription & Upgrade Flow:**
+  - **Structured Tiers:** **Free** (₹0), **Pro** (₹999/mo or ₹799/mo yearly, Save 20%), **Max** (₹2,499/mo or ₹1,999/mo yearly), **Team** (₹4,999/mo or ₹3,999/mo yearly), and **Enterprise** (Custom / Contact Sales).
+  - **Dedicated Sections:** Distinct toggle views for **Individual** vs **Team & Enterprise**.
   - **Dynamic Theme Invariance:** Modal and checkout flow dynamically respond to Light and Dark mode switching using semantic CSS variables.
-  - **Minimalist Dashboard Placements:** Subtle topbar indicator (`आरम्भ · Upgrade ↗`) and clean link near the left account section in the sidebar.
+  - **Minimalist Dashboard Placements:** Subtle topbar indicator (`Free · Upgrade ↗`) and clean link near the left account section in the sidebar.
   - **Single Final Amount Checkout:** Clean single total with taxes included, automated renewals, and instant UPI handoff.
 
 ---

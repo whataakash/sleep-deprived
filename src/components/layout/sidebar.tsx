@@ -164,7 +164,7 @@ export function Sidebar({
         <div className="flex items-center justify-between px-1 text-[11px] font-mono">
           <div className="flex items-center gap-1.5 text-[var(--text-muted)]">
             <span className="w-1.5 h-1.5 rounded-full bg-[#ea580c]" />
-            <span className="text-[var(--text-secondary)] font-semibold">{planInfo.hindiName}</span>
+            <span className="text-[var(--text-secondary)] font-semibold">{planInfo.name}</span>
             <span className="text-[10px] text-[var(--text-muted)]">({user?.usage.runsUsedThisMonth || 0} runs)</span>
           </div>
           <button

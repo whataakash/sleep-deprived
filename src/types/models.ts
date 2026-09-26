@@ -21,7 +21,7 @@ export type ModelProvider =
 
 export type ModelAccessType = 'LOCAL' | 'FREE_HOSTED' | 'BYOK' | 'PAID_HOSTED' | 'PRESCRIBED_EVALUATION';
 
-export type PlanTier = 'FREE' | 'BUILDER' | 'PRO' | 'TEAM';
+export type PlanTier = 'FREE' | 'BUILDER' | 'PRO' | 'TEAM' | 'ENTERPRISE';
 
 export type ModelAvailabilityStatus =
   | 'available'
