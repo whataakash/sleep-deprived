@@ -18,6 +18,8 @@ import {
   Terminal,
 } from 'lucide-react';
 
+import { ModelArena } from './model-arena';
+
 interface ModelMarketplaceProps {
   currentModelId: string;
   onSelectModel: (modelId: string) => void;
@@ -32,7 +34,7 @@ export function ModelMarketplace({
   const { session } = useAuth();
   const user = session.user;
   const [activeCategory, setActiveCategory] = useState<ModelCategory | 'ALL'>('ALL');
-  const [activeTab, setActiveTab] = useState<'catalog' | 'router' | 'compare'>('catalog');
+  const [activeTab, setActiveTab] = useState<'catalog' | 'router' | 'arena' | 'compare'>('catalog');
   const [taskQuery, setTaskQuery] = useState('Fix failing integration tests for auth token dispatch');
 
   // Simulated Router Decision
@@ -113,6 +115,17 @@ export function ModelMarketplace({
           </button>
 
           <button
+            onClick={() => setActiveTab('arena')}
+            className={`px-2.5 py-1 rounded transition-colors cursor-pointer ${
+              activeTab === 'arena'
+                ? 'bg-[#ea580c] text-white font-semibold shadow-xs'
+                : 'bg-[var(--bg-subtle)] text-[var(--text-secondary)] hover:bg-[var(--bg-active)] hover:text-[var(--text-primary)] border border-[var(--border-subtle)]'
+            }`}
+          >
+            Model Arena
+          </button>
+
+          <button
             onClick={() => setActiveTab('compare')}
             className={`px-2.5 py-1 rounded transition-colors cursor-pointer ${
               activeTab === 'compare'
@@ -126,6 +139,9 @@ export function ModelMarketplace({
       </div>
 
       <div className="flex-1 overflow-y-auto p-5 space-y-5">
+        {activeTab === 'arena' && (
+          <ModelArena onApplyWinner={(cand) => onSelectModel(cand.modelId)} />
+        )}
         {activeTab === 'catalog' && (
           <div className="space-y-4">
             {/* Category filter pills */}

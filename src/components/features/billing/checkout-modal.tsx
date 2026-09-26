@@ -68,7 +68,7 @@ export function CheckoutModal({
           planId: plan.id,
           currency,
           billingCycle,
-          email: session.user?.email || 'shivansh@devclub.in',
+          email: session.user?.email || 'evaluator@parishram.ai',
         }),
       });
 

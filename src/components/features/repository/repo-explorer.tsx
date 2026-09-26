@@ -14,6 +14,8 @@ import {
 } from 'lucide-react';
 import { RepoFile, ASTSymbol, WhyThisFile } from '@/types/repository';
 import { MOCK_REPO_FILES, MOCK_SYMBOLS, MOCK_WHY_THIS_FILE, findFileContent } from '@/lib/repository/mock-repo';
+import { MemoryView } from '../memory/memory-view';
+import { DocsPanel } from '../run/docs-panel';
 
 interface RepoExplorerProps {
   onSelectWhyFile?: (filePath: string) => void;
@@ -27,7 +29,7 @@ export function RepoExplorer({ onSelectWhyFile }: RepoExplorerProps) {
     tests: true,
   });
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeTab, setActiveTab] = useState<'files' | 'symbols'>('files');
+  const [activeTab, setActiveTab] = useState<'files' | 'symbols' | 'memory' | 'docs'>('files');
 
   const toggleFolder = (path: string) => {
     setExpandedFolders((prev) => ({
@@ -66,7 +68,7 @@ export function RepoExplorer({ onSelectWhyFile }: RepoExplorerProps) {
           </div>
         </div>
 
-        {/* Tab switcher: Files vs Symbols */}
+        {/* Tab switcher: Files vs Symbols vs Memory vs Docs */}
         <div className="flex items-center gap-1">
           <button
             onClick={() => setActiveTab('files')}
@@ -88,11 +90,40 @@ export function RepoExplorer({ onSelectWhyFile }: RepoExplorerProps) {
           >
             AST Symbols
           </button>
+          <button
+            onClick={() => setActiveTab('memory')}
+            className={`px-2.5 py-1 rounded transition-colors cursor-pointer ${
+              activeTab === 'memory'
+                ? 'bg-[#ea580c] text-white font-semibold'
+                : 'bg-[var(--bg-subtle)] text-[var(--text-secondary)] hover:bg-[var(--bg-active)] hover:text-[var(--text-primary)]'
+            }`}
+          >
+            Repo Memory
+          </button>
+          <button
+            onClick={() => setActiveTab('docs')}
+            className={`px-2.5 py-1 rounded transition-colors cursor-pointer ${
+              activeTab === 'docs'
+                ? 'bg-[#ea580c] text-white font-semibold'
+                : 'bg-[var(--bg-subtle)] text-[var(--text-secondary)] hover:bg-[var(--bg-active)] hover:text-[var(--text-primary)]'
+            }`}
+          >
+            Auto Docs
+          </button>
         </div>
       </div>
 
-      {/* Main Split: Left Tree, Right Preview */}
-      <div className="flex-1 flex overflow-hidden">
+      {activeTab === 'memory' ? (
+        <div className="flex-1 overflow-hidden p-3">
+          <MemoryView />
+        </div>
+      ) : activeTab === 'docs' ? (
+        <div className="flex-1 overflow-hidden p-3">
+          <DocsPanel />
+        </div>
+      ) : (
+        /* Main Split: Left Tree, Right Preview */
+        <div className="flex-1 flex overflow-hidden">
         {/* Left pane: File tree / Symbol list */}
         <div className="w-72 bg-[var(--bg-canvas)] border-r border-[var(--border-subtle)] flex flex-col shrink-0 font-mono text-xs">
           {/* Search box */}
@@ -176,6 +207,7 @@ export function RepoExplorer({ onSelectWhyFile }: RepoExplorerProps) {
           </div>
         </div>
       </div>
+      )}
     </div>
   );
 }

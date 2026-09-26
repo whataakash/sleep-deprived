@@ -117,7 +117,7 @@ export function Topbar({
         )}
       </div>
 
-      {/* Center: Parishram State Pill & Model */}
+      {/* Center: Parishram State Pill, Model, and Subscription Tier */}
       <div className="hidden md:flex items-center gap-2.5">
         <div
           className="flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-semibold border border-transparent"
@@ -132,6 +132,27 @@ export function Topbar({
           <Cpu className="w-3 h-3 text-[#38bdf8]" />
           <span className="text-[var(--text-primary)] truncate max-w-[140px]">{selectedModelName}</span>
         </div>
+
+        {/* High-Converting Subscription Tier Badge & Upgrade Pill (ChatGPT/Claude psychology) */}
+        <button
+          onClick={() => onOpenAccount('billing')}
+          className={`flex items-center gap-1.5 px-2.5 py-0.5 rounded text-[11px] font-bold border transition-all cursor-pointer ${
+            user?.plan === 'FREE'
+              ? 'bg-[#ea580c]/15 hover:bg-[#ea580c]/25 border-[#ea580c]/40 text-[#ea580c] shadow-xs animate-pulse hover:animate-none'
+              : 'bg-[#10b981]/15 hover:bg-[#10b981]/25 border-[#10b981]/40 text-[#10b981]'
+          }`}
+          title="Click to view subscription tiers & quotas"
+        >
+          <span>{planInfo.hindiName}</span>
+          {user?.plan === 'FREE' && (
+            <>
+              <span className="text-[var(--text-muted)]">·</span>
+              <span className="text-[10px] underline font-extrabold flex items-center gap-1">
+                <span>Upgrade ⚡</span>
+              </span>
+            </>
+          )}
+        </button>
       </div>
 
       {/* Right Actions: Command Palette, Theme, Desktop, Run Demo, Account Avatar */}
@@ -200,7 +221,7 @@ export function Topbar({
             title="Account & IDE Settings"
           >
             <div className="w-5 h-5 rounded-full bg-[#ea580c] flex items-center justify-center text-white text-[10px] font-bold">
-              {user?.name ? user.name[0] : 'S'}
+              {user?.name ? user.name[0].toUpperCase() : 'U'}
             </div>
             <ChevronDown className="w-3 h-3 text-[var(--text-muted)]" />
           </button>
@@ -210,7 +231,10 @@ export function Topbar({
             <div className="absolute right-0 mt-2 w-56 bg-[var(--bg-panel)] border border-[var(--border-subtle)] rounded-lg shadow-xl py-2 z-50 animate-in fade-in duration-100 text-xs font-mono">
               <div className="px-3 py-2 border-b border-[var(--border-subtle)]">
                 <div className="font-bold text-[var(--text-primary)] truncate">
-                  {user?.name || 'Shivansh Pandey'}
+                  {user?.name || 'Developer Session'}
+                </div>
+                <div className="text-[10px] text-[var(--text-muted)] truncate">
+                  {user?.email || ''}
                 </div>
                 <div className="text-[10px] text-[var(--text-muted)] flex items-center gap-1.5 mt-0.5">
                   <span className="text-[#ea580c] font-bold">{planInfo.hindiName}</span>

@@ -10,6 +10,7 @@ import {
   Settings,
   Download,
   ShieldAlert,
+  Activity,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth/context';
 import { EvaluationModelAdapter } from '@/lib/models/evaluation-adapter';
@@ -55,8 +56,8 @@ export function Sidebar({
                 : 'text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)] hover:text-[var(--text-primary)]'
             }`}
           >
-            <Layers className="w-3.5 h-3.5 text-[#ea580c]" />
-            <span>Overview</span>
+            <Activity className="w-3.5 h-3.5 text-[#ea580c]" />
+            <span>Mission Control</span>
           </button>
 
           <button
@@ -111,7 +112,7 @@ export function Sidebar({
           >
             <div className="flex items-center gap-2.5">
               <Cpu className="w-3.5 h-3.5 text-[#a78bfa]" />
-              <span>Models & Router</span>
+              <span>Models & Arena</span>
             </div>
             {isEvalMode && (
               <span className="text-[9px] px-1.5 py-0.2 rounded bg-[#ea580c]/15 text-[#ea580c] font-bold">
@@ -164,7 +165,7 @@ export function Sidebar({
         >
           <div className="flex items-center gap-2.5 truncate">
             <div className="w-7 h-7 rounded-full bg-[#ea580c] flex items-center justify-center text-white font-bold text-xs shrink-0 shadow-xs">
-              {user?.name ? user.name[0] : 'S'}
+              {user?.name ? user.name[0].toUpperCase() : 'U'}
             </div>
             <div className="truncate">
               <div className="font-semibold text-[var(--text-primary)] truncate text-[11px]">
@@ -174,7 +175,7 @@ export function Sidebar({
                 <span className="text-[#ea580c] font-bold">{planInfo.hindiName}</span>
                 <span className="text-[9px]">({planInfo.englishSubtitle})</span>
                 <span>·</span>
-                <span>{user?.usage.runsUsedThisMonth || 14} runs</span>
+                <span>{user?.usage.runsUsedThisMonth || 0} runs</span>
               </div>
             </div>
           </div>

@@ -6,15 +6,21 @@ import {
   Cpu,
   ArrowRight,
   ShieldCheck,
-  Terminal,
-  Clock,
+  Compass,
+  Zap,
   Sparkles,
   GitBranch,
+  TrendingUp,
+  CreditCard,
+  Lock,
 } from 'lucide-react';
+import { useAuth } from '@/lib/auth/context';
+import { getPlanDisplay } from '@/lib/billing/plans';
 
 interface OverviewViewProps {
-  onStartRun: (taskText: string, modelId: string) => void;
+  onStartRun: (taskText: string, modelId: string, agentMode?: string) => void;
   onOpenRun: (runNumber: number) => void;
+  onOpenBilling?: () => void;
 }
 
 interface RecentRunItem {
@@ -26,6 +32,7 @@ interface RecentRunItem {
   timestamp: string;
   filesCount: number;
   modelUsed: string;
+  agentMode: string;
 }
 
 const RECENT_RUNS: RecentRunItem[] = [
@@ -38,6 +45,7 @@ const RECENT_RUNS: RecentRunItem[] = [
     timestamp: '12m ago',
     filesCount: 1,
     modelUsed: 'Qwen3-Coder-Next',
+    agentMode: 'Dual Agent (Nav + Sup)',
   },
   {
     id: 'run-1041',
@@ -48,6 +56,7 @@ const RECENT_RUNS: RecentRunItem[] = [
     timestamp: '2h ago',
     filesCount: 3,
     modelUsed: 'DeepSeek-V3-Coder',
+    agentMode: 'Supervisor AI',
   },
   {
     id: 'run-1040',
@@ -58,6 +67,7 @@ const RECENT_RUNS: RecentRunItem[] = [
     timestamp: '5h ago',
     filesCount: 2,
     modelUsed: 'Kimi-K2.5-Agent',
+    agentMode: 'Navigating AI',
   },
   {
     id: 'run-1039',
@@ -68,26 +78,104 @@ const RECENT_RUNS: RecentRunItem[] = [
     timestamp: 'Yesterday',
     filesCount: 4,
     modelUsed: 'GLM-5-MoE',
+    agentMode: 'Dual Agent (Nav + Sup)',
   },
 ];
 
-export function OverviewView({ onStartRun, onOpenRun }: OverviewViewProps) {
+export function OverviewView({ onStartRun, onOpenRun, onOpenBilling }: OverviewViewProps) {
+  const { session } = useAuth();
+  const user = session.user;
+  const currentPlan = user?.plan || 'FREE';
+  const planInfo = getPlanDisplay(currentPlan);
+
   const [taskPrompt, setTaskPrompt] = useState(
     'Fix the authentication failures in auth-gateway-service: forward active session tokens across internal service requests and ensure all regression tests pass.'
   );
   const [selectedModelId, setSelectedModelId] = useState('qwen3-coder-next');
+  const [selectedAgentMode, setSelectedAgentMode] = useState<'dual' | 'navigator' | 'supervisor'>('dual');
+
+  const runsUsed = user?.usage.runsUsedThisMonth || 14;
+  const maxRuns = typeof user?.usage.maxMonthlyRuns === 'number' ? user.usage.maxMonthlyRuns : 25;
+  const usagePercent = Math.min(100, Math.round((runsUsed / maxRuns) * 100));
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-start overflow-y-auto px-4 py-8 select-none font-sans transition-colors">
-      <div className="w-full max-w-2xl space-y-8">
-        {/* Main Heading */}
-        <div className="space-y-1.5">
+    <div className="flex-1 flex flex-col items-center justify-start overflow-y-auto px-4 py-6 select-none font-sans transition-colors">
+      <div className="w-full max-w-2xl space-y-6">
+        {/* Simple Header */}
+        <div className="space-y-1 text-center sm:text-left">
           <h1 className="text-2xl font-bold tracking-tight text-[var(--text-primary)]">
             What are we building?
           </h1>
           <p className="text-xs text-[var(--text-secondary)] font-mono">
             Autonomous software engineering with deterministic proof of work.
           </p>
+        </div>
+
+        {/* AI Agent Selection Bar (Above Chat) */}
+        <div className="flex flex-col gap-1.5 font-mono text-xs">
+          <div className="text-[11px] text-[var(--text-muted)] uppercase tracking-wider font-semibold flex items-center justify-between">
+            <span>Select AI Agent Dispatch Mode</span>
+            <span className="text-[10px] text-[var(--text-muted)] lowercase">co-operative reasoning</span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            {/* Dual Agent (Navigator + Supervisor) */}
+            <button
+              type="button"
+              onClick={() => setSelectedAgentMode('dual')}
+              className={`p-2.5 rounded-lg border text-left transition-all cursor-pointer ${
+                selectedAgentMode === 'dual'
+                  ? 'bg-[var(--bg-elevated)] border-[#ea580c] ring-1 ring-[#ea580c]/30'
+                  : 'bg-[var(--bg-panel)] border-[var(--border-subtle)] hover:border-[var(--border-medium)]'
+              }`}
+            >
+              <div className="flex items-center gap-1.5 font-bold text-xs text-[var(--text-primary)]">
+                <Zap className="w-3.5 h-3.5 text-[#ea580c]" />
+                <span>Autonomous Pair</span>
+              </div>
+              <div className="text-[10px] text-[var(--text-muted)] font-sans mt-0.5 leading-tight">
+                Navigator cartography + Supervisor proof verification
+              </div>
+            </button>
+
+            {/* Navigating AI */}
+            <button
+              type="button"
+              onClick={() => setSelectedAgentMode('navigator')}
+              className={`p-2.5 rounded-lg border text-left transition-all cursor-pointer ${
+                selectedAgentMode === 'navigator'
+                  ? 'bg-[var(--bg-elevated)] border-[#38bdf8] ring-1 ring-[#38bdf8]/30'
+                  : 'bg-[var(--bg-panel)] border-[var(--border-subtle)] hover:border-[var(--border-medium)]'
+              }`}
+            >
+              <div className="flex items-center gap-1.5 font-bold text-xs text-[var(--text-primary)]">
+                <Compass className="w-3.5 h-3.5 text-[#38bdf8]" />
+                <span>Navigating AI</span>
+              </div>
+              <div className="text-[10px] text-[var(--text-muted)] font-sans mt-0.5 leading-tight">
+                AST mapping, call trees, dependency context search
+              </div>
+            </button>
+
+            {/* Supervisor AI */}
+            <button
+              type="button"
+              onClick={() => setSelectedAgentMode('supervisor')}
+              className={`p-2.5 rounded-lg border text-left transition-all cursor-pointer ${
+                selectedAgentMode === 'supervisor'
+                  ? 'bg-[var(--bg-elevated)] border-[#10b981] ring-1 ring-[#10b981]/30'
+                  : 'bg-[var(--bg-panel)] border-[var(--border-subtle)] hover:border-[var(--border-medium)]'
+              }`}
+            >
+              <div className="flex items-center gap-1.5 font-bold text-xs text-[var(--text-primary)]">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#10b981]" />
+                <span>Supervisor AI</span>
+              </div>
+              <div className="text-[10px] text-[var(--text-muted)] font-sans mt-0.5 leading-tight">
+                Scope guard, security scanning, invariant proofs
+              </div>
+            </button>
+          </div>
         </div>
 
         {/* Task Intake Box */}
@@ -139,7 +227,7 @@ export function OverviewView({ onStartRun, onOpenRun }: OverviewViewProps) {
 
             {/* Submit Action Button */}
             <button
-              onClick={() => onStartRun(taskPrompt, selectedModelId)}
+              onClick={() => onStartRun(taskPrompt, selectedModelId, selectedAgentMode)}
               className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#ea580c] hover:bg-[#f97316] text-white font-semibold text-xs transition-all shadow-xs active:scale-[0.98] cursor-pointer"
             >
               <span>Run with परिश्रम</span>
@@ -147,6 +235,42 @@ export function OverviewView({ onStartRun, onOpenRun }: OverviewViewProps) {
             </button>
           </div>
         </div>
+
+        {/* PSYCHOLOGY & FINANCE UPGRADE CARD (ChatGPT Plus / Claude Pro Style) */}
+        {currentPlan === 'FREE' && (
+          <div className="p-3.5 rounded-xl bg-gradient-to-r from-[#ea580c]/10 via-[var(--bg-panel)] to-[var(--bg-panel)] border border-[#ea580c]/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
+            <div className="space-y-1 font-mono">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] px-1.5 py-0.2 rounded bg-[#ea580c]/20 text-[#ea580c] font-extrabold uppercase">
+                  {planInfo.hindiName} ({planInfo.englishSubtitle})
+                </span>
+                <span className="text-[11px] text-[var(--text-secondary)]">
+                  {runsUsed} / {maxRuns} runs used this month ({usagePercent}%)
+                </span>
+              </div>
+
+              {/* Progress Bar */}
+              <div className="w-48 sm:w-64 h-1.5 bg-[var(--bg-elevated)] rounded-full overflow-hidden mt-1">
+                <div
+                  className="h-full bg-[#ea580c] rounded-full transition-all"
+                  style={{ width: `${usagePercent}%` }}
+                />
+              </div>
+
+              <p className="text-[11px] text-[var(--text-secondary)] font-sans pt-1">
+                Upgrade to <strong className="text-[var(--text-primary)]">प्रगति (Builder)</strong> for ₹2,499/mo to unlock Claude 3.7 Sonnet, Kimi K2.5, 128k context, and 150 runs/mo.
+              </p>
+            </div>
+
+            <button
+              onClick={onOpenBilling}
+              className="px-3.5 py-2 rounded-lg bg-[#ea580c] hover:bg-[#f97316] text-white font-bold text-xs flex items-center gap-1.5 transition-all shadow-md active:scale-95 shrink-0 cursor-pointer"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Upgrade to प्रगति ⚡</span>
+            </button>
+          </div>
+        )}
 
         {/* Recent Runs List */}
         <div className="space-y-3 font-mono text-xs">
@@ -174,6 +298,8 @@ export function OverviewView({ onStartRun, onOpenRun }: OverviewViewProps) {
                     </div>
                     <div className="text-[11px] text-[var(--text-muted)] flex items-center gap-2 mt-0.5">
                       <span>Run #{run.number}</span>
+                      <span>·</span>
+                      <span>{run.agentMode}</span>
                       <span>·</span>
                       <span>{run.filesCount} file changed</span>
                       <span>·</span>

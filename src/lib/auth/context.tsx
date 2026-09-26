@@ -4,56 +4,58 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { UserProfile, AuthSession, UserPreferences } from '@/types/auth';
 import { PlanTier, UserApiKey, ModelProvider } from '@/types/models';
 
-const DEFAULT_USER: UserProfile = {
-  id: 'usr-shivansh-dev',
-  name: 'Shivansh Pandey',
-  email: 'shivansh@devclub.in',
+export const DEFAULT_USER_PREFERENCES: UserPreferences = {
+  theme: 'dark',
+  reducedMotion: false,
+  density: 'comfortable',
+  accentColor: '#ea580c',
+  language: 'English',
+  region: 'Global',
+  defaultRepositoryId: 'auth-gateway-service',
+  defaultBranch: 'main',
+  defaultModelId: 'qwen3-coder-next',
+  personality: 'forge',
+  autoApproveSafeTools: true,
+  confirmDestructiveActions: true,
+  notifyOnVerification: true,
+  notifyOnFailure: true,
+
+  fontSize: 13,
+  tabSize: 2,
+  wordWrap: true,
+  lineNumbers: true,
+  minimap: false,
+  bracketMatching: true,
+
+  autonomyLevel: 'AUTONOMOUS',
+  maxRetries: 3,
+  toolApprovalPolicy: 'destructive_only',
+  networkPolicy: 'air_gapped',
+  sandboxPolicy: 'strict_chroot',
+
+  runTestsAuto: true,
+  runTypecheckAuto: true,
+  runLintAuto: true,
+  runBuildAuto: true,
+  verificationStrictness: 'strict',
+
+  telemetry: false,
+  dataRetentionDays: 30,
+  shareCrashDumps: false,
+};
+
+export const DEMO_EVALUATOR_USER: UserProfile = {
+  id: 'usr-evaluator-session',
+  name: 'Dev Evaluator',
+  email: 'evaluator@parishram.ai',
   avatarUrl: '',
-  plan: 'BUILDER',
-  createdAt: '2026-09-01T10:00:00Z',
-  lastLoginAt: '2026-09-26T10:48:00Z',
-  preferences: {
-    theme: 'dark',
-    reducedMotion: false,
-    density: 'comfortable',
-    accentColor: '#ea580c',
-    language: 'English',
-    region: 'Global',
-    defaultRepositoryId: 'auth-gateway-service',
-    defaultBranch: 'main',
-    defaultModelId: 'qwen3-coder-next',
-    personality: 'forge',
-    autoApproveSafeTools: true,
-    confirmDestructiveActions: true,
-    notifyOnVerification: true,
-    notifyOnFailure: true,
-
-    fontSize: 13,
-    tabSize: 2,
-    wordWrap: true,
-    lineNumbers: true,
-    minimap: false,
-    bracketMatching: true,
-
-    autonomyLevel: 'AUTONOMOUS',
-    maxRetries: 3,
-    toolApprovalPolicy: 'destructive_only',
-    networkPolicy: 'air_gapped',
-    sandboxPolicy: 'strict_chroot',
-
-    runTestsAuto: true,
-    runTypecheckAuto: true,
-    runLintAuto: true,
-    runBuildAuto: true,
-    verificationStrictness: 'strict',
-
-    telemetry: false,
-    dataRetentionDays: 30,
-    shareCrashDumps: false,
-  },
+  plan: 'FREE',
+  createdAt: '2026-09-26T10:00:00Z',
+  lastLoginAt: '2026-09-26T18:00:00Z',
+  preferences: DEFAULT_USER_PREFERENCES,
   usage: {
     runsUsedThisMonth: 14,
-    maxMonthlyRuns: 150,
+    maxMonthlyRuns: 25,
     tokensUsedThisMonth: 38450,
     totalTasksVerified: 12,
     providerCostAccruedUsd: 0.18,
@@ -76,7 +78,9 @@ const DEFAULT_USER: UserProfile = {
 
 interface AuthContextType {
   session: AuthSession;
-  login: (email: string) => void;
+  login: (email: string, password?: string) => boolean;
+  signup: (name: string, email: string, password?: string) => boolean;
+  demoLogin: () => void;
   logout: () => void;
   updateProfile: (updates: Partial<UserProfile>) => void;
   updatePreferences: (updates: Partial<UserPreferences>) => void;
@@ -88,22 +92,27 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<UserProfile | null>(DEFAULT_USER);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true);
+  const [user, setUser] = useState<UserProfile | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [isInitialized, setIsInitialized] = useState<boolean>(false);
 
   // Load from localStorage if present
   useEffect(() => {
     try {
-      const saved = localStorage.getItem('forge_user_profile');
+      const saved = localStorage.getItem('parishram_user_profile') || localStorage.getItem('forge_user_profile');
       if (saved) {
-        setUser(JSON.parse(saved));
+        const parsed = JSON.parse(saved);
+        setUser(parsed);
+        setIsAuthenticated(true);
       }
     } catch (e) {
       // ignore
+    } finally {
+      setIsInitialized(true);
     }
   }, []);
 
-  // Sync theme with document class with reactive system preference listener
+  // Sync theme with document class
   useEffect(() => {
     if (typeof document === 'undefined') return;
 
@@ -119,7 +128,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         document.documentElement.classList.remove('light');
         document.documentElement.setAttribute('data-theme', 'dark');
       } else {
-        // System preference
         const media = window.matchMedia('(prefers-color-scheme: dark)');
         const prefersDark = media.matches;
         document.documentElement.classList.toggle('dark', prefersDark);
@@ -153,13 +161,87 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const login = (email: string) => {
-    const updated: UserProfile = {
-      ...DEFAULT_USER,
-      email,
+  const login = (email: string, password?: string) => {
+    if (!email.trim()) return false;
+
+    // Check if previous account exists with this email in storage
+    let existingProfile: UserProfile | null = null;
+    try {
+      const saved = localStorage.getItem(`parishram_account_${email.toLowerCase().trim()}`);
+      if (saved) {
+        existingProfile = JSON.parse(saved);
+      }
+    } catch (e) {
+      // ignore
+    }
+
+    if (!existingProfile) {
+      // Create new profile for this email
+      const displayName = email.split('@')[0].replace(/[\._]/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
+      existingProfile = {
+        id: `usr-${Date.now()}`,
+        name: displayName,
+        email: email.trim(),
+        avatarUrl: '',
+        plan: 'FREE',
+        createdAt: new Date().toISOString(),
+        lastLoginAt: new Date().toISOString(),
+        preferences: DEFAULT_USER_PREFERENCES,
+        usage: {
+          runsUsedThisMonth: 0,
+          maxMonthlyRuns: 25,
+          tokensUsedThisMonth: 0,
+          totalTasksVerified: 0,
+          providerCostAccruedUsd: 0,
+        },
+        apiKeys: [],
+      };
+    } else {
+      existingProfile.lastLoginAt = new Date().toISOString();
+    }
+
+    saveUser(existingProfile);
+    try {
+      localStorage.setItem(`parishram_account_${email.toLowerCase().trim()}`, JSON.stringify(existingProfile));
+    } catch (e) {}
+
+    setIsAuthenticated(true);
+    return true;
+  };
+
+  const signup = (name: string, email: string, password?: string) => {
+    if (!name.trim() || !email.trim()) return false;
+
+    const newProfile: UserProfile = {
+      id: `usr-${Date.now()}`,
+      name: name.trim(),
+      email: email.trim(),
+      avatarUrl: '',
+      plan: 'FREE',
+      createdAt: new Date().toISOString(),
       lastLoginAt: new Date().toISOString(),
+      preferences: DEFAULT_USER_PREFERENCES,
+      usage: {
+        runsUsedThisMonth: 0,
+        maxMonthlyRuns: 25,
+        tokensUsedThisMonth: 0,
+        totalTasksVerified: 0,
+        providerCostAccruedUsd: 0,
+      },
+      apiKeys: [],
     };
-    saveUser(updated);
+
+    saveUser(newProfile);
+    try {
+      localStorage.setItem(`parishram_account_${email.toLowerCase().trim()}`, JSON.stringify(newProfile));
+    } catch (e) {}
+
+    setIsAuthenticated(true);
+    return true;
+  };
+
+  const demoLogin = () => {
+    saveUser(DEMO_EVALUATOR_USER);
     setIsAuthenticated(true);
   };
 
@@ -172,6 +254,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!user) return;
     const updated = { ...user, ...updates };
     saveUser(updated);
+    try {
+      localStorage.setItem(`parishram_account_${updated.email.toLowerCase().trim()}`, JSON.stringify(updated));
+    } catch (e) {}
   };
 
   const updatePreferences = (updates: Partial<UserPreferences>) => {
@@ -219,6 +304,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     updateProfile({ apiKeys: filtered });
   };
 
+  // Avoid flash before hydration completes
+  if (!isInitialized) {
+    return null;
+  }
+
   return (
     <AuthContext.Provider
       value={{
@@ -228,6 +318,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           isAnonymousDemo: !isAuthenticated,
         },
         login,
+        signup,
+        demoLogin,
         logout,
         updateProfile,
         updatePreferences,

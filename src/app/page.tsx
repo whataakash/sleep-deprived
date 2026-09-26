@@ -21,6 +21,7 @@ import { AgentState, ForgeTemperature, Run } from '@/types/agent';
 import { CURRENT_2026_MODELS } from '@/lib/models/gateway';
 import { EvaluationModelAdapter } from '@/lib/models/evaluation-adapter';
 import { Lock } from 'lucide-react';
+import { AuthScreen } from '@/components/features/auth/auth-screen';
 
 function ParishramAppInner() {
   const { session } = useAuth();
@@ -99,7 +100,7 @@ function ParishramAppInner() {
     setCurrentEventIndex(INITIAL_RUN_1042.events.length - 1);
   };
 
-  const handleStartRunFromOverview = (taskText: string, modelId: string) => {
+  const handleStartRunFromOverview = (taskText: string, modelId: string, agentMode?: string) => {
     setSelectedModelId(modelId);
     setCurrentRun((prev) => ({
       ...prev,
@@ -108,6 +109,10 @@ function ParishramAppInner() {
     }));
     handleRunDemo();
   };
+
+  if (!session.isAuthenticated || !session.user) {
+    return <AuthScreen />;
+  }
 
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-[var(--bg-canvas)] text-[var(--text-primary)] font-sans antialiased transition-colors">
@@ -176,6 +181,10 @@ function ParishramAppInner() {
             <OverviewView
               onStartRun={handleStartRunFromOverview}
               onOpenRun={() => setActiveView('runs')}
+              onOpenBilling={() => {
+                setAccountInitialCategory('billing');
+                setIsAccountOpen(true);
+              }}
             />
           )}
 

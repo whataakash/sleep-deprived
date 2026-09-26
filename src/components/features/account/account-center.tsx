@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useAuth } from '@/lib/auth/context';
 import { PlanTier, ModelProvider } from '@/types/models';
 import {
@@ -63,6 +63,13 @@ export function AccountCenter({ isOpen, onClose, initialCategory = 'general' }: 
   const [newKeyProvider, setNewKeyProvider] = useState<ModelProvider>('Qwen');
   const [newKeyValue, setNewKeyValue] = useState('');
   const [savedNotice, setSavedNotice] = useState(false);
+
+  useEffect(() => {
+    if (session.user) {
+      setNameInput(session.user.name || '');
+      setEmailInput(session.user.email || '');
+    }
+  }, [session.user]);
 
   const isEvalMode = EvaluationModelAdapter.isEvaluationMode();
   const user = session.user;
@@ -695,7 +702,7 @@ export function AccountCenter({ isOpen, onClose, initialCategory = 'general' }: 
                     Working Directory
                   </label>
                   <div className="p-2 rounded bg-[var(--bg-canvas)] border border-[var(--border-subtle)] text-[11px] text-[var(--text-muted)]">
-                    /Users/shivanshpandey/Desktop/sleep-deprived
+                    ~/Workspace/sleep-deprived
                   </div>
                 </div>
               </div>
