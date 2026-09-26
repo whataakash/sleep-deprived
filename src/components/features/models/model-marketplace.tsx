@@ -2,39 +2,25 @@
 
 import React, { useState, useMemo } from 'react';
 import {
-  ModelManifest,
   ModelCategory,
   CURRENT_2026_MODELS,
   ParishramAIRouter,
-  UserAIConfig,
-  DEFAULT_USER_AI_CONFIG,
 } from '@/lib/models/gateway';
 import { EntitlementService } from '@/lib/billing/entitlements';
 import { useAuth } from '@/lib/auth/context';
-import { ModelProvider } from '@/types/models';
 import {
   Cpu,
   ShieldCheck,
   CheckCircle2,
   Lock,
-  Sparkles,
   Zap,
   Sliders,
-  ArrowRight,
-  ExternalLink,
-  Code2,
-  Terminal,
-  KeyRound,
-  Eye,
-  EyeOff,
-  Trash2,
-  Plus,
-  Bot,
   Flame,
   Check,
   Server,
   Layers,
   HelpCircle,
+  Bot,
 } from 'lucide-react';
 
 import { ModelArena } from './model-arena';
@@ -49,13 +35,11 @@ interface ModelMarketplaceProps {
 export function ModelMarketplace({
   currentModelId,
   onSelectModel,
-  onOpenAccountKeys,
-  onOpenUpgrade,
 }: ModelMarketplaceProps) {
-  const { session, saveApiKey, removeApiKey } = useAuth();
+  const { session } = useAuth();
   const user = session.user;
 
-  const [activeTab, setActiveTab] = useState<'configure' | 'keys' | 'catalog' | 'arena'>('configure');
+  const [activeTab, setActiveTab] = useState<'catalog' | 'configure' | 'arena'>('catalog');
   const [activeCategory, setActiveCategory] = useState<ModelCategory | 'ALL'>('ALL');
 
   // Parishram AI Tier Assignment Configuration
@@ -66,12 +50,6 @@ export function ModelMarketplace({
   // Difficulty Simulator
   const [taskQuery, setTaskQuery] = useState('Fix failing session token authentication in auth-gateway-service');
 
-  // Key form states
-  const [keyProvider, setKeyProvider] = useState<ModelProvider>('ParishramAI');
-  const [keyValue, setKeyValue] = useState('');
-  const [showKeyText, setShowKeyText] = useState(false);
-  const [keySaveMessage, setKeySaveMessage] = useState<string | null>(null);
-
   // Evaluate difficulty live for simulator
   const simDifficulty = useMemo(() => {
     return ParishramAIRouter.evaluateDifficulty(taskQuery, 2, 0);
@@ -80,21 +58,10 @@ export function ModelMarketplace({
   const lowLevelModel = CURRENT_2026_MODELS.find((m) => m.id === lowLevelModelId) || CURRENT_2026_MODELS[1];
   const frontierModel = CURRENT_2026_MODELS.find((m) => m.id === frontierModelId) || CURRENT_2026_MODELS[3];
 
-  const handleSaveKey = (providerToSave: ModelProvider, valueToSave: string) => {
-    if (!valueToSave.trim()) return;
-    saveApiKey(providerToSave, valueToSave.trim());
-    setKeySaveMessage(`Successfully saved API key for ${providerToSave}`);
-    setKeyValue('');
-    setTimeout(() => setKeySaveMessage(null), 3000);
-  };
-
   const filteredModels = CURRENT_2026_MODELS.filter((m) => {
     if (activeCategory === 'ALL') return true;
     return m.category === activeCategory;
   });
-
-  const existingApiKeys = user?.apiKeys || [];
-  const parishramKeyRecord = existingApiKeys.find((k) => k.provider === 'ParishramAI');
 
   return (
     <div className="flex-1 flex flex-col bg-[var(--bg-panel)] border border-[var(--border-subtle)] rounded-xl overflow-hidden font-sans transition-colors">
@@ -102,54 +69,25 @@ export function ModelMarketplace({
       <div className="p-4 bg-[var(--bg-elevated)] border-b border-[var(--border-subtle)] flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
         <div className="flex items-center gap-2.5">
           <div className="p-1.5 rounded-lg bg-[#ea580c]/12 border border-[#ea580c]/30 text-[#ea580c]">
-            <Sparkles className="w-4 h-4" />
+            <Cpu className="w-4 h-4" />
           </div>
           <div>
             <div className="flex items-center gap-2">
               <span className="font-bold text-[var(--text-primary)] text-sm tracking-wide">
-                CONFIGURE AI & MODELS
+                INTELLIGENCE & MODELS
               </span>
               <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#10b981]/15 text-[#10b981] font-bold border border-[#10b981]/30">
                 Parishram AI Active
               </span>
             </div>
             <div className="text-[11px] text-[var(--text-muted)] mt-0.5">
-              Smart difficulty router, multi-model tier assignment, and BYOK credentials
+              Available models, capabilities, routing heuristics, and baseline arena comparisons
             </div>
           </div>
         </div>
 
         {/* View mode tabs */}
         <div className="flex items-center gap-1 bg-[var(--bg-canvas)] p-1 rounded-lg border border-[var(--border-subtle)]">
-          <button
-            onClick={() => setActiveTab('configure')}
-            className={`px-3 py-1.5 rounded-md transition-all cursor-pointer flex items-center gap-1.5 ${
-              activeTab === 'configure'
-                ? 'bg-[#ea580c] text-white font-bold shadow-xs'
-                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
-            }`}
-          >
-            <Sliders className="w-3.5 h-3.5" />
-            <span>Smart Router</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('keys')}
-            className={`px-3 py-1.5 rounded-md transition-all cursor-pointer flex items-center gap-1.5 ${
-              activeTab === 'keys'
-                ? 'bg-[#ea580c] text-white font-bold shadow-xs'
-                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
-            }`}
-          >
-            <KeyRound className="w-3.5 h-3.5" />
-            <span>API Keys (BYOK)</span>
-            {existingApiKeys.length > 0 && (
-              <span className="px-1.5 py-0.2 rounded-full bg-white/20 text-[10px] font-bold">
-                {existingApiKeys.length}
-              </span>
-            )}
-          </button>
-
           <button
             onClick={() => setActiveTab('catalog')}
             className={`px-3 py-1.5 rounded-md transition-all cursor-pointer flex items-center gap-1.5 ${
@@ -159,7 +97,19 @@ export function ModelMarketplace({
             }`}
           >
             <Cpu className="w-3.5 h-3.5" />
-            <span>Model Catalog</span>
+            <span>Available Models</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('configure')}
+            className={`px-3 py-1.5 rounded-md transition-all cursor-pointer flex items-center gap-1.5 ${
+              activeTab === 'configure'
+                ? 'bg-[#ea580c] text-white font-bold shadow-xs'
+                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+            }`}
+          >
+            <Sliders className="w-3.5 h-3.5" />
+            <span>Routing & Context</span>
           </button>
 
           <button
@@ -360,190 +310,7 @@ export function ModelMarketplace({
           </div>
         )}
 
-        {/* ==================================================================== */}
-        {/* TAB 2: API KEYS (BYOK) & PARISHRAM AI MASTER KEY                     */}
-        {/* ==================================================================== */}
-        {activeTab === 'keys' && (
-          <div className="max-w-3xl mx-auto space-y-6 font-mono text-xs">
-            {/* PARISHRAM AI MASTER KEY CARD */}
-            <div className="p-5 rounded-2xl bg-gradient-to-r from-[#ea580c]/15 via-[var(--bg-canvas)] to-[var(--bg-panel)] border-2 border-[#ea580c]/40 space-y-4 shadow-sm">
-              <div className="flex items-start justify-between gap-3">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <Flame className="w-4 h-4 text-[#ea580c]" />
-                    <span className="font-extrabold text-sm text-[var(--text-primary)]">
-                      PARISHRAM AI MASTER API KEY
-                    </span>
-                    <span className="text-[9px] px-2 py-0.5 rounded-full bg-[#ea580c]/20 text-[#ea580c] font-bold">
-                      CORE HARNESS CREDENTIAL
-                    </span>
-                  </div>
-                  <p className="text-xs text-[var(--text-secondary)] font-sans leading-relaxed">
-                    Paste your Parishram AI or hackathon evaluation API key here. This key powers autonomous code execution, test verification, and proof seals.
-                  </p>
-                </div>
-              </div>
 
-              {parishramKeyRecord ? (
-                <div className="flex items-center justify-between p-3 rounded-lg bg-[var(--bg-canvas)] border border-emerald-500/30">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                    <div>
-                      <div className="text-xs font-bold text-[var(--text-primary)]">
-                        Parishram AI Key Configured
-                      </div>
-                      <div className="text-[11px] text-[var(--text-muted)] font-mono">
-                        {parishramKeyRecord.maskedKey} (Updated: {parishramKeyRecord.updatedAt})
-                      </div>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => removeApiKey('ParishramAI')}
-                    className="p-1.5 rounded hover:bg-[var(--bg-subtle)] text-[var(--text-muted)] hover:text-red-400 transition-colors cursor-pointer"
-                    title="Remove key"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <input
-                      type={showKeyText ? 'text' : 'password'}
-                      value={keyProvider === 'ParishramAI' ? keyValue : ''}
-                      onChange={(e) => {
-                        setKeyProvider('ParishramAI');
-                        setKeyValue(e.target.value);
-                      }}
-                      placeholder="Paste your Parishram AI / AI_API_KEY (e.g. psh_live_... or evaluation key)"
-                      className="flex-1 px-3 py-2 rounded-lg bg-[var(--bg-canvas)] border border-[var(--border-subtle)] text-[var(--text-primary)] outline-none focus:border-[#ea580c] text-xs font-mono"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowKeyText(!showKeyText)}
-                      className="p-2 rounded-lg bg-[var(--bg-canvas)] border border-[var(--border-subtle)] text-[var(--text-muted)] hover:text-[var(--text-primary)] cursor-pointer"
-                    >
-                      {showKeyText ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
-                    <button
-                      onClick={() => handleSaveKey('ParishramAI', keyValue)}
-                      className="px-4 py-2 rounded-lg bg-[#ea580c] hover:bg-[#f97316] text-white font-bold text-xs cursor-pointer shadow-xs active:scale-98 transition-all"
-                    >
-                      Save Key
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* Where to paste explanation note */}
-              <div className="p-3 rounded-lg bg-[var(--bg-canvas)] border border-[var(--border-subtle)] text-[11px] text-[var(--text-muted)] font-sans space-y-1">
-                <div className="font-bold text-[var(--text-primary)] font-mono flex items-center gap-1.5">
-                  <HelpCircle className="w-3.5 h-3.5 text-[#ea580c]" />
-                  <span>Where else can you provide the Parishram AI API key?</span>
-                </div>
-                <div>
-                  • <strong>In the Terminal / Makefile:</strong> Run <code className="px-1.5 py-0.5 rounded bg-[var(--bg-panel)] font-mono text-[10px]">export AI_API_KEY="&lt;YOUR_KEY&gt;" && make run</code>
-                </div>
-                <div>
-                  • <strong>In Project Config:</strong> Add <code className="px-1.5 py-0.5 rounded bg-[var(--bg-panel)] font-mono text-[10px]">AI_API_KEY="&lt;YOUR_KEY&gt;"</code> to your root <code className="px-1.5 py-0.5 rounded bg-[var(--bg-panel)] font-mono text-[10px]">.env</code> file.
-                </div>
-              </div>
-            </div>
-
-            {/* ADD CUSTOM PROVIDER API KEYS (BYOK) */}
-            <div className="p-5 rounded-2xl bg-[var(--bg-canvas)] border border-[var(--border-subtle)] space-y-4">
-              <div className="space-y-1">
-                <h3 className="font-bold text-sm text-[var(--text-primary)]">
-                  Add Your Own Provider API Keys (BYOK)
-                </h3>
-                <p className="text-xs text-[var(--text-secondary)] font-sans leading-relaxed">
-                  Add as many custom keys as you want. Keys are encrypted and stored in your local browser session and never sent to external third parties.
-                </p>
-              </div>
-
-              {keySaveMessage && (
-                <div className="p-2.5 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 shrink-0" />
-                  <span>{keySaveMessage}</span>
-                </div>
-              )}
-
-              <div className="flex flex-col sm:flex-row gap-2">
-                <select
-                  value={keyProvider}
-                  onChange={(e) => setKeyProvider(e.target.value as ModelProvider)}
-                  className="px-3 py-2 rounded-lg bg-[var(--bg-panel)] border border-[var(--border-subtle)] text-xs text-[var(--text-primary)] font-mono outline-none cursor-pointer"
-                >
-                  <option value="Anthropic">Anthropic (Claude 3.7 / 3.5)</option>
-                  <option value="OpenAI">OpenAI (GPT-4o / o3-mini)</option>
-                  <option value="DeepSeek">DeepSeek (V3 / R1)</option>
-                  <option value="Google">Google (Gemini 2.5 Flash / Pro)</option>
-                  <option value="Groq">Groq (Ultra-fast Llama/Qwen)</option>
-                  <option value="OpenRouter">OpenRouter (Unified Gateway)</option>
-                  <option value="Ollama">Ollama Local URL (Default: http://localhost:11434)</option>
-                </select>
-
-                <input
-                  type={showKeyText ? 'text' : 'password'}
-                  value={keyValue}
-                  onChange={(e) => setKeyValue(e.target.value)}
-                  placeholder={`Paste ${keyProvider} API Key...`}
-                  className="flex-1 px-3 py-2 rounded-lg bg-[var(--bg-panel)] border border-[var(--border-subtle)] text-[var(--text-primary)] outline-none focus:border-[#ea580c] text-xs font-mono"
-                />
-
-                <button
-                  onClick={() => handleSaveKey(keyProvider, keyValue)}
-                  className="px-4 py-2 rounded-lg bg-[var(--bg-elevated)] hover:bg-[var(--bg-active)] border border-[var(--border-subtle)] text-[var(--text-primary)] font-bold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  <span>Save Key</span>
-                </button>
-              </div>
-
-              {/* Existing Configured Keys List */}
-              <div className="space-y-2 pt-2">
-                <div className="text-[11px] text-[var(--text-muted)] font-semibold uppercase tracking-wider">
-                  Configured Keys ({existingApiKeys.length})
-                </div>
-
-                {existingApiKeys.length === 0 ? (
-                  <div className="p-4 rounded-lg bg-[var(--bg-panel)] border border-[var(--border-subtle)] text-center text-[var(--text-muted)] text-xs">
-                    No custom keys added yet. Parishram AI will use free hosted endpoints or local Ollama.
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    {existingApiKeys.map((k) => (
-                      <div
-                        key={k.provider}
-                        className="flex items-center justify-between p-3 rounded-lg bg-[var(--bg-panel)] border border-[var(--border-subtle)]"
-                      >
-                        <div className="flex items-center gap-2.5">
-                          <KeyRound className="w-4 h-4 text-[#ea580c]" />
-                          <div>
-                            <div className="font-bold text-xs text-[var(--text-primary)]">
-                              {k.provider}
-                            </div>
-                            <div className="text-[10px] text-[var(--text-muted)]">
-                              {k.maskedKey} • Verified {k.updatedAt}
-                            </div>
-                          </div>
-                        </div>
-
-                        <button
-                          onClick={() => removeApiKey(k.provider)}
-                          className="p-1.5 rounded hover:bg-[var(--bg-subtle)] text-[var(--text-muted)] hover:text-red-400 transition-colors cursor-pointer"
-                          title="Delete key"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* ==================================================================== */}
         {/* TAB 3: MODEL CATALOG & MARKETPLACE                                   */}

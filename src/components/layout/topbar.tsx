@@ -14,11 +14,8 @@ import {
   Sun,
   Moon,
   Lock,
-  Download,
   User,
   Settings,
-  CreditCard,
-  BarChart2,
   LogOut,
   Zap,
   CheckCircle2,
@@ -27,7 +24,6 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth/context';
 import { EvaluationModelAdapter } from '@/lib/models/evaluation-adapter';
-import { getPlanDisplay } from '@/lib/billing/plans';
 
 interface TopbarProps {
   currentTemp: ForgeTemperature;
@@ -35,7 +31,7 @@ interface TopbarProps {
   selectedModelName: string;
   onOpenCommandPalette: () => void;
   onOpenAccount: (initialCategory?: string) => void;
-  onOpenDownload: () => void;
+  onOpenDownload?: () => void;
   onOpenUpgrade?: () => void;
   onRunDemo: () => void;
   onResetDemo: () => void;
@@ -67,7 +63,6 @@ export function Topbar({
   const temp = TEMP_PILL[currentTemp] || TEMP_PILL.COLD;
   const isEvalMode = EvaluationModelAdapter.isEvaluationMode();
   const currentTheme = user?.preferences?.theme || 'dark';
-  const planInfo = getPlanDisplay(user?.plan || 'BUILDER');
 
   const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
   const accountMenuRef = useRef<HTMLDivElement>(null);
@@ -252,12 +247,8 @@ export function Topbar({
                 <div className="font-bold text-[var(--text-primary)] truncate">
                   {user?.name || 'Developer Session'}
                 </div>
-                <div className="text-[10px] text-[var(--text-muted)] truncate">
-                  {user?.email || ''}
-                </div>
-                <div className="text-[10px] text-[var(--text-muted)] flex items-center gap-1.5 mt-0.5">
-                  <span className="text-[#ea580c] font-bold">{planInfo.name}</span>
-                  <span>Plan</span>
+                <div className="text-[10px] text-[var(--text-muted)] truncate font-mono">
+                  {user?.email || 'Active Session'}
                 </div>
               </div>
 
@@ -265,60 +256,12 @@ export function Topbar({
                 <button
                   onClick={() => {
                     setIsAccountMenuOpen(false);
-                    if (onOpenUpgrade) onOpenUpgrade();
-                    else onOpenAccount('billing');
-                  }}
-                  className="w-full flex items-center justify-between px-3 py-1.5 text-left text-[#ea580c] hover:bg-[#ea580c]/10 font-bold transition-colors cursor-pointer"
-                >
-                  <div className="flex items-center gap-2.5">
-                    <CreditCard className="w-3.5 h-3.5 text-[#ea580c]" />
-                    <span>Upgrade Plan</span>
-                  </div>
-                  <span className="text-[9px] bg-[#ea580c] text-white px-1.5 py-0.2 rounded font-extrabold">PRO</span>
-                </button>
-
-                <button
-                  onClick={() => {
-                    setIsAccountMenuOpen(false);
-                    onOpenAccount('account');
-                  }}
-                  className="w-full flex items-center gap-2.5 px-3 py-1.5 text-left text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-subtle)] transition-colors"
-                >
-                  <User className="w-3.5 h-3.5 text-[#38bdf8]" />
-                  <span>Account</span>
-                </button>
-
-                <button
-                  onClick={() => {
-                    setIsAccountMenuOpen(false);
                     onOpenAccount('general');
                   }}
-                  className="w-full flex items-center gap-2.5 px-3 py-1.5 text-left text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-subtle)] transition-colors"
+                  className="w-full flex items-center gap-2.5 px-3 py-1.5 text-left text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-subtle)] transition-colors cursor-pointer"
                 >
                   <Settings className="w-3.5 h-3.5 text-[#a78bfa]" />
-                  <span>Settings</span>
-                </button>
-
-                <button
-                  onClick={() => {
-                    setIsAccountMenuOpen(false);
-                    onOpenAccount('billing');
-                  }}
-                  className="w-full flex items-center gap-2.5 px-3 py-1.5 text-left text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-subtle)] transition-colors"
-                >
-                  <BarChart2 className="w-3.5 h-3.5 text-[#fbbf24]" />
-                  <span>Usage</span>
-                </button>
-
-                <button
-                  onClick={() => {
-                    setIsAccountMenuOpen(false);
-                    onOpenAccount('billing');
-                  }}
-                  className="w-full flex items-center gap-2.5 px-3 py-1.5 text-left text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-subtle)] transition-colors"
-                >
-                  <CreditCard className="w-3.5 h-3.5 text-[#10b981]" />
-                  <span>Billing</span>
+                  <span>Settings & Preferences</span>
                 </button>
               </div>
 
@@ -328,7 +271,7 @@ export function Topbar({
                     setIsAccountMenuOpen(false);
                     logout();
                   }}
-                  className="w-full flex items-center gap-2.5 px-3 py-1.5 text-left text-[#ef4444] hover:bg-[var(--bg-subtle)] transition-colors"
+                  className="w-full flex items-center gap-2.5 px-3 py-1.5 text-left text-[#ef4444] hover:bg-[var(--bg-subtle)] transition-colors cursor-pointer"
                 >
                   <LogOut className="w-3.5 h-3.5" />
                   <span>Log out</span>

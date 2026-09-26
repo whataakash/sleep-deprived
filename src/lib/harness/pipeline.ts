@@ -180,7 +180,7 @@ export class HarnessPipeline {
                 this.modifiedFiles.add(p);
                 this.unifiedDiff += editResult.diff + '\n';
               } catch (editErr: any) {
-                console.warn(`Edit tool warning on ${p}:`, editErr.message);
+                // Tool executor already recorded event error
               }
             }
           } else if (tc.tool === 'write_file') {

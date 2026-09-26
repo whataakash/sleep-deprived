@@ -34,10 +34,10 @@ setup:
 	@echo "==> Compiling PARISHRAM Next.js production build..."
 	npm run build
 
-# 2. RUN: Launch PARISHRAM AI Harness Terminal User Interface (TUI) & Evaluation CLI
+# 2. RUN: Launch PARISHRAM AI Harness Terminal Interface
 run:
 	@echo "==> Initializing PARISHRAM AI Harness Terminal Interface..."
-	@AI_API_KEY="$${AI_API_KEY}" AI_MODEL="$${AI_MODEL}" ISSUE="$${ISSUE:-$(ISSUE)}" npx tsx scripts/terminal-harness.ts $(filter-out $@,$(MAKECMDGOALS)) $(ARGS)
+	@AI_API_KEY="$${AI_API_KEY}" AI_MODEL="$${AI_MODEL}" ISSUE="$${ISSUE:-$(ISSUE)}" npx tsx scripts/cli.ts run $(filter-out $@,$(MAKECMDGOALS)) $(ARGS)
 
 # 2b. WEB: Launch Next.js Glass-Box Web Dashboard
 web:
@@ -51,12 +51,12 @@ web:
 # 3. TEST: Automated compliance and harness verification suite
 test:
 	@echo "==> Running automated evaluation & verification suite..."
-	AI_API_KEY="$${AI_API_KEY}" AI_MODEL="$${AI_MODEL}" npm test
+	@AI_API_KEY="$${AI_API_KEY}" AI_MODEL="$${AI_MODEL}" npx tsx scripts/cli.ts test
 
 # 4. EVALUATE: Headless CLI evaluation against prescribed test case
 evaluate:
 	@echo "==> Running headless autonomous evaluation harness..."
-	AI_API_KEY="$${AI_API_KEY}" AI_MODEL="$${AI_MODEL}" npx tsx scripts/evaluate-harness.ts
+	@AI_API_KEY="$${AI_API_KEY}" AI_MODEL="$${AI_MODEL}" npx tsx scripts/cli.ts evaluate $(filter-out $@,$(MAKECMDGOALS)) $(ARGS)
 
 # 5. SYNC: Fast-forward team rebase & verification helper
 sync:

@@ -2,13 +2,17 @@
   "name": "sleep-deprived",
   "version": "0.1.0",
   "private": true,
+  "bin": {
+    "parishram": "./bin/parishram.js"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
     "test": "npx tsx --test tests/*.test.ts",
-    "harness": "npx tsx scripts/terminal-harness.ts"
+    "harness": "npx tsx scripts/cli.ts run",
+    "parishram": "npx tsx scripts/cli.ts"
   },
   "imports": {
     "@/*": "./src/*"

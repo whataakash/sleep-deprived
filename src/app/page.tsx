@@ -13,8 +13,6 @@ import { ModelMarketplace } from '@/components/features/models/model-marketplace
 import { EvaluationDashboard } from '@/components/features/evaluation/evaluation-dashboard';
 import { AccountCenter } from '@/components/features/account/account-center';
 import { CommandPalette } from '@/components/features/command-palette/command-palette';
-import { DownloadModal } from '@/components/features/download/download-modal';
-import { UpgradeModal } from '@/components/features/billing/upgrade-modal';
 
 import { INITIAL_RUN_1042 } from '@/lib/agent/orchestrator';
 import { ProofGenerator } from '@/lib/verification/proof-generator';
@@ -39,9 +37,7 @@ function ParishramAppInner() {
   // Modals
   const [isAccountOpen, setIsAccountOpen] = useState<boolean>(false);
   const [accountInitialCategory, setAccountInitialCategory] = useState<string>('general');
-  const [isDownloadOpen, setIsDownloadOpen] = useState<boolean>(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState<boolean>(false);
-  const [isUpgradeOpen, setIsUpgradeOpen] = useState<boolean>(false);
 
   const isEvalMode = EvaluationModelAdapter.isEvaluationMode();
 
@@ -177,8 +173,6 @@ function ParishramAppInner() {
           setAccountInitialCategory(cat || 'general');
           setIsAccountOpen(true);
         }}
-        onOpenDownload={() => setIsDownloadOpen(true)}
-        onOpenUpgrade={() => setIsUpgradeOpen(true)}
         onRunDemo={handleRunDemo}
         onResetDemo={handleResetDemo}
         isDemoRunning={isDemoRunning}
@@ -223,8 +217,6 @@ function ParishramAppInner() {
             setAccountInitialCategory('general');
             setIsAccountOpen(true);
           }}
-          onOpenDownload={() => setIsDownloadOpen(true)}
-          onOpenUpgrade={() => setIsUpgradeOpen(true)}
           runStatus={isVerified ? 'VERIFIED' : 'RUNNING'}
         />
 
@@ -234,11 +226,6 @@ function ParishramAppInner() {
             <OverviewView
               onStartRun={handleStartRunFromOverview}
               onOpenRun={() => setActiveView('runs')}
-              onOpenBilling={() => {
-                setAccountInitialCategory('billing');
-                setIsAccountOpen(true);
-              }}
-              onOpenUpgrade={() => setIsUpgradeOpen(true)}
               onRunDemo={handleRunDemo}
               isDemoRunning={isDemoRunning}
               onResetDemo={handleResetDemo}
@@ -289,11 +276,6 @@ function ParishramAppInner() {
             <ModelMarketplace
               currentModelId={selectedModel.id}
               onSelectModel={setSelectedModelId}
-              onOpenAccountKeys={() => {
-                setAccountInitialCategory('ai');
-                setIsAccountOpen(true);
-              }}
-              onOpenUpgrade={() => setIsUpgradeOpen(true)}
             />
           )}
 
@@ -314,15 +296,6 @@ function ParishramAppInner() {
         onClose={() => setIsAccountOpen(false)}
         initialCategory={accountInitialCategory}
       />
-
-      {/* Upgrade & Payment Modal (Claude 2-step flow) */}
-      <UpgradeModal
-        isOpen={isUpgradeOpen}
-        onClose={() => setIsUpgradeOpen(false)}
-      />
-
-      {/* Download Parishram Desktop Modal */}
-      <DownloadModal isOpen={isDownloadOpen} onClose={() => setIsDownloadOpen(false)} />
 
       {/* Command Palette */}
       <CommandPalette

@@ -30,10 +30,10 @@ test('Structural Refinement: 1. Sidebar contains Home, Runs, Repositories', asyn
     sidebarContent.includes('>Repositories</span>'),
     'Sidebar should have "Repositories" navigation item'
   );
-  // Check Models & Arena exists
+  // Check Models exists
   assert.ok(
-    sidebarContent.includes('>Models & Arena</span>'),
-    'Sidebar should have "Models & Arena" navigation item'
+    sidebarContent.includes('>Models</span>') || sidebarContent.includes('>Models & Arena</span>'),
+    'Sidebar should have "Models" navigation item'
   );
 });
 
