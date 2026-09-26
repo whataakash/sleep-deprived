@@ -78,8 +78,10 @@ test('Header & Pricing Modal: Final Polish Verification', async () => {
   assert.ok(topbarContent.includes('aria-label="Search or open command palette (Cmd+K)"'), 'Header must have accessible search button');
   assert.ok(topbarContent.includes('aria-label="Open account and settings menu"'), 'Header must have clean account profile control');
 
-  // 3. Sidebar contains Download Parishram local runtime
-  assert.ok(sidebarContent.includes('Download Parishram'), 'Sidebar must feature Download Parishram under Local Runtime');
+  // 3. Modern Download action button in Header, removed from left sidebar
+  assert.ok(topbarContent.includes('aria-label="Download Parishram Desktop"'), 'Header must feature modern Download action button');
+  assert.ok(!sidebarContent.includes('Local Runtime'), 'Sidebar must not contain Local Runtime section (moved to top-right Header)');
+  assert.ok(!sidebarContent.includes('Download Parishram'), 'Sidebar must not contain Download Parishram button');
 
   // 4. Modal must use viewport-constrained architecture with sticky header and AnimatePresence
   assert.ok(modalContent.includes('max-h-[92dvh]'), 'Modal shell must be constrained to viewport with dvh');

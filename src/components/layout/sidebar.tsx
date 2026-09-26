@@ -8,7 +8,6 @@ import {
   BarChart3,
   Layers,
   Settings,
-  Download,
   ShieldAlert,
   Activity,
 } from 'lucide-react';
@@ -135,51 +134,13 @@ export function Sidebar({
             <span className="text-[12px]">Evaluations</span>
           </button>
         </div>
-
-        {/* Local Engine / Desktop Shell */}
-        <div className="space-y-1 pt-2.5 border-t border-[var(--border-subtle)]">
-          <div className="px-2.5 py-1 text-[10px] text-[var(--text-muted)] uppercase tracking-wider font-semibold">
-            Local Runtime
-          </div>
-
-          <button
-            onClick={() => onOpenDownload && onOpenDownload()}
-            className="w-full flex items-center justify-between px-3 py-2 rounded-lg transition-colors cursor-pointer text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)] hover:text-[var(--text-primary)] group"
-            title="Download Parishram desktop runtime (macOS, Linux, Windows)"
-          >
-            <div className="flex items-center gap-2.5">
-              <Download className="w-4 h-4 text-[#38bdf8] group-hover:scale-110 transition-transform" />
-              <span className="text-[12px]">Download Parishram</span>
-            </div>
-            <span className="text-[9px] px-1.5 py-0.2 rounded bg-[#38bdf8]/10 text-[#38bdf8] font-bold">
-              Tauri
-            </span>
-          </button>
-        </div>
       </div>
 
-      {/* Bottom Account Card & Minimal Upgrade Trigger */}
-      <div className="p-3 border-t border-[var(--border-subtle)] bg-[var(--bg-canvas)] space-y-2">
-        {/* Minimal Plan & Upgrade row right near left account */}
-        <div className="flex items-center justify-between px-1 text-[11px] font-mono">
-          <div className="flex items-center gap-1.5 text-[var(--text-muted)]">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#ea580c]" />
-            <span className="text-[var(--text-secondary)] font-semibold">{planInfo.name}</span>
-            <span className="text-[10px] text-[var(--text-muted)]">({user?.usage.runsUsedThisMonth || 0} runs)</span>
-          </div>
-          <button
-            onClick={() => (onOpenUpgrade ? onOpenUpgrade() : onOpenAccount())}
-            className="text-[10px] font-bold text-[#ea580c] hover:underline flex items-center gap-0.5 transition-colors cursor-pointer"
-            title="Upgrade Plan"
-          >
-            <span>Upgrade</span>
-            <span>↗</span>
-          </button>
-        </div>
-
+      {/* Bottom Account Card */}
+      <div className="p-3 border-t border-[var(--border-subtle)] bg-[var(--bg-canvas)]">
         <button
           onClick={onOpenAccount}
-          className="w-full p-2 rounded bg-[var(--bg-elevated)] hover:bg-[var(--bg-subtle)] border border-[var(--border-subtle)] flex items-center justify-between text-left transition-colors cursor-pointer group"
+          className="w-full p-2 rounded-xl bg-[var(--bg-elevated)] hover:bg-[var(--bg-subtle)] border border-[var(--border-subtle)] hover:border-[var(--border-medium)] flex items-center justify-between text-left transition-colors cursor-pointer group"
           title="Account settings, BYOK keys & IDE preferences"
         >
           <div className="flex items-center gap-2.5 truncate">
@@ -190,8 +151,10 @@ export function Sidebar({
               <div className="font-semibold text-[var(--text-primary)] truncate text-[11px]">
                 {user?.name || 'Evaluator Session'}
               </div>
-              <div className="text-[10px] text-[var(--text-muted)] truncate">
-                {user?.email || 'evaluator@parishram.ai'}
+              <div className="text-[10px] text-[var(--text-muted)] truncate flex items-center gap-1.5">
+                <span className="text-[#ea580c] font-semibold">{planInfo.name} Plan</span>
+                <span>·</span>
+                <span>{user?.usage.runsUsedThisMonth || 0} runs</span>
               </div>
             </div>
           </div>

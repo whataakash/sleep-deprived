@@ -27,6 +27,7 @@ import {
 import { useAuth } from '@/lib/auth/context';
 import { EvaluationModelAdapter } from '@/lib/models/evaluation-adapter';
 import { getPlanDisplay } from '@/lib/billing/plans';
+import { PlanSelector } from '@/components/layout/plan-selector';
 
 interface TopbarProps {
   currentTemp: ForgeTemperature;
@@ -69,6 +70,7 @@ export function Topbar({
   const planInfo = getPlanDisplay(user?.plan || 'BUILDER');
 
   const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
+  const [isPlanMenuOpen, setIsPlanMenuOpen] = useState(false);
   const accountMenuRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown on outside click
@@ -203,8 +205,29 @@ export function Topbar({
         )}
       </div>
 
-      {/* RIGHT: [search] [theme] [profile] */}
+      {/* RIGHT: [download] [search] [theme] [divider] [upgrade/plan selector] [profile] */}
       <div className="flex items-center gap-2 sm:gap-2.5">
+        {/* Full Shiny Black Animated Download Action Button */}
+        <button
+          onClick={onOpenDownload}
+          className="relative overflow-hidden flex items-center gap-2 px-3 sm:px-3.5 py-2 rounded-xl bg-gradient-to-b from-[#26262b] via-[#121216] to-[#050507] hover:from-[#32323a] hover:via-[#191920] hover:to-[#0a0a0f] border border-white/20 hover:border-white/40 text-white shadow-[inset_0_1px_0_0_rgba(255,255,255,0.3),0_2px_10px_rgba(0,0,0,0.6)] hover:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.45),0_4px_18px_rgba(0,0,0,0.8)] transition-all duration-200 cursor-pointer min-h-[40px] group active:scale-[0.97]"
+          title="Download Parishram Desktop"
+          aria-label="Download Parishram Desktop"
+        >
+          {/* Animated Glass Light Beam / Shining Sheen Reflection */}
+          <span
+            aria-hidden="true"
+            className="absolute inset-0 pointer-events-none overflow-hidden rounded-xl"
+          >
+            <span className="absolute top-0 bottom-0 left-0 w-1/2 bg-gradient-to-r from-transparent via-white/35 to-transparent animate-shining-beam" />
+          </span>
+
+          <Download className="w-4 h-4 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] group-hover:translate-y-[1px] transition-transform relative z-10 shrink-0" />
+          <span className="hidden sm:inline font-sans text-xs font-bold tracking-wide text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] relative z-10">
+            Download
+          </span>
+        </button>
+
         {/* Command Palette search trigger: Icon-only with accessible label */}
         <button
           onClick={onOpenCommandPalette}
@@ -229,10 +252,28 @@ export function Topbar({
           )}
         </button>
 
+        {/* Subtle vertical separator to visually distinguish utilities from user/billing actions */}
+        <div className="hidden sm:block h-5 w-[1px] bg-[var(--border-subtle)] mx-0.5" aria-hidden="true" />
+
+        {/* Futuristic Glowing Purple & Golden Shining Upgrade / Plan Selector */}
+        <PlanSelector
+          isOpen={isPlanMenuOpen}
+          onToggle={() => {
+            setIsAccountMenuOpen(false);
+            setIsPlanMenuOpen((prev) => !prev);
+          }}
+          onClose={() => setIsPlanMenuOpen(false)}
+          onOpenUpgrade={onOpenUpgrade}
+          onOpenAccount={onOpenAccount}
+        />
+
         {/* Clean Google-like Account Control: Standalone Circular Avatar Button */}
         <div className="relative" ref={accountMenuRef}>
           <button
-            onClick={() => setIsAccountMenuOpen(!isAccountMenuOpen)}
+            onClick={() => {
+              setIsPlanMenuOpen(false);
+              setIsAccountMenuOpen(!isAccountMenuOpen);
+            }}
             className="w-10 h-10 rounded-full bg-[var(--bg-elevated)] hover:bg-[var(--bg-subtle)] border border-[var(--border-subtle)] hover:border-[var(--border-medium)] transition-all cursor-pointer flex items-center justify-center shadow-xs focus:outline-none focus:ring-2 focus:ring-[#ea580c]/40"
             title="Account & Settings"
             aria-label="Open account and settings menu"

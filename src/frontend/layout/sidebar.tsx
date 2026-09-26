@@ -8,7 +8,6 @@ import {
   BarChart3,
   Layers,
   Settings,
-  Download,
   ShieldAlert,
   Activity,
 } from 'lucide-react';
@@ -131,27 +130,6 @@ export function Sidebar({
           >
             <BarChart3 className="w-4 h-4 text-[#10b981]" />
             <span className="text-[12px]">Evaluations</span>
-          </button>
-        </div>
-
-        {/* Local Engine / Desktop Shell */}
-        <div className="space-y-1 pt-2.5 border-t border-[var(--border-subtle)]">
-          <div className="px-2.5 py-1 text-[10px] text-[var(--text-muted)] uppercase tracking-wider font-semibold">
-            Local Runtime
-          </div>
-
-          <button
-            onClick={() => onOpenDownload && onOpenDownload()}
-            className="w-full flex items-center justify-between px-3 py-2 rounded-lg transition-colors cursor-pointer text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)] hover:text-[var(--text-primary)] group"
-            title="Download Parishram desktop runtime (macOS, Linux, Windows)"
-          >
-            <div className="flex items-center gap-2.5">
-              <Download className="w-4 h-4 text-[#38bdf8] group-hover:scale-110 transition-transform" />
-              <span className="text-[12px]">Download Parishram</span>
-            </div>
-            <span className="text-[9px] px-1.5 py-0.2 rounded bg-[#38bdf8]/10 text-[#38bdf8] font-bold">
-              Tauri
-            </span>
           </button>
         </div>
       </div>
