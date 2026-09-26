@@ -28,7 +28,7 @@ export function ProofPanel({
   const totalTests = (proof.tests.unit?.total || 0) + (proof.tests.integration?.total || 0) + (proof.tests.regression?.total || 0);
 
   return (
-    <div className="flex-1 flex flex-col bg-[var(--bg-panel)] border border-[var(--border-subtle)] rounded-lg overflow-y-auto transition-colors">
+    <div className="flex-1 flex flex-col bg-[var(--bg-panel)] overflow-y-auto transition-colors">
       {/* Proof Header with Cryptographic Stamp */}
       <div className="p-5 bg-gradient-to-r from-[#10b981]/12 via-[var(--bg-elevated)] to-[var(--bg-panel)] border-b border-[var(--border-subtle)] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">

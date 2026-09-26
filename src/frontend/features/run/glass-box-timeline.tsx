@@ -47,15 +47,15 @@ export function GlassBoxTimeline({
   });
 
   return (
-    <div className="flex-1 flex flex-col bg-[#0e1115] border border-[#232a32] rounded overflow-hidden">
+    <div className="flex-1 flex flex-col bg-[var(--bg-panel)] overflow-hidden transition-colors">
       {/* Header bar with filters */}
-      <div className="p-3 bg-[#13171d] border-b border-[#232a32] flex items-center justify-between">
+      <div className="p-3 bg-[var(--bg-elevated)] border-b border-[var(--border-subtle)] flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Terminal className="w-4 h-4 text-[#ea580c]" />
           <span className="text-xs font-semibold text-[var(--text-primary)] uppercase tracking-wider font-mono">
             Glass Box Execution Timeline
           </span>
-          <span className="text-[11px] font-mono px-1.5 py-0.5 rounded bg-[#1f262e] text-[var(--text-muted)]">
+          <span className="text-[11px] font-mono px-1.5 py-0.5 rounded bg-[var(--bg-subtle)] text-[var(--text-muted)] border border-[var(--border-subtle)]">
             Observable Actions Only
           </span>
         </div>
@@ -69,7 +69,7 @@ export function GlassBoxTimeline({
               className={`px-2 py-1 rounded capitalize transition-colors cursor-pointer ${
                 filter === f
                   ? 'bg-[#ea580c] text-white font-semibold'
-                  : 'bg-[#181d24] text-[var(--text-secondary)] hover:bg-[#202731]'
+                  : 'bg-[var(--bg-subtle)] text-[var(--text-secondary)] hover:bg-[var(--bg-active)] hover:text-[var(--text-primary)] border border-[var(--border-subtle)]'
               }`}
             >
               {f}
@@ -90,14 +90,14 @@ export function GlassBoxTimeline({
           return (
             <div
               key={evt.id}
-              className={`p-3 rounded border transition-all ${
+              className={`p-3 rounded-lg border transition-all ${
                 isProof
-                  ? 'bg-[#10b981]/5 border-[#10b981]/30 hover:border-[#10b981]/50'
+                  ? 'bg-[#10b981]/10 border-[#10b981]/30 hover:border-[#10b981]/50'
                   : isFailure
-                  ? 'bg-[#ef4444]/5 border-[#ef4444]/30 hover:border-[#ef4444]/50'
+                  ? 'bg-[#ef4444]/10 border-[#ef4444]/30 hover:border-[#ef4444]/50'
                   : isRecovery
-                  ? 'bg-[#ea580c]/5 border-[#ea580c]/30 hover:border-[#ea580c]/50'
-                  : 'bg-[#14181e] border-[#252d36] hover:border-[#333d49]'
+                  ? 'bg-[#ea580c]/10 border-[#ea580c]/30 hover:border-[#ea580c]/50'
+                  : 'bg-[var(--bg-canvas)] border-[var(--border-subtle)] hover:border-[var(--border-medium)]'
               }`}
             >
               <div
@@ -137,7 +137,7 @@ export function GlassBoxTimeline({
                       >
                         {evt.title}
                       </span>
-                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#1e252e] text-[var(--text-secondary)] border border-[#2d3744]">
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--bg-subtle)] text-[var(--text-secondary)] border border-[var(--border-subtle)]">
                         STATE: {evt.state}
                       </span>
                     </div>
@@ -148,14 +148,14 @@ export function GlassBoxTimeline({
                   </div>
                 </div>
 
-                <div className="text-[var(--text-muted)] hover:text-white p-1">
+                <div className="text-[var(--text-muted)] hover:text-[var(--text-primary)] p-1">
                   {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
                 </div>
               </div>
 
               {/* Expanded details */}
               {isExpanded && (
-                <div className="mt-3 pt-2.5 border-t border-[#252d36] text-[11px] space-y-2">
+                <div className="mt-3 pt-2.5 border-t border-[var(--border-subtle)] text-[11px] space-y-2">
                   {evt.title.includes('RELEVANT FILES') && (
                     <div className="flex items-center gap-2">
                       <span className="text-[var(--text-muted)]">Target AST:</span>
@@ -192,7 +192,7 @@ export function GlassBoxTimeline({
                     </div>
                   )}
 
-                  <div className="p-2 rounded bg-[#0b0e12] border border-[#1f262f] text-[var(--text-muted)] text-[10px]">
+                  <div className="p-2 rounded bg-[var(--code-bg)] border border-[var(--border-subtle)] text-[var(--text-secondary)] text-[10px]">
                     <code>{JSON.stringify({ eventId: evt.id, state: evt.state, temperature: evt.temperature }, null, 2)}</code>
                   </div>
                 </div>

@@ -16,7 +16,7 @@ interface RecoveryTraceProps {
 
 export function RecoveryTrace({ attempts, onOpenDiff }: RecoveryTraceProps) {
   return (
-    <div className="flex-1 flex flex-col bg-[var(--bg-panel)] border border-[var(--border-subtle)] rounded-lg overflow-hidden transition-colors">
+    <div className="flex-1 flex flex-col bg-[var(--bg-panel)] overflow-hidden transition-colors">
       {/* Header */}
       <div className="p-3 bg-[var(--bg-elevated)] border-b border-[var(--border-subtle)] flex items-center justify-between">
         <div className="space-y-0.5">

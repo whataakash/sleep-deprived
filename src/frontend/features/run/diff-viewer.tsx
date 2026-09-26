@@ -38,7 +38,7 @@ export function DiffViewer({ onBackToRun }: DiffViewerProps) {
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-[var(--bg-panel)] border border-[var(--border-subtle)] rounded-lg overflow-hidden transition-colors">
+    <div className="flex-1 flex flex-col bg-[var(--bg-panel)] overflow-hidden transition-colors">
       {/* File Header */}
       <div className="p-3 bg-[var(--bg-elevated)] border-b border-[var(--border-subtle)] flex items-center justify-between">
         <div className="flex items-center gap-3">

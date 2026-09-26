@@ -8,7 +8,6 @@ import { ProofGraph } from './proof-graph';
 import { DiffViewer } from './diff-viewer';
 import { RecoveryTrace } from './recovery-trace';
 import { GlassBoxTimeline } from './glass-box-timeline';
-import { TimelineScrubber } from './timeline-scrubber';
 import { TerminalDrawer } from './terminal-drawer';
 import { WhyDrawer } from './why-drawer';
 import { TaskContractPanel } from './task-contract-panel';
@@ -70,7 +69,7 @@ export function RunView({
   proof,
   onOpenWhyFile,
 }: RunViewProps) {
-  const [activeTab, setActiveTab] = useState<RunViewTab>('proof');
+  const [activeTab, setActiveTab] = useState<RunViewTab>('diff');
   const [showProofGraphModal, setShowProofGraphModal] = useState(false);
   const [showWhyModal, setShowWhyModal] = useState(false);
   const [showApprovalModal, setShowApprovalModal] = useState(false);
@@ -86,14 +85,18 @@ export function RunView({
   const stuckTelemetry = StuckAgentDetector.analyzeToolCalls(run.toolCalls);
 
   return (
-    <div className="flex-1 flex flex-col overflow-hidden gap-2 font-sans transition-colors">
-      {/* LEVEL 1: WHAT IS HAPPENING? (Run Header & Status) */}
-      <div className="p-2.5 sm:p-3 bg-[var(--bg-panel)] border border-[var(--border-subtle)] rounded-lg flex flex-wrap items-center justify-between gap-3 font-mono text-xs select-none">
+    <div className="flex-1 flex flex-col overflow-hidden bg-[var(--bg-panel)] border border-[var(--border-subtle)] rounded-xl shadow-xs font-sans transition-colors">
+      {/* LEVEL 1: Run Header & Status */}
+      <div className="p-3 bg-[var(--bg-elevated)] border-b border-[var(--border-subtle)] flex flex-wrap items-center justify-between gap-3 font-mono text-xs select-none">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-[var(--bg-panel)] border border-[var(--border-subtle)] text-[#ea580c] font-semibold text-xs shadow-2xs">
+              <Layers className="w-3.5 h-3.5" />
+              <span className="font-bold text-[var(--text-primary)]">Run Details</span>
+            </div>
             <span className="font-extrabold text-[var(--text-primary)] text-sm">Run #{run.runNumber}</span>
             <span className="text-[var(--text-muted)]">·</span>
-            <span className="text-[var(--text-primary)] font-medium truncate max-w-sm sm:max-w-md">
+            <span className="text-[var(--text-secondary)] font-medium truncate max-w-sm sm:max-w-md">
               {run.taskTitle}
             </span>
           </div>
@@ -113,7 +116,7 @@ export function RunView({
         <div className="flex items-center gap-1.5">
           <button
             onClick={() => setShowApprovalModal(true)}
-            className="flex items-center gap-1 px-2.5 py-1 rounded bg-[var(--bg-elevated)] hover:bg-[var(--bg-subtle)] text-[#ea580c] border border-[#ea580c]/30 text-[11px] transition-colors cursor-pointer"
+            className="flex items-center gap-1 px-2.5 py-1 rounded bg-[var(--bg-panel)] hover:bg-[var(--bg-subtle)] text-[#ea580c] border border-[#ea580c]/30 text-[11px] transition-colors cursor-pointer"
             title="Inspect human permission gates for sensitive actions"
           >
             <ShieldAlert className="w-3.5 h-3.5" />
@@ -122,7 +125,7 @@ export function RunView({
 
           <button
             onClick={() => setShowProofGraphModal(true)}
-            className="flex items-center gap-1 px-2.5 py-1 rounded bg-[var(--bg-elevated)] hover:bg-[var(--bg-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-subtle)] text-[11px] transition-colors cursor-pointer"
+            className="flex items-center gap-1 px-2.5 py-1 rounded bg-[var(--bg-panel)] hover:bg-[var(--bg-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-subtle)] text-[11px] transition-colors cursor-pointer"
           >
             <Layers className="w-3.5 h-3.5 text-[#10b981]" />
             <span>Evidence Graph</span>
@@ -130,7 +133,7 @@ export function RunView({
 
           <button
             onClick={() => setShowWhyModal(true)}
-            className="flex items-center gap-1 px-2.5 py-1 rounded bg-[var(--bg-elevated)] hover:bg-[var(--bg-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-subtle)] text-[11px] transition-colors cursor-pointer"
+            className="flex items-center gap-1 px-2.5 py-1 rounded bg-[var(--bg-panel)] hover:bg-[var(--bg-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-subtle)] text-[11px] transition-colors cursor-pointer"
             title="Explain autonomous choices"
           >
             <HelpCircle className="w-3.5 h-3.5 text-[#38bdf8]" />
@@ -139,10 +142,10 @@ export function RunView({
         </div>
       </div>
 
-      {/* DUAL AGENT CO-PILOT ACTIVITY BAR (Navigating AI & Supervisor AI) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 font-mono text-[11px] select-none">
+      {/* DUAL AGENT RUN METADATA & TELEMETRY STRIP */}
+      <div className="px-3 py-2 bg-[var(--bg-canvas)] border-b border-[var(--border-subtle)] grid grid-cols-1 md:grid-cols-2 gap-2 font-mono text-[11px] select-none">
         {/* Navigating AI Bar */}
-        <div className="px-3 py-1.5 rounded-lg bg-[var(--bg-panel)] border border-[#38bdf8]/30 flex items-center justify-between gap-2 shadow-2xs">
+        <div className="px-2.5 py-1 rounded bg-[var(--bg-panel)] border border-[#38bdf8]/30 flex items-center justify-between gap-2 shadow-2xs">
           <div className="flex items-center gap-2 truncate">
             <Compass className="w-3.5 h-3.5 text-[#38bdf8] shrink-0" />
             <span className="font-bold text-[#38bdf8] shrink-0">{navigator.displayName}:</span>
@@ -154,7 +157,7 @@ export function RunView({
         </div>
 
         {/* Supervisor AI Bar */}
-        <div className="px-3 py-1.5 rounded-lg bg-[var(--bg-panel)] border border-[#10b981]/30 flex items-center justify-between gap-2 shadow-2xs">
+        <div className="px-2.5 py-1 rounded bg-[var(--bg-panel)] border border-[#10b981]/30 flex items-center justify-between gap-2 shadow-2xs">
           <div className="flex items-center gap-2 truncate">
             <ShieldCheck className="w-3.5 h-3.5 text-[#10b981] shrink-0" />
             <span className="font-bold text-[#10b981] shrink-0">{supervisor.displayName}:</span>
@@ -168,26 +171,14 @@ export function RunView({
         </div>
       </div>
 
-      {/* COMPACT SEGMENTED NAVIGATION TABS */}
-      <div className="flex items-center gap-1 overflow-x-auto pb-1 scrollbar-none font-mono text-xs select-none">
-        <button
-          onClick={() => setActiveTab('proof')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors cursor-pointer shrink-0 ${
-            activeTab === 'proof'
-              ? 'bg-[#ea580c] text-white font-bold shadow-xs'
-              : 'bg-[var(--bg-panel)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-subtle)]'
-          }`}
-        >
-          <ShieldCheck className="w-3.5 h-3.5" />
-          <span>Proof of Work</span>
-        </button>
-
+      {/* SEGMENTED NAVIGATION TABS */}
+      <div className="px-3 py-2 bg-[var(--bg-panel)] border-b border-[var(--border-subtle)] flex flex-wrap items-center gap-1.5 font-mono text-xs select-none">
         <button
           onClick={() => setActiveTab('diff')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors cursor-pointer shrink-0 ${
+          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md transition-colors cursor-pointer shrink-0 text-xs ${
             activeTab === 'diff'
               ? 'bg-[#ea580c] text-white font-bold shadow-xs'
-              : 'bg-[var(--bg-panel)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-subtle)]'
+              : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] border border-transparent'
           }`}
         >
           <FileCode className="w-3.5 h-3.5 text-[#38bdf8]" />
@@ -196,10 +187,10 @@ export function RunView({
 
         <button
           onClick={() => setActiveTab('recovery')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors cursor-pointer shrink-0 ${
+          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md transition-colors cursor-pointer shrink-0 text-xs ${
             activeTab === 'recovery'
               ? 'bg-[#ea580c] text-white font-bold shadow-xs'
-              : 'bg-[var(--bg-panel)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-subtle)]'
+              : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] border border-transparent'
           }`}
         >
           <Flame className="w-3.5 h-3.5 text-[#ea580c]" />
@@ -208,10 +199,10 @@ export function RunView({
 
         <button
           onClick={() => setActiveTab('contract')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors cursor-pointer shrink-0 ${
+          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md transition-colors cursor-pointer shrink-0 text-xs ${
             activeTab === 'contract'
               ? 'bg-[#ea580c] text-white font-bold shadow-xs'
-              : 'bg-[var(--bg-panel)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-subtle)]'
+              : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] border border-transparent'
           }`}
         >
           <ListChecks className="w-3.5 h-3.5 text-[#10b981]" />
@@ -219,11 +210,37 @@ export function RunView({
         </button>
 
         <button
+          onClick={() => setActiveTab('timeline')}
+          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md transition-colors cursor-pointer shrink-0 text-xs ${
+            activeTab === 'timeline'
+              ? 'bg-[#ea580c] text-white font-bold shadow-xs'
+              : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] border border-transparent'
+          }`}
+        >
+          <Terminal className="w-3.5 h-3.5 text-[#ea580c]" />
+          <span>Glass Box</span>
+        </button>
+
+        <div className="h-3.5 w-[1px] bg-[var(--border-subtle)] mx-0.5 hidden sm:block shrink-0" />
+
+        <button
+          onClick={() => setActiveTab('proof')}
+          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md transition-colors cursor-pointer shrink-0 text-xs ${
+            activeTab === 'proof'
+              ? 'bg-[#ea580c] text-white font-bold shadow-xs'
+              : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] border border-transparent'
+          }`}
+        >
+          <ShieldCheck className="w-3.5 h-3.5 text-[#10b981]" />
+          <span>Proof of Work</span>
+        </button>
+
+        <button
           onClick={() => setActiveTab('scope-security')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors cursor-pointer shrink-0 ${
+          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md transition-colors cursor-pointer shrink-0 text-xs ${
             activeTab === 'scope-security'
               ? 'bg-[#ea580c] text-white font-bold shadow-xs'
-              : 'bg-[var(--bg-panel)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-subtle)]'
+              : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] border border-transparent'
           }`}
         >
           <ShieldAlert className="w-3.5 h-3.5 text-[#fbbf24]" />
@@ -232,10 +249,10 @@ export function RunView({
 
         <button
           onClick={() => setActiveTab('regression')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors cursor-pointer shrink-0 ${
+          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md transition-colors cursor-pointer shrink-0 text-xs ${
             activeTab === 'regression'
               ? 'bg-[#ea580c] text-white font-bold shadow-xs'
-              : 'bg-[var(--bg-panel)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-subtle)]'
+              : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] border border-transparent'
           }`}
         >
           <CheckCircle2 className="w-3.5 h-3.5 text-[#10b981]" />
@@ -244,10 +261,10 @@ export function RunView({
 
         <button
           onClick={() => setActiveTab('checkpoints')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors cursor-pointer shrink-0 ${
+          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md transition-colors cursor-pointer shrink-0 text-xs ${
             activeTab === 'checkpoints'
               ? 'bg-[#ea580c] text-white font-bold shadow-xs'
-              : 'bg-[var(--bg-panel)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-subtle)]'
+              : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] border border-transparent'
           }`}
         >
           <History className="w-3.5 h-3.5 text-[#38bdf8]" />
@@ -256,10 +273,10 @@ export function RunView({
 
         <button
           onClick={() => setActiveTab('branching')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors cursor-pointer shrink-0 ${
+          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md transition-colors cursor-pointer shrink-0 text-xs ${
             activeTab === 'branching'
               ? 'bg-[#ea580c] text-white font-bold shadow-xs'
-              : 'bg-[var(--bg-panel)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-subtle)]'
+              : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] border border-transparent'
           }`}
         >
           <GitFork className="w-3.5 h-3.5 text-[#a78bfa]" />
@@ -268,26 +285,14 @@ export function RunView({
 
         <button
           onClick={() => setActiveTab('docs')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors cursor-pointer shrink-0 ${
+          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md transition-colors cursor-pointer shrink-0 text-xs ${
             activeTab === 'docs'
               ? 'bg-[#ea580c] text-white font-bold shadow-xs'
-              : 'bg-[var(--bg-panel)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-subtle)]'
+              : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-elevated)] border border-transparent'
           }`}
         >
           <BookOpen className="w-3.5 h-3.5 text-[#38bdf8]" />
           <span>Auto Docs</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab('timeline')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors cursor-pointer shrink-0 ${
-            activeTab === 'timeline'
-              ? 'bg-[#ea580c] text-white font-bold shadow-xs'
-              : 'bg-[var(--bg-panel)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-subtle)]'
-          }`}
-        >
-          <Terminal className="w-3.5 h-3.5" />
-          <span>Glass Box</span>
         </button>
       </div>
 
@@ -374,17 +379,10 @@ export function RunView({
         </div>
       )}
 
-      {/* LEVEL 3 EXPANDABLE: Replay Scrubber (Agent Replay #12) */}
-      <TimelineScrubber
-        events={run.events}
-        currentEventIndex={currentEventIndex}
-        onScrub={onScrub}
-        isPlaying={isPlayingReplay}
-        onTogglePlay={onTogglePlay}
-      />
-
-      {/* Terminal Output */}
-      <TerminalDrawer customSnippet={customTerminalLog} />
+      {/* Terminal Output Docked at Bottom of Unified Container */}
+      <div className="border-t border-[var(--border-subtle)] bg-[var(--bg-canvas)]">
+        <TerminalDrawer customSnippet={customTerminalLog} />
+      </div>
     </div>
   );
 }

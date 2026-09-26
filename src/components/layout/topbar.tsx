@@ -19,6 +19,8 @@ import {
   CreditCard,
   BarChart2,
   LogOut,
+  Zap,
+  CheckCircle2,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth/context';
 import { EvaluationModelAdapter } from '@/lib/models/evaluation-adapter';
@@ -121,14 +123,24 @@ export function Topbar({
 
       {/* Center: Parishram State Pill, Model, and Subscription Tier */}
       <div className="hidden md:flex items-center gap-2.5">
-        <div
-          className="flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-semibold border border-transparent"
-          style={{ backgroundColor: temp.bg, color: temp.color }}
-          title="Parishram State: Contextual Harness Activity"
-        >
-          <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: temp.color }} />
-          <span className="capitalize">{temp.label}</span>
-        </div>
+        {currentState === 'COMPLETE' ? (
+          <div
+            className="flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-semibold border border-[#10b981]/30 bg-[#10b981]/15 text-[#10b981]"
+            title="Parishram State: Verified & Complete"
+          >
+            <CheckCircle2 className="w-3 h-3 text-[#10b981]" />
+            <span>Verified</span>
+          </div>
+        ) : (
+          <div
+            className="flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-semibold border border-transparent"
+            style={{ backgroundColor: temp.bg, color: temp.color }}
+            title="Parishram State: Contextual Harness Activity"
+          >
+            <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: temp.color }} />
+            <span className="capitalize">{temp.label}</span>
+          </div>
+        )}
 
         <div className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-[var(--bg-elevated)] border border-[var(--border-subtle)] text-[11px] text-[var(--text-muted)]">
           <Cpu className="w-3 h-3 text-[#38bdf8]" />
@@ -140,7 +152,7 @@ export function Topbar({
           onClick={() => (onOpenUpgrade ? onOpenUpgrade() : onOpenAccount('billing'))}
           className={`flex items-center gap-1.5 px-2.5 py-0.5 rounded text-[11px] font-bold border transition-all cursor-pointer ${
             user?.plan === 'FREE'
-              ? 'bg-[#ea580c]/15 hover:bg-[#ea580c]/25 border-[#ea580c]/40 text-[#ea580c] shadow-xs animate-pulse hover:animate-none'
+              ? 'bg-[#ea580c]/15 hover:bg-[#ea580c]/25 border-[#ea580c]/40 text-[#ea580c] shadow-xs'
               : 'bg-[#10b981]/15 hover:bg-[#10b981]/25 border-[#10b981]/40 text-[#10b981]'
           }`}
           title="Click to view subscription tiers & upgrade"
@@ -149,8 +161,9 @@ export function Topbar({
           {user?.plan === 'FREE' && (
             <>
               <span className="text-[var(--text-muted)]">·</span>
-              <span className="text-[10px] underline font-extrabold flex items-center gap-1">
-                <span>Upgrade ⚡</span>
+              <span className="text-[10px] font-extrabold flex items-center gap-1 text-[#ea580c] hover:underline">
+                <span>Upgrade</span>
+                <Zap className="w-3 h-3 fill-[#ea580c] text-[#ea580c]" />
               </span>
             </>
           )}
