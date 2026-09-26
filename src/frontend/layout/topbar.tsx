@@ -22,6 +22,7 @@ import {
   LogOut,
   Zap,
   CheckCircle2,
+  ArrowRight,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth/context';
 import { EvaluationModelAdapter } from '@/lib/models/evaluation-adapter';
@@ -34,6 +35,7 @@ interface TopbarProps {
   onOpenCommandPalette: () => void;
   onOpenAccount: (initialCategory?: string) => void;
   onOpenDownload: () => void;
+  onOpenUpgrade?: () => void;
   onRunDemo: () => void;
   onResetDemo: () => void;
   isDemoRunning?: boolean;
@@ -54,6 +56,7 @@ export function Topbar({
   onOpenCommandPalette,
   onOpenAccount,
   onOpenDownload,
+  onOpenUpgrade,
   onRunDemo,
   onResetDemo,
   isDemoRunning,
@@ -200,8 +203,21 @@ export function Topbar({
         )}
       </div>
 
-      {/* RIGHT: [search] [theme] [profile] */}
+      {/* RIGHT: [upgrade] [search] [theme] [profile] */}
       <div className="flex items-center gap-2 sm:gap-2.5">
+        {/* Simple, quiet Upgrade Action */}
+        {onOpenUpgrade && (
+          <button
+            onClick={onOpenUpgrade}
+            className="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[var(--bg-elevated)] hover:bg-[var(--bg-subtle)] border border-[var(--border-subtle)] hover:border-[var(--border-medium)] text-xs font-mono text-[var(--text-secondary)] hover:text-[#ea580c] transition-all cursor-pointer min-h-[40px] shadow-xs"
+            title="Upgrade Plan"
+            aria-label="Upgrade Plan"
+          >
+            <span>Upgrade</span>
+            <ArrowRight className="w-3.5 h-3.5 text-[#ea580c]" />
+          </button>
+        )}
+
         {/* Command Palette search trigger: Icon-only with accessible label */}
         <button
           onClick={onOpenCommandPalette}
@@ -210,27 +226,6 @@ export function Topbar({
           aria-label="Search or open command palette (Cmd+K)"
         >
           <Search className="w-4 h-4" />
-        </button>
-
-        {/* Full Shiny Black Animated Download Action Button */}
-        <button
-          onClick={onOpenDownload}
-          className="relative overflow-hidden flex items-center gap-2 px-3 sm:px-3.5 py-2 rounded-xl bg-gradient-to-b from-[#26262b] via-[#121216] to-[#050507] hover:from-[#32323a] hover:via-[#191920] hover:to-[#0a0a0f] border border-white/20 hover:border-white/40 text-white shadow-[inset_0_1px_0_0_rgba(255,255,255,0.3),0_2px_10px_rgba(0,0,0,0.6)] hover:shadow-[inset_0_1px_0_0_rgba(255,255,255,0.45),0_4px_18px_rgba(0,0,0,0.8)] transition-all duration-200 cursor-pointer min-h-[40px] group active:scale-[0.97]"
-          title="Download"
-          aria-label="Download Parishram Desktop"
-        >
-          {/* Animated Glass Light Beam / Shining Sheen Reflection */}
-          <span
-            aria-hidden="true"
-            className="absolute inset-0 pointer-events-none overflow-hidden rounded-xl"
-          >
-            <span className="absolute top-0 bottom-0 left-0 w-1/2 bg-gradient-to-r from-transparent via-white/35 to-transparent animate-shining-beam" />
-          </span>
-
-          <Download className="w-4 h-4 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] group-hover:translate-y-[1px] transition-transform relative z-10 shrink-0" />
-          <span className="hidden sm:inline font-sans text-xs font-bold tracking-wide text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)] relative z-10">
-            Download
-          </span>
         </button>
 
         {/* Theme Switcher Toggle */}

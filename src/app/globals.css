@@ -147,26 +147,3 @@ samp {
   box-shadow: 0 0 20px rgba(16, 185, 129, 0.25);
 }
 
-/* Full Shiny Black Button Light Beam Sheen Animation */
-@keyframes buttonShine {
-  0% {
-    transform: translateX(-150%) skewX(-20deg);
-    opacity: 0;
-  }
-  15% {
-    opacity: 1;
-  }
-  45% {
-    transform: translateX(300%) skewX(-20deg);
-    opacity: 1;
-  }
-  46%, 100% {
-    transform: translateX(300%) skewX(-20deg);
-    opacity: 0;
-  }
-}
-
-.animate-shining-beam {
-  animation: buttonShine 3.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-}
-
