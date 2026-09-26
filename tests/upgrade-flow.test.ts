@@ -47,3 +47,36 @@ test('Billing & Upgrade: Verified Recipient Safety', () => {
   const verifiedRecipient = 'shivansh.p@fam';
   assert.equal(verifiedRecipient, 'shivansh.p@fam', 'Verified UPI recipient must be shivansh.p@fam');
 });
+
+test('Header & Pricing Modal: Final Polish Verification', async () => {
+  const fs = await import('node:fs/promises');
+  const path = await import('node:path');
+
+  const topbarContent = await fs.readFile(
+    path.join(process.cwd(), 'src/components/layout/topbar.tsx'),
+    'utf-8'
+  );
+  const modalContent = await fs.readFile(
+    path.join(process.cwd(), 'src/components/features/billing/upgrade-modal.tsx'),
+    'utf-8'
+  );
+
+  // 1. Topbar should NOT contain "Free · Upgrade" or visible "Cmd+K" text
+  assert.ok(!topbarContent.includes('Upgrade ↗'), 'Header should not contain visible Upgrade ↗ pill');
+  assert.ok(!topbarContent.includes('<span>Cmd+K</span>'), 'Header should not contain visible Cmd+K text');
+
+  // 2. Topbar contains clean Search icon button and Desktop runtime button
+  assert.ok(topbarContent.includes('aria-label="Search or open command palette (Cmd+K)"'), 'Header must have accessible search button');
+  assert.ok(topbarContent.includes('<span>Desktop</span>'), 'Header must have Desktop runtime button');
+  assert.ok(topbarContent.includes('Download'), 'Desktop button must include Download icon');
+
+  // 3. Modal must use viewport-constrained architecture with sticky header and AnimatePresence
+  assert.ok(modalContent.includes('max-h-[92dvh]'), 'Modal shell must be constrained to viewport with dvh');
+  assert.ok(modalContent.includes('shrink-0 z-10'), 'Modal top bar must be sticky/fixed so close button never scrolls away');
+  assert.ok(modalContent.includes('aria-label="Close subscription plans modal"'), 'Close button must have clear accessibility label');
+  assert.ok(modalContent.includes('overflow-y-auto overscroll-contain min-h-0'), 'Modal body must scroll internally');
+  assert.ok(modalContent.includes('Plans that fit your work'), 'Modal header copy must feature clean heading');
+  assert.ok(modalContent.includes('Choose the setup that matches how you build.'), 'Modal header copy must be concise without vertical clutter');
+  assert.ok(modalContent.includes('AnimatePresence'), 'Modal and tab transitions must use Motion AnimatePresence');
+});
+

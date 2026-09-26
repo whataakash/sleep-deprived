@@ -145,55 +145,37 @@ export function Topbar({
           <span className="text-[var(--text-primary)] truncate max-w-[140px]">{selectedModelName}</span>
         </div>
 
-        {/* High-Converting Subscription Tier Badge & Upgrade Pill (ChatGPT/Claude psychology) */}
-        <button
-          onClick={() => onOpenAccount('billing')}
-          className={`flex items-center gap-1.5 px-2.5 py-0.5 rounded text-[11px] font-bold border transition-all cursor-pointer ${
-            user?.plan === 'FREE'
-              ? 'bg-[#ea580c]/15 hover:bg-[#ea580c]/25 border-[#ea580c]/40 text-[#ea580c] shadow-xs'
-              : 'bg-[#10b981]/15 hover:bg-[#10b981]/25 border-[#10b981]/40 text-[#10b981]'
-          }`}
-          title="Click to view subscription tiers & quotas"
-        >
-          <span>{planInfo.name}</span>
-          {user?.plan === 'FREE' && (
-            <>
-              <span className="text-[var(--text-muted)]">·</span>
-              <span className="text-[10px] font-extrabold flex items-center gap-1 text-[#ea580c] hover:underline">
-                <span>Upgrade</span>
-                <Zap className="w-3 h-3 fill-[#ea580c] text-[#ea580c]" />
-              </span>
-            </>
-          )}
-        </button>
       </div>
 
-      {/* Right Actions: Command Palette, Theme, Desktop, Run Demo, Account Avatar */}
+      {/* Right Actions: Plans, Search (icon), Desktop local runtime, Theme, Run Demo, Account Avatar */}
       <div className="flex items-center gap-1.5 sm:gap-2">
-        {/* Command Palette trigger */}
+        {/* Command Palette search trigger: Icon-only with accessible label */}
         <button
           onClick={onOpenCommandPalette}
-          className="hidden sm:flex items-center gap-1.5 px-2 py-1 rounded bg-[var(--bg-elevated)] hover:bg-[var(--bg-subtle)] border border-[var(--border-subtle)] text-[11px] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
+          className="p-2 rounded-lg bg-[var(--bg-elevated)] hover:bg-[var(--bg-subtle)] border border-[var(--border-subtle)] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors cursor-pointer min-w-[36px] min-h-[36px] flex items-center justify-center"
+          title="Search & Command Palette (Cmd+K)"
+          aria-label="Search or open command palette (Cmd+K)"
         >
-          <Search className="w-3 h-3" />
-          <span>Cmd+K</span>
+          <Search className="w-3.5 h-3.5" />
         </button>
 
-        {/* Download Parishram desktop shell */}
+        {/* Download / Desktop Local Runtime */}
         <button
           onClick={onOpenDownload}
-          className="hidden md:flex items-center gap-1 px-2 py-1 rounded bg-[var(--bg-elevated)] hover:bg-[var(--bg-subtle)] border border-[var(--border-subtle)] text-[11px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
-          title="Download Parishram desktop runtime (macOS, Linux, Windows)"
+          className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[var(--bg-elevated)] hover:bg-[var(--bg-subtle)] border border-[var(--border-subtle)] text-[11px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer min-h-[36px]"
+          title="Run Parishram locally — Desktop runtime (macOS, Linux, Windows)"
+          aria-label="Download or run Parishram desktop app locally"
         >
-          <Download className="w-3 h-3 text-[#38bdf8]" />
+          <Download className="w-3.5 h-3.5 text-[#38bdf8]" />
           <span>Desktop</span>
         </button>
 
         {/* Theme Switcher Toggle */}
         <button
           onClick={toggleTheme}
-          className="p-1 sm:p-1.5 rounded bg-[var(--bg-elevated)] hover:bg-[var(--bg-subtle)] border border-[var(--border-subtle)] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
+          className="p-2 rounded-lg bg-[var(--bg-elevated)] hover:bg-[var(--bg-subtle)] border border-[var(--border-subtle)] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors cursor-pointer min-w-[36px] min-h-[36px] flex items-center justify-center"
           title={`Switch to ${currentTheme === 'light' ? 'Dark' : 'Light'} theme`}
+          aria-label={`Switch to ${currentTheme === 'light' ? 'Dark' : 'Light'} theme`}
         >
           {currentTheme === 'light' ? (
             <Moon className="w-3.5 h-3.5 text-[#ea580c]" />

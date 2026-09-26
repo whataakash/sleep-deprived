@@ -122,11 +122,11 @@ export function Topbar({
         )}
       </div>
 
-      {/* Center: Parishram State Pill, Model, and Subscription Tier */}
+      {/* Center: Parishram State Pill & Model Context */}
       <div className="hidden md:flex items-center gap-2.5">
         {currentState === 'COMPLETE' ? (
           <div
-            className="flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-semibold border border-[#10b981]/30 bg-[#10b981]/15 text-[#10b981]"
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold border border-[#10b981]/30 bg-[#10b981]/15 text-[#10b981]"
             title="Parishram State: Verified & Complete"
           >
             <CheckCircle2 className="w-3 h-3 text-[#10b981]" />
@@ -134,7 +134,7 @@ export function Topbar({
           </div>
         ) : (
           <div
-            className="flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-semibold border border-transparent"
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold border border-transparent"
             style={{ backgroundColor: temp.bg, color: temp.color }}
             title="Parishram State: Contextual Harness Activity"
           >
@@ -143,61 +143,52 @@ export function Topbar({
           </div>
         )}
 
-        <div className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-[var(--bg-elevated)] border border-[var(--border-subtle)] text-[11px] text-[var(--text-muted)]">
+        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[var(--bg-elevated)] border border-[var(--border-subtle)] text-[11px] text-[var(--text-muted)]">
           <Cpu className="w-3 h-3 text-[#38bdf8]" />
           <span className="text-[var(--text-primary)] truncate max-w-[140px]">{selectedModelName}</span>
         </div>
-
-        {/* Minimal Subscription Tier Badge & Upgrade Pill */}
-        <button
-          onClick={() => (onOpenUpgrade ? onOpenUpgrade() : onOpenAccount('billing'))}
-          className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-[var(--bg-elevated)] hover:bg-[var(--bg-subtle)] border border-[var(--border-subtle)] text-[11px] font-mono transition-colors cursor-pointer"
-          title="Subscription Plans"
-        >
-          <span className="text-[#ea580c] font-bold">{planInfo.name}</span>
-          <span className="text-[var(--text-muted)]">·</span>
-          <span className="text-[10px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] flex items-center gap-0.5">
-            <span>Upgrade ↗</span>
-          </span>
-        </button>
       </div>
 
-      {/* Right Actions: Minimal Upgrade Link, Command Palette, Theme, Desktop, Run Demo, Account Avatar */}
+      {/* Right Actions: Plans, Search (icon), Desktop local runtime, Theme, Run Demo, Account Avatar */}
       <div className="flex items-center gap-1.5 sm:gap-2">
-        {/* Minimal Upgrade Action on Top */}
+        {/* Plans link */}
         <button
           onClick={() => (onOpenUpgrade ? onOpenUpgrade() : onOpenAccount('billing'))}
-          className="hidden sm:flex items-center gap-1 px-2 py-1 rounded bg-[var(--bg-elevated)] hover:bg-[var(--bg-subtle)] border border-[var(--border-subtle)] text-[11px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
+          className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[var(--bg-elevated)] hover:bg-[var(--bg-subtle)] border border-[var(--border-subtle)] text-[11px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer min-h-[36px]"
           title="Subscription Plans"
+          aria-label="View Subscription Plans"
         >
-          <Sparkles className="w-3 h-3 text-[#ea580c]" />
+          <Sparkles className="w-3.5 h-3.5 text-[#ea580c]" />
           <span>Plans</span>
         </button>
 
-        {/* Command Palette trigger */}
+        {/* Command Palette search trigger: Icon-only with accessible label */}
         <button
           onClick={onOpenCommandPalette}
-          className="hidden sm:flex items-center gap-1.5 px-2 py-1 rounded bg-[var(--bg-elevated)] hover:bg-[var(--bg-subtle)] border border-[var(--border-subtle)] text-[11px] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
+          className="p-2 rounded-lg bg-[var(--bg-elevated)] hover:bg-[var(--bg-subtle)] border border-[var(--border-subtle)] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors cursor-pointer min-w-[36px] min-h-[36px] flex items-center justify-center"
+          title="Search & Command Palette (Cmd+K)"
+          aria-label="Search or open command palette (Cmd+K)"
         >
-          <Search className="w-3 h-3" />
-          <span>Cmd+K</span>
+          <Search className="w-3.5 h-3.5" />
         </button>
 
-        {/* Download Parishram desktop shell */}
+        {/* Download / Desktop Local Runtime */}
         <button
           onClick={onOpenDownload}
-          className="hidden md:flex items-center gap-1 px-2 py-1 rounded bg-[var(--bg-elevated)] hover:bg-[var(--bg-subtle)] border border-[var(--border-subtle)] text-[11px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
-          title="Download Parishram desktop runtime (macOS, Linux, Windows)"
+          className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[var(--bg-elevated)] hover:bg-[var(--bg-subtle)] border border-[var(--border-subtle)] text-[11px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer min-h-[36px]"
+          title="Run Parishram locally — Desktop runtime (macOS, Linux, Windows)"
+          aria-label="Download or run Parishram desktop app locally"
         >
-          <Download className="w-3 h-3 text-[#38bdf8]" />
+          <Download className="w-3.5 h-3.5 text-[#38bdf8]" />
           <span>Desktop</span>
         </button>
 
         {/* Theme Switcher Toggle */}
         <button
           onClick={toggleTheme}
-          className="p-1 sm:p-1.5 rounded bg-[var(--bg-elevated)] hover:bg-[var(--bg-subtle)] border border-[var(--border-subtle)] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
+          className="p-2 rounded-lg bg-[var(--bg-elevated)] hover:bg-[var(--bg-subtle)] border border-[var(--border-subtle)] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors cursor-pointer min-w-[36px] min-h-[36px] flex items-center justify-center"
           title={`Switch to ${currentTheme === 'light' ? 'Dark' : 'Light'} theme`}
+          aria-label={`Switch to ${currentTheme === 'light' ? 'Dark' : 'Light'} theme`}
         >
           {currentTheme === 'light' ? (
             <Moon className="w-3.5 h-3.5 text-[#ea580c]" />

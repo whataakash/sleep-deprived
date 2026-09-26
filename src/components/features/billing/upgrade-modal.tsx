@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { PricingPlan, PaymentInvoice } from '@/types/billing';
 import { useAuth } from '@/lib/auth/context';
 import { PRICING_PLANS } from '@/lib/billing/plans';
@@ -90,7 +91,28 @@ export function UpgradeModal({
   const [errorMessage, setErrorMessage] = useState('');
   const [verifiedInvoice, setVerifiedInvoice] = useState<PaymentInvoice | null>(null);
 
-  if (!isOpen) return null;
+  // Prevent background page scrolling while modal is open
+  useEffect(() => {
+    if (isOpen) {
+      const prevOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = prevOverflow;
+      };
+    }
+  }, [isOpen]);
+
+  // Keyboard accessibility: Escape key closes modal
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   // Dynamic pricing calculations pulling from the active plan
   const monthlyTotal = selectedPlan.monthlyPriceInr || 0;
@@ -178,113 +200,140 @@ export function UpgradeModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5 overflow-y-auto">
-      <div
-        className={`w-full ${
-          step === 'PLANS' ? 'max-w-5xl' : 'max-w-4xl'
-        } bg-[var(--bg-panel)] text-[var(--text-primary)] border border-[var(--border-subtle)] rounded-2xl shadow-2xl overflow-hidden font-sans transition-all duration-200 animate-in fade-in zoom-in-95`}
-      >
-        {/* Top Header Bar */}
-        <div className="px-5 sm:px-6 py-3.5 border-b border-[var(--border-subtle)] bg-[var(--bg-panel)] flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="text-xs font-mono font-bold tracking-wider text-[#ea580c] uppercase">
-              Subscription Plans
-            </span>
-            {step === 'CONFIGURE' && (
-              <button
-                onClick={() => setStep('PLANS')}
-                className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] flex items-center gap-1 transition-colors cursor-pointer font-mono"
-              >
-                <ArrowLeft className="w-3.5 h-3.5" />
-                <span>Change Plan</span>
-              </button>
-            )}
-          </div>
-          <button
-            onClick={onClose}
-            className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-subtle)] transition-colors cursor-pointer"
-            title="Close"
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          key="upgrade-modal-backdrop"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.18, ease: 'easeOut' }}
+          className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 md:p-6 overflow-hidden"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) onClose();
+          }}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Subscription Plans"
+        >
+          <motion.div
+            key="upgrade-modal-shell"
+            initial={{ opacity: 0, y: 10, scale: 0.995 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 8, scale: 0.995 }}
+            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            className={`w-full ${
+              step === 'PLANS' ? 'max-w-5xl' : 'max-w-4xl'
+            } max-h-[92dvh] sm:max-h-[90dvh] flex flex-col bg-[var(--bg-panel)] text-[var(--text-primary)] border border-[var(--border-subtle)] rounded-2xl shadow-2xl overflow-hidden font-sans`}
           >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-
-        {/* ========================================================================= */}
-        {/* SCREEN 1: PLANS OVERVIEW (AUTHENTIC PARISHRAM IDENTITY)                    */}
-        {/* ========================================================================= */}
-        {step === 'PLANS' && (
-          <div className="p-5 sm:p-7 space-y-6">
-            {/* Header with Title and Segmented Switcher */}
-            <div className="text-center space-y-3">
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#ea580c]/10 text-[#ea580c] text-[11px] font-mono font-bold">
-                <Sparkles className="w-3 h-3" />
-                <span>SUBSCRIPTION PLANS</span>
+            {/* Top Header Bar — ALWAYS STICKY & CLOSE BUTTON ALWAYS ACCESSIBLE */}
+            <div className="px-4 sm:px-6 py-3 border-b border-[var(--border-subtle)] bg-[var(--bg-panel)] flex items-center justify-between shrink-0 z-10">
+              <div className="flex items-center gap-2.5">
+                <span className="text-[11px] font-mono font-bold tracking-wider text-[#ea580c] uppercase">
+                  Subscription Plans
+                </span>
+                {step === 'CONFIGURE' && (
+                  <button
+                    onClick={() => setStep('PLANS')}
+                    className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] flex items-center gap-1 transition-colors cursor-pointer font-mono px-2 py-1 rounded"
+                  >
+                    <ArrowLeft className="w-3.5 h-3.5" />
+                    <span>Change Plan</span>
+                  </button>
+                )}
               </div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-[var(--text-primary)] tracking-tight">
-                Plans that fit your work
-              </h2>
-              <p className="text-xs sm:text-sm text-[var(--text-secondary)] max-w-xl mx-auto">
-                Deterministic code repair, failure recovery, and frontier reasoning models tailored for developers and engineering teams.
-              </p>
-
-              {/* Toggles: Audience Segment and Billing Frequency */}
-              <div className="pt-2 flex flex-wrap items-center justify-center gap-2.5">
-                {/* Individual vs Team & Enterprise Segment */}
-                <div className="inline-flex items-center p-1 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-subtle)] text-xs font-mono">
-                  <button
-                    onClick={() => setTierView('individual')}
-                    className={`px-3.5 py-1.5 rounded-lg transition-all cursor-pointer ${
-                      tierView === 'individual'
-                        ? 'bg-[var(--bg-panel)] text-[var(--text-primary)] font-bold shadow-xs border border-[var(--border-subtle)]'
-                        : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
-                    }`}
-                  >
-                    Individual
-                  </button>
-                  <button
-                    onClick={() => setTierView('team')}
-                    className={`px-3.5 py-1.5 rounded-lg transition-all cursor-pointer ${
-                      tierView === 'team'
-                        ? 'bg-[var(--bg-panel)] text-[var(--text-primary)] font-bold shadow-xs border border-[var(--border-subtle)]'
-                        : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
-                    }`}
-                  >
-                    Team & Enterprise
-                  </button>
-                </div>
-
-                {/* Minimal Billing Cycle Switcher */}
-                <div className="inline-flex items-center p-1 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-subtle)] text-xs font-mono">
-                  <button
-                    onClick={() => setBillingCycle('monthly')}
-                    className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
-                      billingCycle === 'monthly'
-                        ? 'bg-[var(--bg-panel)] text-[var(--text-primary)] font-bold shadow-xs border border-[var(--border-subtle)]'
-                        : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
-                    }`}
-                  >
-                    Monthly
-                  </button>
-                  <button
-                    onClick={() => setBillingCycle('yearly')}
-                    className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
-                      billingCycle === 'yearly'
-                        ? 'bg-[var(--bg-panel)] text-[var(--text-primary)] font-bold shadow-xs border border-[var(--border-subtle)]'
-                        : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
-                    }`}
-                  >
-                    <span>Yearly</span>
-                    <span className="text-[10px] bg-[#10b981]/15 text-[#10b981] px-1.5 py-0.2 rounded font-bold border border-[#10b981]/25">
-                      Save 20%
-                    </span>
-                  </button>
-                </div>
-              </div>
+              <button
+                onClick={onClose}
+                className="p-2 -mr-1 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-subtle)] transition-colors cursor-pointer min-w-[40px] min-h-[40px] flex items-center justify-center"
+                title="Close"
+                aria-label="Close subscription plans modal"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
 
-            {/* Individual Plans View: Free, Pro, Max */}
-            {tierView === 'individual' && (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-5 items-stretch pt-1">
+            {/* Scrollable Modal Content */}
+            <div className="flex-1 overflow-y-auto overscroll-contain min-h-0">
+              {/* ========================================================================= */}
+              {/* SCREEN 1: PLANS OVERVIEW (AUTHENTIC PARISHRAM IDENTITY)                    */}
+              {/* ========================================================================= */}
+              {step === 'PLANS' && (
+                <div className="p-4 sm:p-6 lg:p-7 space-y-4 sm:space-y-5">
+                  {/* Header with Title and Segmented Switcher */}
+                  <div className="text-center space-y-1 sm:space-y-1.5 max-w-xl mx-auto">
+                    <h2 className="text-xl sm:text-2xl lg:text-3xl font-extrabold text-[var(--text-primary)] tracking-tight">
+                      Plans that fit your work
+                    </h2>
+                    <p className="text-xs sm:text-sm text-[var(--text-secondary)]">
+                      Choose the setup that matches how you build.
+                    </p>
+
+                    {/* Toggles: Audience Segment and Billing Frequency */}
+                    <div className="pt-2 flex flex-wrap items-center justify-center gap-2 sm:gap-2.5">
+                      {/* Individual vs Team & Enterprise Segment */}
+                      <div className="inline-flex items-center p-1 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-subtle)] text-xs font-mono">
+                        <button
+                          onClick={() => setTierView('individual')}
+                          className={`px-3.5 py-1.5 rounded-lg transition-all cursor-pointer ${
+                            tierView === 'individual'
+                              ? 'bg-[var(--bg-panel)] text-[var(--text-primary)] font-bold shadow-xs border border-[var(--border-subtle)]'
+                              : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+                          }`}
+                        >
+                          Individual
+                        </button>
+                        <button
+                          onClick={() => setTierView('team')}
+                          className={`px-3.5 py-1.5 rounded-lg transition-all cursor-pointer ${
+                            tierView === 'team'
+                              ? 'bg-[var(--bg-panel)] text-[var(--text-primary)] font-bold shadow-xs border border-[var(--border-subtle)]'
+                              : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+                          }`}
+                        >
+                          Team & Enterprise
+                        </button>
+                      </div>
+
+                      {/* Minimal Billing Cycle Switcher */}
+                      <div className="inline-flex items-center p-1 rounded-xl bg-[var(--bg-elevated)] border border-[var(--border-subtle)] text-xs font-mono">
+                        <button
+                          onClick={() => setBillingCycle('monthly')}
+                          className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
+                            billingCycle === 'monthly'
+                              ? 'bg-[var(--bg-panel)] text-[var(--text-primary)] font-bold shadow-xs border border-[var(--border-subtle)]'
+                              : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+                          }`}
+                        >
+                          Monthly
+                        </button>
+                        <button
+                          onClick={() => setBillingCycle('yearly')}
+                          className={`px-3 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5 ${
+                            billingCycle === 'yearly'
+                              ? 'bg-[var(--bg-panel)] text-[var(--text-primary)] font-bold shadow-xs border border-[var(--border-subtle)]'
+                              : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+                          }`}
+                        >
+                          <span>Yearly</span>
+                          <span className="text-[10px] bg-[#10b981]/15 text-[#10b981] px-1.5 py-0.2 rounded font-bold border border-[#10b981]/25">
+                            Save 20%
+                          </span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Individual Plans View: Free, Pro, Max */}
+                  <AnimatePresence mode="wait">
+                    {tierView === 'individual' ? (
+                      <motion.div
+                        key="individual-tiers"
+                        initial={{ opacity: 0, y: 6 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -6 }}
+                        transition={{ duration: 0.16 }}
+                        className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-5 items-stretch pt-1"
+                      >
                 {/* 1. Free */}
                 <div className="bg-[var(--bg-elevated)] border border-[var(--border-subtle)] rounded-2xl p-5 flex flex-col justify-between space-y-5 hover:border-[var(--border-medium)] transition-colors">
                   <div className="space-y-4">
@@ -459,18 +508,21 @@ export function UpgradeModal({
                       ].map((feat, i) => (
                         <div key={i} className="flex items-start gap-2 text-[var(--text-secondary)]">
                           <Check className="w-3.5 h-3.5 text-[#10b981] shrink-0 mt-0.5" />
-                          <span className="text-[11px]">{feat}</span>
                         </div>
                       ))}
                     </div>
                   </div>
                 </div>
-              </div>
-            )}
-
-            {/* Team & Enterprise Plans View */}
-            {tierView === 'team' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-stretch pt-1 max-w-4xl mx-auto">
+              </motion.div>
+            ) : (
+              <motion.div
+                key="team-tiers"
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.16 }}
+                className="grid grid-cols-1 md:grid-cols-2 gap-5 items-stretch pt-1 max-w-4xl mx-auto"
+              >
                 {/* 1. Team Card */}
                 <div className="bg-[var(--bg-elevated)] border-2 border-[#38bdf8]/40 hover:border-[#38bdf8] rounded-2xl p-6 flex flex-col justify-between space-y-5 transition-colors">
                   <div className="space-y-4">
@@ -601,10 +653,11 @@ export function UpgradeModal({
                     </div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             )}
-          </div>
-        )}
+          </AnimatePresence>
+        </div>
+      )}
 
         {/* ========================================================================= */}
         {/* SCREEN 2: CONFIGURE YOUR PLAN (2-COLUMN CHECKOUT WITH EXACT GST BREAKDOWN) */}
@@ -968,7 +1021,10 @@ export function UpgradeModal({
           </div>
         )}
       </div>
-    </div>
+    </motion.div>
+  </motion.div>
+)}
+</AnimatePresence>
   );
 }
 
