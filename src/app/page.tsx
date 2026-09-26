@@ -5,7 +5,7 @@ import { MotionConfig } from 'motion/react';
 import { AuthProvider, useAuth } from '@/lib/auth/context';
 import { Topbar } from '@/components/layout/topbar';
 import { Sidebar, MainNavView } from '@/components/layout/sidebar';
-import { ParishramPath } from '@/components/layout/forge-line';
+import { ParishramPath } from '@/components/layout/parishram-path';
 import { OverviewView } from '@/components/features/overview/overview-view';
 import { RunView } from '@/components/features/run/run-view';
 import { RepoExplorer } from '@/components/features/repository/repo-explorer';
