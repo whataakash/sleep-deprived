@@ -40,37 +40,37 @@ export function Sidebar({
   const planInfo = getPlanDisplay(user?.plan || 'BUILDER');
 
   return (
-    <aside className="w-60 bg-[var(--bg-canvas)] border-r border-[var(--border-subtle)] flex flex-col justify-between select-none z-10 shrink-0 font-mono text-xs transition-colors">
-      <div className="p-3 space-y-4">
+    <aside className="w-64 sm:w-[264px] bg-[var(--bg-canvas)] border-r border-[var(--border-subtle)] flex flex-col justify-between select-none z-10 shrink-0 font-mono text-xs transition-colors">
+      <div className="p-3.5 space-y-4">
         {/* Workspace section */}
         <div className="space-y-1">
-          <div className="px-2 py-1 text-[10px] text-[var(--text-muted)] uppercase tracking-wider font-semibold">
+          <div className="px-2.5 py-1 text-[10px] text-[var(--text-muted)] uppercase tracking-wider font-semibold">
             Workspace
           </div>
 
           <button
             onClick={() => onSelectView('overview')}
-            className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded transition-colors cursor-pointer ${
+            className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors cursor-pointer ${
               activeView === 'overview'
-                ? 'bg-[var(--bg-active)] text-[var(--text-primary)] font-semibold border border-[var(--border-active)]'
+                ? 'bg-[var(--bg-active)] text-[var(--text-primary)] font-semibold border border-[var(--border-active)] shadow-xs'
                 : 'text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)] hover:text-[var(--text-primary)]'
             }`}
           >
-            <Activity className="w-3.5 h-3.5 text-[#ea580c]" />
-            <span>Mission Control</span>
+            <Activity className="w-4 h-4 text-[#ea580c]" />
+            <span className="text-[12px]">Mission Control</span>
           </button>
 
           <button
             onClick={() => onSelectView('runs')}
-            className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded transition-colors cursor-pointer ${
+            className={`w-full flex items-center justify-between px-3 py-2 rounded-lg transition-colors cursor-pointer ${
               activeView === 'runs'
-                ? 'bg-[var(--bg-active)] text-[var(--text-primary)] font-semibold border border-[var(--border-active)]'
+                ? 'bg-[var(--bg-active)] text-[var(--text-primary)] font-semibold border border-[var(--border-active)] shadow-xs'
                 : 'text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)] hover:text-[var(--text-primary)]'
             }`}
           >
             <div className="flex items-center gap-2.5">
-              <Terminal className="w-3.5 h-3.5 text-[#38bdf8]" />
-              <span>Runs</span>
+              <Terminal className="w-4 h-4 text-[#38bdf8]" />
+              <span className="text-[12px]">Runs</span>
             </div>
             <span
               className={`text-[9px] px-1.5 py-0.2 rounded font-bold ${
@@ -85,34 +85,34 @@ export function Sidebar({
 
           <button
             onClick={() => onSelectView('repositories')}
-            className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded transition-colors cursor-pointer ${
+            className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors cursor-pointer ${
               activeView === 'repositories'
-                ? 'bg-[var(--bg-active)] text-[var(--text-primary)] font-semibold border border-[var(--border-active)]'
+                ? 'bg-[var(--bg-active)] text-[var(--text-primary)] font-semibold border border-[var(--border-active)] shadow-xs'
                 : 'text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)] hover:text-[var(--text-primary)]'
             }`}
           >
-            <FolderGit2 className="w-3.5 h-3.5 text-[#fbbf24]" />
-            <span>Repositories</span>
+            <FolderGit2 className="w-4 h-4 text-[#fbbf24]" />
+            <span className="text-[12px]">Repositories</span>
           </button>
         </div>
 
         {/* Intelligence section */}
-        <div className="space-y-1 pt-2 border-t border-[var(--border-subtle)]">
-          <div className="px-2 py-1 text-[10px] text-[var(--text-muted)] uppercase tracking-wider font-semibold">
+        <div className="space-y-1 pt-2.5 border-t border-[var(--border-subtle)]">
+          <div className="px-2.5 py-1 text-[10px] text-[var(--text-muted)] uppercase tracking-wider font-semibold">
             Intelligence
           </div>
 
           <button
             onClick={() => onSelectView('models')}
-            className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded transition-colors cursor-pointer ${
+            className={`w-full flex items-center justify-between px-3 py-2 rounded-lg transition-colors cursor-pointer ${
               activeView === 'models'
-                ? 'bg-[var(--bg-active)] text-[var(--text-primary)] font-semibold border border-[var(--border-active)]'
+                ? 'bg-[var(--bg-active)] text-[var(--text-primary)] font-semibold border border-[var(--border-active)] shadow-xs'
                 : 'text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)] hover:text-[var(--text-primary)]'
             }`}
           >
             <div className="flex items-center gap-2.5">
-              <Cpu className="w-3.5 h-3.5 text-[#a78bfa]" />
-              <span>Models & Arena</span>
+              <Cpu className="w-4 h-4 text-[#a78bfa]" />
+              <span className="text-[12px]">Models & Arena</span>
             </div>
             {isEvalMode && (
               <span className="text-[9px] px-1.5 py-0.2 rounded bg-[#ea580c]/15 text-[#ea580c] font-bold">
@@ -123,31 +123,31 @@ export function Sidebar({
 
           <button
             onClick={() => onSelectView('evaluations')}
-            className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded transition-colors cursor-pointer ${
+            className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors cursor-pointer ${
               activeView === 'evaluations'
-                ? 'bg-[var(--bg-active)] text-[var(--text-primary)] font-semibold border border-[var(--border-active)]'
+                ? 'bg-[var(--bg-active)] text-[var(--text-primary)] font-semibold border border-[var(--border-active)] shadow-xs'
                 : 'text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)] hover:text-[var(--text-primary)]'
             }`}
           >
-            <BarChart3 className="w-3.5 h-3.5 text-[#10b981]" />
-            <span>Evaluations</span>
+            <BarChart3 className="w-4 h-4 text-[#10b981]" />
+            <span className="text-[12px]">Evaluations</span>
           </button>
         </div>
 
         {/* Local Engine / Desktop Shell */}
-        <div className="space-y-1 pt-2 border-t border-[var(--border-subtle)]">
-          <div className="px-2 py-1 text-[10px] text-[var(--text-muted)] uppercase tracking-wider font-semibold">
+        <div className="space-y-1 pt-2.5 border-t border-[var(--border-subtle)]">
+          <div className="px-2.5 py-1 text-[10px] text-[var(--text-muted)] uppercase tracking-wider font-semibold">
             Local Runtime
           </div>
 
           <button
             onClick={() => onOpenDownload && onOpenDownload()}
-            className="w-full flex items-center justify-between px-2.5 py-1.5 rounded transition-colors cursor-pointer text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)] hover:text-[var(--text-primary)] group"
+            className="w-full flex items-center justify-between px-3 py-2 rounded-lg transition-colors cursor-pointer text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)] hover:text-[var(--text-primary)] group"
             title="Download Parishram desktop runtime (macOS, Linux, Windows)"
           >
             <div className="flex items-center gap-2.5">
-              <Download className="w-3.5 h-3.5 text-[#38bdf8] group-hover:scale-110 transition-transform" />
-              <span>Download Parishram</span>
+              <Download className="w-4 h-4 text-[#38bdf8] group-hover:scale-110 transition-transform" />
+              <span className="text-[12px]">Download Parishram</span>
             </div>
             <span className="text-[9px] px-1.5 py-0.2 rounded bg-[#38bdf8]/10 text-[#38bdf8] font-bold">
               Tauri

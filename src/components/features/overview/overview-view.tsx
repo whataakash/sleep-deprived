@@ -13,6 +13,8 @@ import {
   TrendingUp,
   CreditCard,
   Lock,
+  Play,
+  RotateCcw,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth/context';
 import { getPlanDisplay } from '@/lib/billing/plans';
@@ -22,6 +24,9 @@ interface OverviewViewProps {
   onOpenRun: (runNumber: number) => void;
   onOpenBilling?: () => void;
   onOpenUpgrade?: () => void;
+  onRunDemo?: () => void;
+  isDemoRunning?: boolean;
+  onResetDemo?: () => void;
 }
 
 interface RecentRunItem {
@@ -83,7 +88,15 @@ const RECENT_RUNS: RecentRunItem[] = [
   },
 ];
 
-export function OverviewView({ onStartRun, onOpenRun, onOpenBilling, onOpenUpgrade }: OverviewViewProps) {
+export function OverviewView({
+  onStartRun,
+  onOpenRun,
+  onOpenBilling,
+  onOpenUpgrade,
+  onRunDemo,
+  isDemoRunning,
+  onResetDemo,
+}: OverviewViewProps) {
   const { session } = useAuth();
   const user = session.user;
   const currentPlan = user?.plan || 'FREE';
@@ -100,8 +113,8 @@ export function OverviewView({ onStartRun, onOpenRun, onOpenBilling, onOpenUpgra
   const usagePercent = Math.min(100, Math.round((runsUsed / maxRuns) * 100));
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-start overflow-y-auto px-4 py-6 select-none font-sans transition-colors">
-      <div className="w-full max-w-2xl space-y-6">
+    <div className="flex-1 flex flex-col items-center justify-start overflow-y-auto px-4 sm:px-6 lg:px-8 py-6 select-none font-sans transition-colors">
+      <div className="w-full max-w-4xl lg:max-w-5xl space-y-6">
         {/* Simple Header */}
         <div className="space-y-1 text-center sm:text-left">
           <h1 className="text-2xl font-bold tracking-tight text-[var(--text-primary)]">
@@ -234,6 +247,44 @@ export function OverviewView({ onStartRun, onOpenRun, onOpenBilling, onOpenUpgra
               <span>Run</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
+          </div>
+        </div>
+
+        {/* Secondary Contextual Action: Run Demo */}
+        <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-[var(--text-muted)] font-mono px-1">
+          <div className="flex items-center gap-2">
+            {onRunDemo && (
+              <button
+                type="button"
+                onClick={onRunDemo}
+                disabled={isDemoRunning}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--bg-panel)] hover:bg-[var(--bg-elevated)] border border-[var(--border-subtle)] hover:border-[var(--border-medium)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all cursor-pointer shadow-xs disabled:opacity-50 text-[11px] font-semibold"
+                title="Run step-by-step benchmark demo"
+              >
+                <Play className={`w-3 h-3 text-[#ea580c] ${isDemoRunning ? 'animate-spin' : ''}`} />
+                <span>{isDemoRunning ? 'Running Demo...' : 'Run Demo'}</span>
+              </button>
+            )}
+
+            {onResetDemo && (
+              <button
+                type="button"
+                onClick={onResetDemo}
+                className="p-1.5 rounded-lg bg-[var(--bg-panel)] hover:bg-[var(--bg-elevated)] border border-[var(--border-subtle)] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
+                title="Reset to benchmark Run #1042"
+              >
+                <RotateCcw className="w-3 h-3" />
+              </button>
+            )}
+          </div>
+
+          <div className="hidden sm:flex items-center gap-3 text-[11px] text-[var(--text-muted)]">
+            <span className="flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#10b981]" />
+              <span>Zero prompt leakage</span>
+            </span>
+            <span>·</span>
+            <span>Deterministic verification</span>
           </div>
         </div>
 

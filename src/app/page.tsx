@@ -190,6 +190,9 @@ function ParishramAppInner() {
                 setIsAccountOpen(true);
               }}
               onOpenUpgrade={() => setIsUpgradeOpen(true)}
+              onRunDemo={handleRunDemo}
+              isDemoRunning={isDemoRunning}
+              onResetDemo={handleResetDemo}
             />
           )}
 

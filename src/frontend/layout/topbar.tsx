@@ -84,54 +84,27 @@ export function Topbar({
   };
 
   return (
-    <header className="w-full bg-[var(--bg-canvas)] border-b border-[var(--border-subtle)] px-3 sm:px-4 py-2 flex items-center justify-between gap-3 text-xs font-mono select-none z-20 transition-colors">
-      {/* Brand & Repository Context */}
-      <div className="flex items-center gap-2.5 sm:gap-3.5">
-        {/* Real Product Wordmark & Clean Brand Slot */}
-        <div className="flex items-center gap-2">
-          {/* Reserved clean brand slot for future SVG/logo */}
-          <div className="brand-logo-slot hidden" aria-hidden="true" />
-          <span className="font-black text-base sm:text-lg tracking-tight text-[var(--text-primary)] select-none">
-            परिश्रम
-          </span>
-        </div>
-
-        <div className="h-4 w-[1px] bg-[var(--border-subtle)] mx-0.5 sm:mx-1" />
-
-        <div className="flex items-center gap-2 text-[11px] text-[var(--text-secondary)]">
-          <div className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-[var(--bg-elevated)] border border-[var(--border-subtle)]">
-            <FolderGit2 className="w-3 h-3 text-[#ea580c]" />
-            <span className="text-[var(--text-primary)] font-medium truncate max-w-[120px] sm:max-w-none">auth-gateway-service</span>
-          </div>
-
-          <div className="hidden sm:flex items-center gap-1 text-[var(--text-muted)]">
-            <GitBranch className="w-3 h-3" />
-            <span>main</span>
-          </div>
-        </div>
-
-        {/* Evaluation Mode Indicator */}
-        {isEvalMode && (
-          <div className="hidden lg:flex items-center gap-1.5 px-2 py-0.5 rounded bg-[#ea580c]/15 border border-[#ea580c]/40 text-[#ea580c] text-[10px] font-bold">
-            <Lock className="w-3 h-3" />
-            <span>EVALUATION MODE (LOCKED)</span>
-          </div>
-        )}
+    <header className="w-full bg-[var(--bg-canvas)] border-b border-[var(--border-subtle)] px-4 sm:px-6 h-16 flex items-center justify-between gap-4 text-xs font-mono select-none z-20 transition-colors">
+      {/* LEFT: Prominent Brand */}
+      <div className="flex items-center gap-3">
+        <span className="font-black text-2xl sm:text-[26px] tracking-tight text-[var(--text-primary)] select-none">
+          परिश्रम
+        </span>
       </div>
 
-      {/* Center: Parishram State Pill, Model, and Subscription Tier */}
-      <div className="hidden md:flex items-center gap-2.5">
+      {/* CENTER / CONTEXT: Quiet Secondary Status */}
+      <div className="hidden md:flex items-center gap-2">
         {currentState === 'COMPLETE' ? (
           <div
-            className="flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-semibold border border-[#10b981]/30 bg-[#10b981]/15 text-[#10b981]"
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium border border-[#10b981]/25 bg-[#10b981]/10 text-[#10b981]"
             title="Parishram State: Verified & Complete"
           >
-            <CheckCircle2 className="w-3 h-3 text-[#10b981]" />
+            <CheckCircle2 className="w-3.5 h-3.5 text-[#10b981]" />
             <span>Verified</span>
           </div>
         ) : (
           <div
-            className="flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-semibold border border-transparent"
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium border border-transparent"
             style={{ backgroundColor: temp.bg, color: temp.color }}
             title="Parishram State: Contextual Harness Activity"
           >
@@ -140,85 +113,51 @@ export function Topbar({
           </div>
         )}
 
-        <div className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-[var(--bg-elevated)] border border-[var(--border-subtle)] text-[11px] text-[var(--text-muted)]">
-          <Cpu className="w-3 h-3 text-[#38bdf8]" />
-          <span className="text-[var(--text-primary)] truncate max-w-[140px]">{selectedModelName}</span>
-        </div>
-
+        {isEvalMode && (
+          <div className="flex items-center gap-1 px-2 py-0.5 rounded bg-[#ea580c]/10 border border-[#ea580c]/25 text-[#ea580c] text-[10px] font-medium">
+            <Lock className="w-3 h-3" />
+            <span>परिश्रम AI (Evaluation)</span>
+          </div>
+        )}
       </div>
 
-      {/* Right Actions: Plans, Search (icon), Desktop local runtime, Theme, Run Demo, Account Avatar */}
-      <div className="flex items-center gap-1.5 sm:gap-2">
+      {/* RIGHT: [search] [theme] [profile] */}
+      <div className="flex items-center gap-2 sm:gap-2.5">
         {/* Command Palette search trigger: Icon-only with accessible label */}
         <button
           onClick={onOpenCommandPalette}
-          className="p-2 rounded-lg bg-[var(--bg-elevated)] hover:bg-[var(--bg-subtle)] border border-[var(--border-subtle)] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors cursor-pointer min-w-[36px] min-h-[36px] flex items-center justify-center"
+          className="p-2 sm:p-2.5 rounded-xl bg-[var(--bg-elevated)] hover:bg-[var(--bg-subtle)] border border-[var(--border-subtle)] hover:border-[var(--border-medium)] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-all cursor-pointer min-w-[40px] min-h-[40px] flex items-center justify-center shadow-xs"
           title="Search & Command Palette (Cmd+K)"
           aria-label="Search or open command palette (Cmd+K)"
         >
-          <Search className="w-3.5 h-3.5" />
-        </button>
-
-        {/* Download / Desktop Local Runtime */}
-        <button
-          onClick={onOpenDownload}
-          className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[var(--bg-elevated)] hover:bg-[var(--bg-subtle)] border border-[var(--border-subtle)] text-[11px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors cursor-pointer min-h-[36px]"
-          title="Run Parishram locally — Desktop runtime (macOS, Linux, Windows)"
-          aria-label="Download or run Parishram desktop app locally"
-        >
-          <Download className="w-3.5 h-3.5 text-[#38bdf8]" />
-          <span>Desktop</span>
+          <Search className="w-4 h-4" />
         </button>
 
         {/* Theme Switcher Toggle */}
         <button
           onClick={toggleTheme}
-          className="p-2 rounded-lg bg-[var(--bg-elevated)] hover:bg-[var(--bg-subtle)] border border-[var(--border-subtle)] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors cursor-pointer min-w-[36px] min-h-[36px] flex items-center justify-center"
+          className="p-2 sm:p-2.5 rounded-xl bg-[var(--bg-elevated)] hover:bg-[var(--bg-subtle)] border border-[var(--border-subtle)] hover:border-[var(--border-medium)] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-all cursor-pointer min-w-[40px] min-h-[40px] flex items-center justify-center shadow-xs"
           title={`Switch to ${currentTheme === 'light' ? 'Dark' : 'Light'} theme`}
           aria-label={`Switch to ${currentTheme === 'light' ? 'Dark' : 'Light'} theme`}
         >
           {currentTheme === 'light' ? (
-            <Moon className="w-3.5 h-3.5 text-[#ea580c]" />
+            <Moon className="w-4 h-4 text-[#ea580c]" />
           ) : (
-            <Sun className="w-3.5 h-3.5 text-[#fbbf24]" />
+            <Sun className="w-4 h-4 text-[#fbbf24]" />
           )}
         </button>
 
-        {/* Run Demo button */}
-        <div className="flex items-center gap-1">
-          <button
-            onClick={onRunDemo}
-            disabled={isDemoRunning}
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded text-[11px] font-semibold transition-colors cursor-pointer ${
-              isDemoRunning
-                ? 'bg-[var(--bg-subtle)] text-[var(--text-muted)] cursor-not-allowed border border-[var(--border-subtle)]'
-                : 'bg-[#ea580c] hover:bg-[#f97316] text-white shadow-xs active:scale-[0.98]'
-            }`}
-          >
-            <Play className={`w-3 h-3 fill-current ${isDemoRunning ? 'animate-spin' : ''}`} />
-            <span>{isDemoRunning ? 'RUNNING' : 'RUN DEMO'}</span>
-          </button>
-
-          <button
-            onClick={onResetDemo}
-            className="p-1 rounded bg-[var(--bg-elevated)] hover:bg-[var(--bg-subtle)] border border-[var(--border-subtle)] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
-            title="Reset to benchmark Run #1042"
-          >
-            <RotateCcw className="w-3 h-3" />
-          </button>
-        </div>
-
-        {/* User Account Avatar Menu (Section 20 Requirement) */}
+        {/* Clean Google-like Account Control: Standalone Circular Avatar Button */}
         <div className="relative" ref={accountMenuRef}>
           <button
             onClick={() => setIsAccountMenuOpen(!isAccountMenuOpen)}
-            className="flex items-center gap-1.5 p-1 pl-1.5 rounded bg-[var(--bg-elevated)] hover:bg-[var(--bg-subtle)] border border-[var(--border-subtle)] transition-colors cursor-pointer"
-            title="Account & IDE Settings"
+            className="w-10 h-10 rounded-full bg-[var(--bg-elevated)] hover:bg-[var(--bg-subtle)] border border-[var(--border-subtle)] hover:border-[var(--border-medium)] transition-all cursor-pointer flex items-center justify-center shadow-xs focus:outline-none focus:ring-2 focus:ring-[#ea580c]/40"
+            title="Account & Settings"
+            aria-label="Open account and settings menu"
           >
-            <div className="w-5 h-5 rounded-full bg-[#ea580c] flex items-center justify-center text-white text-[10px] font-bold">
-              {user?.name ? user.name[0].toUpperCase() : 'U'}
+            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#ea580c] to-[#f97316] flex items-center justify-center text-white shadow-xs">
+              <User className="w-4 h-4" />
             </div>
-            <ChevronDown className="w-3 h-3 text-[var(--text-muted)]" />
           </button>
 
           {/* Compact Account Menu */}

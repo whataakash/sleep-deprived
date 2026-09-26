@@ -222,9 +222,7 @@ export function UpgradeModal({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.995 }}
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className={`w-full ${
-              step === 'PLANS' ? 'max-w-5xl' : 'max-w-4xl'
-            } max-h-[92dvh] sm:max-h-[90dvh] flex flex-col bg-[var(--bg-panel)] text-[var(--text-primary)] border border-[var(--border-subtle)] rounded-2xl shadow-2xl overflow-hidden font-sans`}
+            className="w-full max-w-4xl max-h-[92dvh] sm:max-h-[90dvh] flex flex-col bg-[var(--bg-panel)] text-[var(--text-primary)] border border-[var(--border-subtle)] rounded-2xl shadow-2xl overflow-hidden font-sans"
           >
             {/* Top Header Bar — ALWAYS STICKY & CLOSE BUTTON ALWAYS ACCESSIBLE */}
             <div className="px-4 sm:px-6 py-3 border-b border-[var(--border-subtle)] bg-[var(--bg-panel)] flex items-center justify-between shrink-0 z-10">
@@ -332,10 +330,10 @@ export function UpgradeModal({
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -6 }}
                         transition={{ duration: 0.16 }}
-                        className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-5 items-stretch pt-1"
+                        className="grid grid-cols-1 md:grid-cols-2 gap-5 lg:gap-6 items-stretch pt-1 max-w-3xl mx-auto"
                       >
                 {/* 1. Free */}
-                <div className="bg-[var(--bg-elevated)] border border-[var(--border-subtle)] rounded-2xl p-5 flex flex-col justify-between space-y-5 hover:border-[var(--border-medium)] transition-colors">
+                <div className="bg-[var(--bg-elevated)] border border-[var(--border-subtle)] rounded-2xl p-6 flex flex-col justify-between space-y-6 hover:border-[var(--border-medium)] transition-colors">
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div>
@@ -358,7 +356,7 @@ export function UpgradeModal({
 
                     <button
                       onClick={() => handleSelectPlan(PRICING_PLANS[0])}
-                      className="w-full py-2 px-3 rounded-lg bg-[var(--bg-subtle)] hover:bg-[var(--bg-active)] border border-[var(--border-subtle)] text-[var(--text-primary)] font-semibold text-xs transition-colors cursor-pointer"
+                      className="w-full py-2.5 px-3 rounded-lg bg-[var(--bg-subtle)] hover:bg-[var(--bg-active)] border border-[var(--border-subtle)] text-[var(--text-primary)] font-semibold text-xs transition-colors cursor-pointer"
                     >
                       {user?.plan === 'FREE' ? 'Current Plan' : 'Select Free'}
                     </button>
@@ -384,7 +382,7 @@ export function UpgradeModal({
                 </div>
 
                 {/* 2. Pro — HERO CARD */}
-                <div className="bg-[var(--bg-canvas)] border-2 border-[#ea580c] rounded-2xl p-5 flex flex-col justify-between space-y-5 shadow-xl relative ring-1 ring-[#ea580c]/20">
+                <div className="bg-[var(--bg-canvas)] border-2 border-[#ea580c] rounded-2xl p-6 flex flex-col justify-between space-y-6 shadow-xl relative ring-1 ring-[#ea580c]/20">
                   {/* Popular Pill */}
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-[#ea580c] text-white font-mono text-[10px] font-extrabold uppercase tracking-wider shadow-sm flex items-center gap-1">
                     <Sparkles className="w-3 h-3" />
@@ -452,67 +450,6 @@ export function UpgradeModal({
                     </div>
                   </div>
                 </div>
-
-                {/* 3. Max */}
-                <div className="bg-[var(--bg-elevated)] border border-[var(--border-subtle)] rounded-2xl p-5 flex flex-col justify-between space-y-5 hover:border-[var(--border-medium)] transition-colors">
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="text-xl font-bold text-[var(--text-primary)]">Max</h3>
-                        <div className="text-[11px] font-mono text-[var(--text-muted)]">Senior / Power User</div>
-                      </div>
-                      <span className="text-xs font-mono font-semibold px-2 py-0.5 rounded bg-[var(--bg-subtle)] text-[var(--text-secondary)] border border-[var(--border-subtle)]">
-                        ₹{billingCycle === 'yearly' ? '1,999' : '2,499'}/mo
-                      </span>
-                    </div>
-
-                    <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
-                      Frontier reasoning models and 1,000,000 token context for complex multi-file architectural refactoring.
-                    </p>
-
-                    <div className="pt-2">
-                      <div className="flex items-baseline gap-1.5">
-                        <span className="text-3xl font-black text-[var(--text-primary)]">
-                          ₹{billingCycle === 'yearly' ? '1,999' : '2,499'}
-                        </span>
-                        <span className="text-xs text-[var(--text-muted)] font-mono">/ mo</span>
-                      </div>
-                      <div className="text-[10px] text-[var(--text-muted)] font-mono">
-                        {billingCycle === 'yearly'
-                          ? 'Billed annually at ₹23,988/yr · Taxes included'
-                          : 'Billed monthly · Taxes included'}
-                      </div>
-                    </div>
-
-                    <button
-                      onClick={() => handleSelectPlan(PRICING_PLANS[2])}
-                      className="w-full py-2 px-3 rounded-lg bg-[var(--bg-subtle)] hover:bg-[var(--bg-active)] border border-[var(--border-subtle)] text-[var(--text-primary)] font-semibold text-xs transition-colors cursor-pointer"
-                    >
-                      Upgrade to Max
-                    </button>
-                    <div className="text-[10px] text-center text-[var(--text-muted)] font-mono">
-                      No commitment · Cancel anytime
-                    </div>
-
-                    <div className="pt-3 border-t border-[var(--border-subtle)] space-y-2 text-xs">
-                      <div className="text-[10px] uppercase tracking-wider font-mono font-semibold text-[var(--text-muted)]">
-                        Everything in Pro, plus:
-                      </div>
-                      {[
-                        '500 verified runs per month',
-                        'Claude 3.7 Sonnet & DeepSeek R1 models',
-                        '1,000,000 token context window',
-                        'Parallel targeted test & tool execution',
-                        'Continuous verification CI/CD webhooks',
-                        'Proof graph export & audit log signatures',
-                      ].map((feat, i) => (
-                        <div key={i} className="flex items-start gap-2 text-[var(--text-secondary)]">
-                          <Check className="w-3.5 h-3.5 text-[#10b981] shrink-0 mt-0.5" />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
               </motion.div>
             ) : (
               <motion.div
@@ -521,7 +458,7 @@ export function UpgradeModal({
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -6 }}
                 transition={{ duration: 0.16 }}
-                className="grid grid-cols-1 md:grid-cols-2 gap-5 items-stretch pt-1 max-w-4xl mx-auto"
+                className="grid grid-cols-1 md:grid-cols-2 gap-5 lg:gap-6 items-stretch pt-1 max-w-3xl mx-auto"
               >
                 {/* 1. Team Card */}
                 <div className="bg-[var(--bg-elevated)] border-2 border-[#38bdf8]/40 hover:border-[#38bdf8] rounded-2xl p-6 flex flex-col justify-between space-y-5 transition-colors">
