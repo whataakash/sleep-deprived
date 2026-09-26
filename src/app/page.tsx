@@ -14,6 +14,7 @@ import { EvaluationDashboard } from '@/components/features/evaluation/evaluation
 import { AccountCenter } from '@/components/features/account/account-center';
 import { CommandPalette } from '@/components/features/command-palette/command-palette';
 import { DownloadModal } from '@/components/features/download/download-modal';
+import { UpgradeModal } from '@/components/features/billing/upgrade-modal';
 
 import { INITIAL_RUN_1042 } from '@/lib/agent/orchestrator';
 import { ProofGenerator } from '@/lib/verification/proof-generator';
@@ -39,6 +40,7 @@ function ParishramAppInner() {
   const [accountInitialCategory, setAccountInitialCategory] = useState<string>('general');
   const [isDownloadOpen, setIsDownloadOpen] = useState<boolean>(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState<boolean>(false);
+  const [isUpgradeOpen, setIsUpgradeOpen] = useState<boolean>(false);
 
   const isEvalMode = EvaluationModelAdapter.isEvaluationMode();
 
@@ -127,6 +129,7 @@ function ParishramAppInner() {
           setIsAccountOpen(true);
         }}
         onOpenDownload={() => setIsDownloadOpen(true)}
+        onOpenUpgrade={() => setIsUpgradeOpen(true)}
         onRunDemo={handleRunDemo}
         onResetDemo={handleResetDemo}
         isDemoRunning={isDemoRunning}
@@ -172,6 +175,7 @@ function ParishramAppInner() {
             setIsAccountOpen(true);
           }}
           onOpenDownload={() => setIsDownloadOpen(true)}
+          onOpenUpgrade={() => setIsUpgradeOpen(true)}
           runStatus={isVerified ? 'VERIFIED' : 'RUNNING'}
         />
 
@@ -185,6 +189,7 @@ function ParishramAppInner() {
                 setAccountInitialCategory('billing');
                 setIsAccountOpen(true);
               }}
+              onOpenUpgrade={() => setIsUpgradeOpen(true)}
             />
           )}
 
@@ -212,6 +217,7 @@ function ParishramAppInner() {
                 setAccountInitialCategory('ai');
                 setIsAccountOpen(true);
               }}
+              onOpenUpgrade={() => setIsUpgradeOpen(true)}
             />
           )}
 
@@ -231,6 +237,12 @@ function ParishramAppInner() {
         isOpen={isAccountOpen}
         onClose={() => setIsAccountOpen(false)}
         initialCategory={accountInitialCategory}
+      />
+
+      {/* Upgrade & Payment Modal (Claude 2-step flow) */}
+      <UpgradeModal
+        isOpen={isUpgradeOpen}
+        onClose={() => setIsUpgradeOpen(false)}
       />
 
       {/* Download Parishram Desktop Modal */}

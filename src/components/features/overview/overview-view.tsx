@@ -21,6 +21,7 @@ interface OverviewViewProps {
   onStartRun: (taskText: string, modelId: string, agentMode?: string) => void;
   onOpenRun: (runNumber: number) => void;
   onOpenBilling?: () => void;
+  onOpenUpgrade?: () => void;
 }
 
 interface RecentRunItem {
@@ -82,7 +83,7 @@ const RECENT_RUNS: RecentRunItem[] = [
   },
 ];
 
-export function OverviewView({ onStartRun, onOpenRun, onOpenBilling }: OverviewViewProps) {
+export function OverviewView({ onStartRun, onOpenRun, onOpenBilling, onOpenUpgrade }: OverviewViewProps) {
   const { session } = useAuth();
   const user = session.user;
   const currentPlan = user?.plan || 'FREE';
@@ -238,10 +239,10 @@ export function OverviewView({ onStartRun, onOpenRun, onOpenBilling }: OverviewV
 
         {/* PSYCHOLOGY & FINANCE UPGRADE CARD (ChatGPT Plus / Claude Pro Style) */}
         {currentPlan === 'FREE' && (
-          <div className="p-3.5 rounded-xl bg-gradient-to-r from-[#ea580c]/10 via-[var(--bg-panel)] to-[var(--bg-panel)] border border-[#ea580c]/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
-            <div className="space-y-1 font-mono">
+          <div className="p-4 rounded-xl bg-gradient-to-r from-[#ea580c]/12 via-[var(--bg-panel)] to-[var(--bg-panel)] border border-[#ea580c]/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
+            <div className="space-y-1.5 font-mono">
               <div className="flex items-center gap-2">
-                <span className="text-[10px] px-1.5 py-0.2 rounded bg-[#ea580c]/20 text-[#ea580c] font-extrabold uppercase">
+                <span className="text-[10px] px-2 py-0.5 rounded bg-[#ea580c]/20 text-[#ea580c] font-extrabold uppercase">
                   {planInfo.hindiName} ({planInfo.englishSubtitle})
                 </span>
                 <span className="text-[11px] text-[var(--text-secondary)]">
@@ -250,25 +251,27 @@ export function OverviewView({ onStartRun, onOpenRun, onOpenBilling }: OverviewV
               </div>
 
               {/* Progress Bar */}
-              <div className="w-48 sm:w-64 h-1.5 bg-[var(--bg-elevated)] rounded-full overflow-hidden mt-1">
+              <div className="w-48 sm:w-64 h-1.5 bg-[var(--bg-elevated)] rounded-full overflow-hidden">
                 <div
                   className="h-full bg-[#ea580c] rounded-full transition-all"
                   style={{ width: `${usagePercent}%` }}
                 />
               </div>
 
-              <p className="text-[11px] text-[var(--text-secondary)] font-sans pt-1">
-                Upgrade to <strong className="text-[var(--text-primary)]">प्रगति (Builder)</strong> for ₹2,499/mo to unlock Claude 3.7 Sonnet, Kimi K2.5, 128k context, and 150 runs/mo.
+              <p className="text-[11px] text-[var(--text-secondary)] font-sans pt-0.5">
+                Scale your output with <strong className="text-[var(--text-primary)]">प्रगति (Pro)</strong> at ₹2,399/mo (or ₹1,999/mo billed annually, Save 17%) for 150 verified runs/mo, frontier models, and multi-agent swarms.
               </p>
             </div>
 
-            <button
-              onClick={onOpenBilling}
-              className="px-3.5 py-2 rounded-lg bg-[#ea580c] hover:bg-[#f97316] text-white font-bold text-xs flex items-center gap-1.5 transition-all shadow-md active:scale-95 shrink-0 cursor-pointer"
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Upgrade to प्रगति ⚡</span>
-            </button>
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 shrink-0">
+              <button
+                onClick={() => (onOpenUpgrade ? onOpenUpgrade() : onOpenBilling?.())}
+                className="px-4 py-2 rounded-lg bg-[#ea580c] hover:bg-[#f97316] text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-md active:scale-95 cursor-pointer"
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Upgrade to प्रगति ⚡</span>
+              </button>
+            </div>
           </div>
         )}
 

@@ -111,17 +111,34 @@ Automatically scores task complexity (1–10), counts affected files, estimates 
 
 ## 7. Subscription Plans & Payment Checkout Architecture
 
-### Hindi Identity Plan Hierarchy:
-- **आरम्भ (Starter):** Free tier, 25 autonomous runs/mo, 64k tokens context.
-- **प्रगति (Builder):** ₹2,499/mo ($29/mo), 150 runs/mo, 128k context, 2x parallel tools.
-- **प्रवीण (Professional):** ₹6,999/mo ($79/mo), 500 runs/mo, 256k context, 4x parallel tools.
-- **दल (Team):** ₹16,999/mo ($199/mo), unlimited verified runs, 1M context, 8x parallel tools.
+### Claude-Style 2-Step Upgrade & Payment Flow:
+1. **Step 1: "Plans that grow with you" (Plans Overview & Comparison):**
+   - **Segmented Audience Switcher:** Centered toggle between `[ Individual | Team and Enterprise ]`.
+   - **3-Card Grid:**
+     - **Free (आरम्भ / Starter):** Minimalist tree/node icon, ₹0/mo, "Use Parishram for free" CTA, 25 runs/mo, open-weight models.
+     - **Pro (प्रगति / Builder) — Hero Card:** Prominent bordered card with Monthly/Yearly toggle pill and "Save 17%" badge, ₹2,399/mo (or ₹1,999/mo billed annually at ₹23,999/yr), high-contrast "Get Pro plan" CTA, "No commitment · Cancel anytime", 150 verified runs/mo, frontier models, and multi-agent swarms.
+     - **Max (दल / Team & Enterprise):** From ₹11,999/mo, "Get Max plan" CTA, unlimited verified runs, 1M context, 8x parallel tools, and dedicated cluster support.
+2. **Step 2: "Configure your plan" (2-Column Payment & Tax Configuration):**
+   - **Left Column:**
+     - Side-by-side radio billing options:
+       - `Pro monthly`: INR 2,399.00 (includes GST), Billed monthly.
+       - `Pro annual`: INR 23,999.00 (includes GST), Billed yearly (Save 17%).
+     - Comprehensive billing information: Full name, Country/region dropdown, Street address, Business name (optional), Tax ID Type (`India (IN GST)`), and GSTIN input (`22AAAAA0000A1Z5 (optional)`), with invoice name option.
+     - Payment methods: Direct instant UPI payment to verified merchant **`shivansh.p@fam`** and Credit/Debit Card tab.
+   - **Right Column (Order Summary Card):**
+     - Serif typography heading: `Pro plan`.
+     - Exact Indian GST breakdown matching official invoicing:
+       - Subtotal: **₹2,033.05**
+       - Tax (18% GST): **₹365.95**
+       - Total due today: **₹2,399.00**
+     - Renewal terms: "Your subscription will auto-renew on 10/26/2026. You will be charged ₹2,033.05/month + tax."
+     - Recurring agreement confirmation checkbox.
+     - High-contrast `Subscribe` CTA button triggering backend verification handoff.
 
-### Payment Architecture:
-- **Merchant Destination:** Configured strictly server-side to **`shivansh.p@fam`** (FamPay / UPI).
-- **Official Checkout Flow:** Clean summary screen → hosted/provider handoff (UPI QR / VPA deep link) → server-side status verification (`/api/billing/verify`).
-- **Zero Fake UI:** Users never enter credit card or banking details into custom Parishram inputs.
-- **State Enforcement:** Subscriptions only activate upon `PAYMENT_SUCCESS` confirmed by backend cryptographic/status checks.
+### Psychological & Financial Growth Levers:
+- **Universal Main Page Accessibility:** Prominent `⚡ Upgrade` button in the Topbar, High-converting upgrade card in the Sidebar, conversion banner in Mission Control Overview, and interactive unlock buttons in the Model Marketplace.
+- **Value Anchoring & Micro-commitments:** Clear "Save 17%" badge, "No commitment · Cancel anytime" reassurance, and zero friction instant UPI checkout.
+- **Strict Recipient Security:** All UPI/FamPay transactions strictly resolve to **`shivansh.p@fam`** with server-side validation (`/api/billing/verify`). Subscriptions only activate upon cryptographic verification.
 
 ---
 

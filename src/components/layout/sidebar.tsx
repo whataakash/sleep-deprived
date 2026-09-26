@@ -24,6 +24,7 @@ interface SidebarProps {
   onSelectView: (view: MainNavView) => void;
   onOpenAccount: () => void;
   onOpenDownload?: () => void;
+  onOpenUpgrade?: () => void;
   runStatus?: 'VERIFIED' | 'RUNNING' | 'IDLE';
 }
 
@@ -32,6 +33,7 @@ export function Sidebar({
   onSelectView,
   onOpenAccount,
   onOpenDownload,
+  onOpenUpgrade,
   runStatus = 'VERIFIED',
 }: SidebarProps) {
   const { session } = useAuth();
@@ -152,6 +154,31 @@ export function Sidebar({
             <span className="text-[9px] px-1.5 py-0.2 rounded bg-[#38bdf8]/10 text-[#38bdf8] font-bold">
               Tauri
             </span>
+          </button>
+        </div>
+      </div>
+
+      {/* High-Converting Upgrade Card (Claude/ChatGPT style) */}
+      <div className="px-3 pb-1">
+        <div className="p-2.5 rounded-lg bg-gradient-to-br from-[#ea580c]/15 via-[var(--bg-elevated)] to-[var(--bg-elevated)] border border-[#ea580c]/30 text-xs shadow-xs">
+          <div className="flex items-center justify-between font-bold text-[var(--text-primary)] mb-1">
+            <span className="flex items-center gap-1.5 text-[#ea580c]">
+              <span>⚡</span>
+              <span>प्रगति (Pro)</span>
+            </span>
+            <span className="text-[9px] text-[#10b981] bg-[#10b981]/15 px-1.5 py-0.5 rounded font-extrabold border border-[#10b981]/30">
+              Save 17%
+            </span>
+          </div>
+          <p className="text-[10px] text-[var(--text-secondary)] font-sans leading-tight mb-2">
+            Frontier models, 150 verified runs/mo & multi-agent swarms.
+          </p>
+          <button
+            onClick={() => (onOpenUpgrade ? onOpenUpgrade() : onOpenAccount())}
+            className="w-full py-1.5 px-2 rounded bg-[#ea580c] hover:bg-[#f97316] text-white font-bold text-[11px] flex items-center justify-center gap-1 shadow-sm transition-all cursor-pointer active:scale-95"
+          >
+            <span>Upgrade plan</span>
+            <span>→</span>
           </button>
         </div>
       </div>

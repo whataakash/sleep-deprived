@@ -129,3 +129,26 @@ Animations are built on `motion/react` with strict adherence to accessibility st
   - Progress bar: Width tweening over 300ms.
   - Accordion: Height and opacity interpolation with `AnimatePresence`.
 - **Zero AI Gimmicks:** No bouncing robots, no floating particle canvases, and no infinite pulsating borders.
+
+---
+
+## 7. Editorial Pricing & Upgrade Modal Design System
+
+Inspired by world-class software interfaces (Claude / Anthropic), the subscription and upgrade modal embodies an editorial, high-trust visual language:
+
+### Step 1: "Plans that grow with you" (Plans Comparison Grid)
+- **Typography:** Refined editorial serif title (`"Plans that grow with you"`) paired with crisp sans-serif feature bullets.
+- **Segmented Audience Pill:** Centered toggle `[ Individual | Team and Enterprise ]` with smooth pill background transition.
+- **Card Hierarchy:**
+  - Standard cards have subtle `[var(--border-subtle)]` borders and muted badge elements.
+  - The **Pro (Hero)** card is bordered with `[var(--border-medium)]`, features an interactive Monthly/Yearly toggle with an emerald `"Save 17%"` badge, and a high-contrast solid white primary CTA (`"Get Pro plan"`).
+  - Micro-reassurance copy: `"No commitment · Cancel anytime"` placed directly under primary buttons.
+
+### Step 2: "Configure your plan" (2-Column Checkout)
+- **2-Column Asymmetric Layout:**
+  - Left Column (60%): Interactive radio billing selector with active border state, comprehensive billing details (GSTIN, Company name, Street Address), and official payment tabs.
+  - Right Column (40%): Sticky Order Summary card featuring serif `Pro plan` header, clean subtotal breakdown (`₹2,033.05` + `18% GST ₹365.95` = `₹2,399.00`), auto-renewal terms notice, and agreement checkbox.
+- **Verified Payment Handoff:**
+  - Seamless instant UPI payment to verified recipient `shivansh.p@fam`.
+  - Zero custom card forms or raw credential harvesting.
+

@@ -24,12 +24,14 @@ interface ModelMarketplaceProps {
   currentModelId: string;
   onSelectModel: (modelId: string) => void;
   onOpenAccountKeys: () => void;
+  onOpenUpgrade?: () => void;
 }
 
 export function ModelMarketplace({
   currentModelId,
   onSelectModel,
   onOpenAccountKeys,
+  onOpenUpgrade,
 }: ModelMarketplaceProps) {
   const { session } = useAuth();
   const user = session.user;
@@ -255,10 +257,11 @@ export function ModelMarketplace({
                       ) : (
                         <div className="space-y-1.5">
                           <button
-                            disabled
-                            className="w-full py-1.5 rounded bg-[var(--bg-subtle)] text-[var(--text-muted)] font-semibold text-xs border border-[var(--border-subtle)] cursor-not-allowed"
+                            onClick={() => (onOpenUpgrade ? onOpenUpgrade() : onOpenAccountKeys())}
+                            className="w-full py-1.5 rounded bg-gradient-to-r from-[#ea580c]/20 to-[#ea580c]/10 hover:from-[#ea580c]/30 hover:to-[#ea580c]/20 text-[#ea580c] hover:text-[#f97316] font-bold text-xs border border-[#ea580c]/30 cursor-pointer flex items-center justify-center gap-1.5 transition-all active:scale-98"
+                            title="Upgrade plan to unlock this frontier model"
                           >
-                            🔒 {model.minimumPlanRequired} TIER REQUIRED
+                            <span>⚡ UPGRADE TO UNLOCK ({model.minimumPlanRequired})</span>
                           </button>
                           <div className="text-[10px] text-center text-[var(--text-muted)]">
                             Or configure your own API key in Account settings.

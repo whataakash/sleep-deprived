@@ -174,9 +174,13 @@ Tests verify:
   - **Light Mode:** Warm white canvas (`#f6f8fa`), pure white panels (`#ffffff`), crisp borders (`#d0d7de`), graphite text (`#1f2328`).
   - **Dark Mode:** Deep technical zinc (`#090a0d`), charcoal panels (`#111418`), technical borders (`#232a32`), flame accents (`#ea580c`).
   - **System Mode:** Seamless automatic synchronization with OS preferences via `prefers-color-scheme`.
-- **IDE Settings:**
+- **IDE Settings & Billing:**
   - 12 comprehensive categories: General, Appearance, Editor, AI & Models, Agent Policy, Repository, Terminal, Verification, Notifications, Privacy & Security, Account Profile, Plan & Billing.
   - Interactive search bar with instant progressive disclosure.
+- **Claude-Style Upgrade & Payment Flow:**
+  - **Step 1 ("Plans that grow with you"):** Editorial plans comparison with segmented audience switcher (`Individual` vs `Team & Enterprise`), 3-tier card grid (Free, Pro with Monthly/Yearly toggle and 17% savings, Max), and high-contrast conversion CTA.
+  - **Step 2 ("Configure your plan"):** 2-column checkout with radio billing selection, business details, Indian GST breakdown (Subtotal ₹2,033.05 + 18% GST ₹365.95 = ₹2,399.00), and verified instant UPI handoff to `shivansh.p@fam`.
+  - **Main Page Accessibility:** Instant access via Topbar `⚡ Upgrade` CTA, Sidebar growth card, Mission Control Overview banner, and Model Marketplace locked-tier unlock buttons.
 
 ---
 

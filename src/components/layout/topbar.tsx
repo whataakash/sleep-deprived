@@ -31,6 +31,7 @@ interface TopbarProps {
   onOpenCommandPalette: () => void;
   onOpenAccount: (initialCategory?: string) => void;
   onOpenDownload: () => void;
+  onOpenUpgrade?: () => void;
   onRunDemo: () => void;
   onResetDemo: () => void;
   isDemoRunning?: boolean;
@@ -51,6 +52,7 @@ export function Topbar({
   onOpenCommandPalette,
   onOpenAccount,
   onOpenDownload,
+  onOpenUpgrade,
   onRunDemo,
   onResetDemo,
   isDemoRunning,
@@ -135,13 +137,13 @@ export function Topbar({
 
         {/* High-Converting Subscription Tier Badge & Upgrade Pill (ChatGPT/Claude psychology) */}
         <button
-          onClick={() => onOpenAccount('billing')}
+          onClick={() => (onOpenUpgrade ? onOpenUpgrade() : onOpenAccount('billing'))}
           className={`flex items-center gap-1.5 px-2.5 py-0.5 rounded text-[11px] font-bold border transition-all cursor-pointer ${
             user?.plan === 'FREE'
               ? 'bg-[#ea580c]/15 hover:bg-[#ea580c]/25 border-[#ea580c]/40 text-[#ea580c] shadow-xs animate-pulse hover:animate-none'
               : 'bg-[#10b981]/15 hover:bg-[#10b981]/25 border-[#10b981]/40 text-[#10b981]'
           }`}
-          title="Click to view subscription tiers & quotas"
+          title="Click to view subscription tiers & upgrade"
         >
           <span>{planInfo.hindiName}</span>
           {user?.plan === 'FREE' && (
@@ -155,8 +157,17 @@ export function Topbar({
         </button>
       </div>
 
-      {/* Right Actions: Command Palette, Theme, Desktop, Run Demo, Account Avatar */}
+      {/* Right Actions: Upgrade CTA, Command Palette, Theme, Desktop, Run Demo, Account Avatar */}
       <div className="flex items-center gap-1.5 sm:gap-2">
+        {/* Prominent High-Converting Upgrade Button */}
+        <button
+          onClick={() => (onOpenUpgrade ? onOpenUpgrade() : onOpenAccount('billing'))}
+          className="flex items-center gap-1 px-2.5 py-1 rounded bg-gradient-to-r from-[#ea580c] to-[#f97316] hover:brightness-110 text-white font-bold text-[11px] shadow-sm transition-all cursor-pointer active:scale-95"
+          title="Plans that grow with you - Upgrade"
+        >
+          <span>⚡ Upgrade</span>
+        </button>
+
         {/* Command Palette trigger */}
         <button
           onClick={onOpenCommandPalette}
@@ -243,6 +254,21 @@ export function Topbar({
               </div>
 
               <div className="py-1">
+                <button
+                  onClick={() => {
+                    setIsAccountMenuOpen(false);
+                    if (onOpenUpgrade) onOpenUpgrade();
+                    else onOpenAccount('billing');
+                  }}
+                  className="w-full flex items-center justify-between px-3 py-1.5 text-left text-[#ea580c] hover:bg-[#ea580c]/10 font-bold transition-colors cursor-pointer"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <CreditCard className="w-3.5 h-3.5 text-[#ea580c]" />
+                    <span>Upgrade Plan</span>
+                  </div>
+                  <span className="text-[9px] bg-[#ea580c] text-white px-1.5 py-0.2 rounded font-extrabold">PRO</span>
+                </button>
+
                 <button
                   onClick={() => {
                     setIsAccountMenuOpen(false);
