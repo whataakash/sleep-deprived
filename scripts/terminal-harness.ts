@@ -83,7 +83,7 @@ async function getIssueInput(): Promise<string> {
 
 export async function runTerminalHarness(customTask?: string): Promise<void> {
   console.log(`\n${c.orange}╔══════════════════════════════════════════════════════════════════════════════╗${c.reset}`);
-  console.log(`${c.orange}║${c.reset}   ${c.bold}परिश्रम् (PARISHRAM) — AUTONOMOUS CODING-AGENT HARNESS (TUI MODE)${c.reset}          ${c.orange}║${c.reset}`);
+  console.log(`${c.orange}║${c.reset}   ${c.bold}PARISHRAM — AUTONOMOUS CODING-AGENT HARNESS (TUI MODE)${c.reset}                     ${c.orange}║${c.reset}`);
   console.log(`${c.orange}║${c.reset}   ${c.dim}"Understand. Execute. Verify. Prove." — LCC × DevClub Hackathon 2026${c.reset}       ${c.orange}║${c.reset}`);
   console.log(`${c.orange}╚══════════════════════════════════════════════════════════════════════════════╝${c.reset}\n`);
 
