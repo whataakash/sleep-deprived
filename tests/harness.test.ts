@@ -120,3 +120,31 @@ test('7. AI_MODEL environment variable dynamically configures prescribed model',
   assert.equal(EvaluationModelAdapter.isEvaluationMode(), true);
   delete process.env.AI_MODEL;
 });
+
+test('8. DeepSeek and Qwen evaluation model compliance and text-only enforcement', async () => {
+  // Test DeepSeek configuration
+  process.env.AI_MODEL = 'deepseek-chat';
+  const deepseekAdapter = new EvaluationModelAdapter({ apiKey: 'test-eval-key-deepseek' });
+  assert.equal(deepseekAdapter.getModelName(), 'deepseek-chat');
+  assert.equal(deepseekAdapter.hasValidKey(), true);
+
+  const res = await deepseekAdapter.generateText({
+    systemPrompt: 'You are Parishram coding agent.',
+    userPrompt: 'Implement test case',
+    contextFiles: [],
+  });
+  assert.equal(res.textOnlyEnforced, true);
+  assert.equal(res.modelUsed, 'deepseek-chat');
+
+  // Verify non-text rejection
+  await assert.rejects(async () => {
+    await deepseekAdapter.generateText({
+      systemPrompt: 'System',
+      userPrompt: null as any,
+      contextFiles: [],
+    });
+  }, /userPrompt must be non-empty text/);
+
+  delete process.env.AI_MODEL;
+});
+

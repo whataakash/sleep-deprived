@@ -14,9 +14,6 @@ import {
   Sun,
   Moon,
   Lock,
-  User,
-  Settings,
-  LogOut,
   Zap,
   CheckCircle2,
   Sparkles,
@@ -64,19 +61,6 @@ export function Topbar({
   const isEvalMode = EvaluationModelAdapter.isEvaluationMode();
   const currentTheme = user?.preferences?.theme || 'dark';
 
-  const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
-  const accountMenuRef = useRef<HTMLDivElement>(null);
-
-  // Close dropdown on outside click
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (accountMenuRef.current && !accountMenuRef.current.contains(event.target as Node)) {
-        setIsAccountMenuOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
 
   // Resolved theme tracking (supports 'light', 'dark', and 'system' seamlessly)
   const [resolvedTheme, setResolvedTheme] = useState<'dark' | 'light'>(() => {
@@ -226,60 +210,6 @@ export function Topbar({
             <Sun className="w-4 h-4 text-[#fbbf24]" />
           )}
         </button>
-
-        {/* Clean Google-like Account Control: Standalone Circular Avatar Button */}
-        <div className="relative" ref={accountMenuRef}>
-          <button
-            onClick={() => setIsAccountMenuOpen(!isAccountMenuOpen)}
-            className="w-10 h-10 rounded-full bg-[var(--bg-elevated)] hover:bg-[var(--bg-subtle)] border border-[var(--border-subtle)] hover:border-[var(--border-medium)] transition-all cursor-pointer flex items-center justify-center shadow-xs focus:outline-none focus:ring-2 focus:ring-[#ea580c]/40"
-            title="Account & Settings"
-            aria-label="Open account and settings menu"
-          >
-            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#ea580c] to-[#f97316] flex items-center justify-center text-white shadow-xs">
-              <User className="w-4 h-4" />
-            </div>
-          </button>
-
-          {/* Compact Account Menu */}
-          {isAccountMenuOpen && (
-            <div className="absolute right-0 mt-2 w-56 bg-[var(--bg-panel)] border border-[var(--border-subtle)] rounded-lg shadow-xl py-2 z-50 animate-in fade-in duration-100 text-xs font-mono">
-              <div className="px-3 py-2 border-b border-[var(--border-subtle)]">
-                <div className="font-bold text-[var(--text-primary)] truncate">
-                  {user?.name || 'Developer Session'}
-                </div>
-                <div className="text-[10px] text-[var(--text-muted)] truncate font-mono">
-                  {user?.email || 'Active Session'}
-                </div>
-              </div>
-
-              <div className="py-1">
-                <button
-                  onClick={() => {
-                    setIsAccountMenuOpen(false);
-                    onOpenAccount('appearance');
-                  }}
-                  className="w-full flex items-center gap-2.5 px-3 py-1.5 text-left text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-subtle)] transition-colors cursor-pointer"
-                >
-                  <Settings className="w-3.5 h-3.5 text-[#a78bfa]" />
-                  <span>Settings & Preferences</span>
-                </button>
-              </div>
-
-              <div className="pt-1 border-t border-[var(--border-subtle)]">
-                <button
-                  onClick={() => {
-                    setIsAccountMenuOpen(false);
-                    logout();
-                  }}
-                  className="w-full flex items-center gap-2.5 px-3 py-1.5 text-left text-[#ef4444] hover:bg-[var(--bg-subtle)] transition-colors cursor-pointer"
-                >
-                  <LogOut className="w-3.5 h-3.5" />
-                  <span>Log out</span>
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
       </div>
     </header>
   );

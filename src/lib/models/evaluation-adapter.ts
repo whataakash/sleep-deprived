@@ -115,44 +115,64 @@ export class EvaluationModelAdapter implements EvaluationModel {
     const fileChars = request.contextFiles.reduce((acc, f) => acc + f.content.length, 0);
     const estPromptTokens = Math.round((promptChars + fileChars) / 4);
 
-    // If an external AI endpoint is configured with AI_API_KEY, call it via OpenAI-compatible text endpoint
-    if (this.apiKey && typeof process !== 'undefined' && process.env.AI_API_ENDPOINT) {
-      try {
-        const res = await fetch(`${process.env.AI_API_ENDPOINT}/chat/completions`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${this.apiKey}`,
-          },
-          body: JSON.stringify({
-            model: this.modelName,
-            messages: [
-              { role: 'system', content: request.systemPrompt },
-              { role: 'user', content: request.userPrompt },
-            ],
-            temperature: request.temperature ?? 0.1,
-            max_tokens: request.maxTokens ?? 2048,
-          }),
-        });
-
-        if (res.ok) {
-          const data = await res.json();
-          const content = data.choices?.[0]?.message?.content || '';
-          return {
-            content,
-            tokensUsed: {
-              prompt: data.usage?.prompt_tokens || estPromptTokens,
-              completion: data.usage?.completion_tokens || 200,
-              total: data.usage?.total_tokens || estPromptTokens + 200,
-            },
-            durationMs: Date.now() - startTime,
-            modelUsed: this.modelName,
-            textOnlyEnforced: true,
-          };
+    // If an external AI API key is configured, invoke the OpenAI-compatible text endpoint (DeepSeek & Qwen)
+    if (this.apiKey && this.apiKey.trim().length > 0 && !this.apiKey.startsWith('test-eval-key')) {
+      let endpointBase = (typeof process !== 'undefined' && process.env.AI_API_ENDPOINT) || '';
+      if (!endpointBase) {
+        const lowerModel = this.modelName.toLowerCase();
+        if (lowerModel.includes('deepseek')) {
+          endpointBase = 'https://api.deepseek.com';
+        } else if (lowerModel.includes('qwen')) {
+          endpointBase = 'https://dashscope-intl.aliyuncs.com/compatible-mode/v1';
         }
-      } catch (err) {
-        // Fall back to deterministic evaluation harness engine
-        console.warn('EvaluationModelAdapter: API endpoint error, falling back to harness logic:', err);
+      }
+
+      if (endpointBase) {
+        const cleanBase = endpointBase.replace(/\/+$/, '').replace(/\/chat\/completions$/, '');
+        const targetModel = this.modelName === 'hackathon-prescribed-text-v1' ? 'deepseek-chat' : this.modelName;
+
+        try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+          const res = await fetch(`${cleanBase}/chat/completions`, {
+            method: 'POST',
+            signal: controller.signal,
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${this.apiKey}`,
+            },
+            body: JSON.stringify({
+              model: targetModel,
+              messages: [
+                { role: 'system', content: request.systemPrompt },
+                { role: 'user', content: request.userPrompt },
+              ],
+              temperature: request.temperature ?? 0.1,
+              max_tokens: request.maxTokens ?? 2048,
+            }),
+          });
+          clearTimeout(timeoutId);
+
+          if (res.ok) {
+            const data = await res.json();
+            const content = data.choices?.[0]?.message?.content || '';
+            return {
+              content,
+              tokensUsed: {
+                prompt: data.usage?.prompt_tokens || estPromptTokens,
+                completion: data.usage?.completion_tokens || 200,
+                total: data.usage?.total_tokens || estPromptTokens + 200,
+              },
+              durationMs: Date.now() - startTime,
+              modelUsed: targetModel,
+              textOnlyEnforced: true,
+            };
+          }
+        } catch (err) {
+          // Graceful fallback to deterministic evaluation harness engine
+          console.warn('EvaluationModelAdapter: Live API error, falling back to harness verification engine:', err);
+        }
       }
     }
 

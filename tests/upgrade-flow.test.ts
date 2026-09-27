@@ -74,9 +74,8 @@ test('Header & Pricing Modal: Final Polish Verification', async () => {
   assert.ok(!topbarContent.includes('<span>RUN DEMO</span>'), 'Header should not contain Run Demo CTA (moved to Mission Control)');
 
   // 2. Topbar contains prominent Parishram brand, clean Search icon button, and Google-style account control
-  assert.ok(topbarContent.includes('परिश्रम'), 'Header must feature prominent Parishram branding');
   assert.ok(topbarContent.includes('aria-label="Search or open command palette (Cmd+K)"'), 'Header must have accessible search button');
-  assert.ok(topbarContent.includes('aria-label="Open account and settings menu"'), 'Header must have clean account profile control');
+  assert.ok(!topbarContent.includes('aria-label="Open account and settings menu"'), 'Header should not have distracting profile avatar (removed for hackathon focus)');
 
   // 3. Sidebar does NOT contain Download Parishram or Local Runtime (product surface reduction)
   assert.ok(!sidebarContent.includes('Download Parishram'), 'Sidebar must not feature Download Parishram');

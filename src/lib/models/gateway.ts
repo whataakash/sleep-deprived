@@ -33,7 +33,7 @@ export const CURRENT_2026_MODELS: DynamicCodingModel[] = [
     availability: 'locked_evaluation',
     lastVerifiedAt: '2026-09-26',
     sourceUrl: 'https://github.com/hackathon-evaluation-brief',
-    whyThisModelRationale: 'Mandatory evaluation model prescribed by organizers. Standardized text-only evaluation path initialized via AI_API_KEY with zero credential prompt.',
+    whyThisModelRationale: 'Mandatory evaluation model prescribed by organizers (DeepSeek & Qwen). Standardized text-only evaluation path initialized via AI_API_KEY with zero credential prompt.',
     benchmarks: [
       { name: 'Evaluation Harness Suite', score: 100, date: 'Sep 2026', source: 'Harness Benchmark Suite' },
     ],

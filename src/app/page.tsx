@@ -21,7 +21,6 @@ import { AgentState, ForgeTemperature, Run } from '@/types/agent';
 import { CURRENT_2026_MODELS } from '@/lib/models/gateway';
 import { EvaluationModelAdapter } from '@/lib/models/evaluation-adapter';
 import { Lock } from 'lucide-react';
-import { AuthScreen } from '@/components/features/auth/auth-screen';
 
 function ParishramAppInner() {
   const { session } = useAuth();
@@ -156,10 +155,6 @@ function ParishramAppInner() {
     }));
     handleRunDemo(finalTaskTitle);
   };
-
-  if (!session.isAuthenticated || !session.user) {
-    return <AuthScreen />;
-  }
 
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-[var(--bg-canvas)] text-[var(--text-primary)] font-sans antialiased transition-colors">
