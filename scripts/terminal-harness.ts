@@ -105,7 +105,7 @@ export async function runTerminalHarness(customTask?: string): Promise<void> {
     `  ${c.cyan}• AI_API_KEY:${c.reset}      ${
       apiKey
         ? `${c.green}Configured (${apiKey.slice(0, 4)}...${apiKey.slice(-4)})${c.reset}`
-        : `${c.yellow}Standby / Simulated Evaluator Session${c.reset}`
+        : `${c.yellow}Not set (Export AI_API_KEY="<key>" for live model execution)${c.reset}`
     }`
   );
   console.log(`  ${c.cyan}• Authentication:${c.reset}  ${c.green}Bypassed (Zero-friction evaluator auto-auth)${c.reset}`);

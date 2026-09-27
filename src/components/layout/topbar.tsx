@@ -30,8 +30,8 @@ interface TopbarProps {
   onOpenAccount: (initialCategory?: string) => void;
   onOpenDownload?: () => void;
   onOpenUpgrade?: () => void;
-  onRunDemo: () => void;
-  onResetDemo: () => void;
+  onRunDemo?: () => void;
+  onResetDemo?: () => void;
   isDemoRunning?: boolean;
 }
 
@@ -51,9 +51,6 @@ export function Topbar({
   onOpenAccount,
   onOpenDownload,
   onOpenUpgrade,
-  onRunDemo,
-  onResetDemo,
-  isDemoRunning,
 }: TopbarProps) {
   const { session, updatePreferences, logout } = useAuth();
   const user = session.user;

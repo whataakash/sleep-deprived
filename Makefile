@@ -57,6 +57,13 @@ evaluate:
 	@echo "==> Running headless autonomous evaluation harness..."
 	@AI_API_KEY="$${AI_API_KEY}" AI_MODEL="$${AI_MODEL}" npx tsx scripts/cli.ts evaluate $(filter-out $@,$(MAKECMDGOALS)) $(ARGS)
 
+# 4b. PYTHON: Native Python harness runner
+py-evaluate:
+	@AI_API_KEY="$${AI_API_KEY}" AI_MODEL="$${AI_MODEL}" python3 harness.py --issue="$${ISSUE:-$(ISSUE)}"
+
+py-run:
+	@AI_API_KEY="$${AI_API_KEY}" AI_MODEL="$${AI_MODEL}" python3 harness.py "$${ISSUE:-$(ISSUE)}"
+
 # 5. SYNC: Fast-forward team rebase & verification helper
 sync:
 	@echo "==> Syncing branch with main..."

@@ -17,20 +17,61 @@ import { CommandPalette } from '@/components/features/command-palette/command-pa
 import { INITIAL_RUN_1042 } from '@/lib/agent/orchestrator';
 import { ProofGenerator } from '@/lib/verification/proof-generator';
 import { ProofRecord } from '@/types/verification';
-import { AgentState, ForgeTemperature, Run } from '@/types/agent';
+import { AgentState, ForgeTemperature, Run, RunEvent } from '@/types/agent';
 import { CURRENT_2026_MODELS } from '@/lib/models/gateway';
 import { EvaluationModelAdapter } from '@/lib/models/evaluation-adapter';
 import { Lock } from 'lucide-react';
 
+const STANDBY_EVALUATION_RUN: Run = {
+  id: 'eval-standby',
+  runNumber: 1,
+  taskTitle: 'Awaiting Evaluation Task',
+  taskDescription: 'Enter an issue or task in the evaluator console to begin autonomous execution.',
+  repositoryId: 'parishram',
+  branch: 'main',
+  modelId: 'hackathon-prescribed-text-v1',
+  state: 'INTAKE',
+  temperature: 'COLD',
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+  events: [
+    {
+      id: 'evt-standby',
+      runId: 'eval-standby',
+      timestamp: '00:00',
+      type: 'task.received',
+      title: 'PARISHRAM EVALUATION HARNESS READY',
+      summary: 'Autonomous engineering loop initialized. Enter an issue description or repository task to launch.',
+      state: 'INTAKE',
+      temperature: 'COLD',
+    },
+  ],
+  plan: [],
+  toolCalls: [],
+  recoveryAttempts: [],
+  metrics: {
+    totalTokens: 0,
+    promptTokens: 0,
+    completionTokens: 0,
+    totalCostUsd: 0,
+    totalDurationMs: 0,
+    toolCallsCount: 0,
+    testsExecutedCount: 0,
+    testsPassedCount: 0,
+    filesInspectedCount: 0,
+    filesModifiedCount: 0,
+    retriesCount: 0,
+    contextEfficiencyPercent: 100,
+  },
+};
+
 function ParishramAppInner() {
   const { session } = useAuth();
   const [activeView, setActiveView] = useState<MainNavView>('overview');
-  const [currentRun, setCurrentRun] = useState<Run>(INITIAL_RUN_1042);
-  const [currentEventIndex, setCurrentEventIndex] = useState<number>(
-    INITIAL_RUN_1042.events.length - 1
-  );
+  const [currentRun, setCurrentRun] = useState<Run>(STANDBY_EVALUATION_RUN);
+  const [currentEventIndex, setCurrentEventIndex] = useState<number>(0);
   const [selectedModelId, setSelectedModelId] = useState<string>('qwen3-coder-next');
-  const [isDemoRunning, setIsDemoRunning] = useState<boolean>(false);
+  const [isExecuting, setIsExecuting] = useState<boolean>(false);
   const [isPlayingReplay, setIsPlayingReplay] = useState<boolean>(false);
 
   // Modals
@@ -43,7 +84,7 @@ function ParishramAppInner() {
   const replayTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const [proofRecord, setProofRecord] = useState<ProofRecord>(() =>
-    ProofGenerator.generateAuthProof(currentRun.id)
+    ProofGenerator.generateAuthProof('eval-standby')
   );
   const selectedModel =
     isEvalMode
@@ -54,7 +95,7 @@ function ParishramAppInner() {
     currentRun.events[currentEventIndex] || currentRun.events[currentRun.events.length - 1];
   const currentState: AgentState = currentEvent ? currentEvent.state : 'COMPLETE';
   const currentTemp: ForgeTemperature = currentEvent ? currentEvent.temperature : 'FORGING';
-  const isVerified = currentEventIndex >= currentRun.events.length - 2;
+  const isVerified = currentRun.state === 'COMPLETE' && proofRecord.status === 'VERIFIED';
 
   // Replay playback logic
   useEffect(() => {
@@ -76,79 +117,292 @@ function ParishramAppInner() {
     };
   }, [isPlayingReplay, currentRun.events.length]);
 
-  // Real pipeline runner integration
-  const handleRunDemo = (overrideTask?: string) => {
-    setIsDemoRunning(true);
-    setCurrentEventIndex(0);
+  // Real pipeline runner integration for live evaluation tasks
+  const handleExecuteCustomTask = async (
+    taskText: string,
+    modelId?: string,
+    clientApiKey?: string
+  ) => {
+    const taskToRun: string = (taskText || '').trim();
+    if (!taskToRun) return;
+
+    const effectiveKey =
+      (clientApiKey || '').trim() ||
+      (typeof window !== 'undefined' ? localStorage.getItem('parishram_api_key') || '' : '') ||
+      (typeof process !== 'undefined' ? process.env?.AI_API_KEY || '' : '');
+
+    setIsExecuting(true);
     setActiveView('runs');
 
-    const taskToRun = overrideTask || currentRun.taskTitle;
+    const runId = 'run-' + Date.now().toString(36);
 
-    // Trigger real backend evaluation pipeline
-    if (typeof window !== 'undefined') {
-      fetch('/api/evaluation/run', {
+    // If no API key is provided, stop and report clearly that AI_API_KEY is required
+    if (!effectiveKey && !EvaluationModelAdapter.isEvaluationMode()) {
+      const promptEvent: RunEvent = {
+        id: `evt-${runId}-key-required`,
+        runId,
+        timestamp: new Date().toLocaleTimeString(),
+        type: 'verification.failed',
+        title: 'AI_API_KEY REQUIRED FOR LIVE EVALUATION',
+        summary:
+          'No AI_API_KEY detected. Please enter your API key (DeepSeek / OpenAI / Groq / OpenRouter / Gemini) in the input field above, or export AI_API_KEY="<key>" in your terminal.',
+        state: 'FAILED',
+        temperature: 'COLD',
+      };
+      setCurrentRun({
+        id: runId,
+        runNumber: (currentRun.runNumber || 0) + 1,
+        taskTitle: taskToRun,
+        taskDescription: taskToRun,
+        repositoryId: 'parishram',
+        branch: 'main',
+        modelId: modelId || selectedModel.id,
+        state: 'FAILED',
+        temperature: 'COLD',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        events: [promptEvent],
+        plan: [],
+        toolCalls: [],
+        recoveryAttempts: [],
+        metrics: {
+          totalTokens: 0,
+          promptTokens: 0,
+          completionTokens: 0,
+          totalCostUsd: 0,
+          totalDurationMs: 0,
+          toolCallsCount: 0,
+          testsExecutedCount: 0,
+          testsPassedCount: 0,
+          filesInspectedCount: 0,
+          filesModifiedCount: 0,
+          retriesCount: 0,
+          contextEfficiencyPercent: 100,
+        },
+      });
+      setCurrentEventIndex(0);
+      setIsExecuting(false);
+      return;
+    }
+
+    const liveRun: Run = {
+      id: runId,
+      runNumber: (currentRun.runNumber || 0) + 1,
+      taskTitle: taskToRun,
+      taskDescription: taskToRun,
+      repositoryId: 'parishram',
+      branch: 'main',
+      modelId: modelId || selectedModel.id,
+      state: 'PLAN',
+      temperature: 'THINKING',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      events: [
+        {
+          id: `evt-${runId}-1`,
+          runId,
+          timestamp: new Date().toLocaleTimeString(),
+          type: 'task.received',
+          title: 'Task Intake & Contract Synthesized',
+          summary: taskToRun,
+          state: 'INTAKE',
+          temperature: 'COLD',
+        },
+        {
+          id: `evt-${runId}-2`,
+          runId,
+          timestamp: new Date().toLocaleTimeString(),
+          type: 'plan.created',
+          title: 'Live Model Loop Initialized',
+          summary: `Dispatching to text-only model ${selectedModel.displayName}...`,
+          state: 'PLAN',
+          temperature: 'WORKING',
+        },
+      ],
+      plan: [],
+      toolCalls: [],
+      recoveryAttempts: [],
+      metrics: {
+        totalTokens: 0,
+        promptTokens: 0,
+        completionTokens: 0,
+        totalCostUsd: 0,
+        totalDurationMs: 0,
+        toolCallsCount: 0,
+        testsExecutedCount: 0,
+        testsPassedCount: 0,
+        filesInspectedCount: 0,
+        filesModifiedCount: 0,
+        retriesCount: 0,
+        contextEfficiencyPercent: 100,
+      },
+    };
+
+    setCurrentRun(liveRun);
+    setCurrentEventIndex(1);
+
+    try {
+      const res = await fetch('/api/evaluation/run', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           task: taskToRun,
-          prescribedModel: selectedModel.id,
+          prescribedModel: modelId || selectedModel.id,
+          apiKey: effectiveKey || undefined,
         }),
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data && data.proof) {
-            setProofRecord((prev) => ({
-              ...prev,
-              proofHash: data.proof.proofHash,
-              status: data.status === 'VERIFIED' ? 'VERIFIED' : 'FAILED',
-              badgeTitle: data.status === 'VERIFIED' ? 'VERIFIED ✓' : 'REJECTED',
-              tests: {
-                ...prev.tests,
-                unit: {
-                  ...prev.tests.unit,
-                  passed: data.testSummary?.testsPassed ?? prev.tests.unit.passed,
-                  total: data.testSummary?.testsRun ?? prev.tests.unit.total,
-                },
-              },
-            }));
-          }
-        })
-        .catch(() => {
-          // Offline fallback
+      });
+
+      const data = await res.json();
+
+      if (data && data.status === 'VERIFIED') {
+        const events: RunEvent[] = [...liveRun.events];
+
+        if (Array.isArray(data.toolEvents)) {
+          data.toolEvents.forEach((te: any, idx: number) => {
+            events.push({
+              id: `evt-${runId}-tool-${idx}`,
+              runId,
+              timestamp: te.timestamp || new Date().toLocaleTimeString(),
+              type:
+                te.tool === 'edit_file' || te.tool === 'write_file'
+                  ? 'file.modified'
+                  : te.tool === 'read_file'
+                    ? 'file.inspected'
+                    : te.tool === 'run_tests' || te.tool === 'run_command'
+                      ? 'test.executed'
+                      : 'tool.completed',
+              title: `[${te.tool}] ${te.input?.filePath || te.input?.path || te.input?.command || te.tool}`,
+              summary: te.output || te.error || 'Completed',
+              state: te.tool === 'edit_file' ? 'EDIT' : 'RUN',
+              temperature: 'FORGING',
+            });
+          });
+        }
+
+        events.push({
+          id: `evt-${runId}-verify`,
+          runId,
+          timestamp: new Date().toLocaleTimeString(),
+          type: 'verification.passed',
+          title: 'Independent Verification Gate Passed',
+          summary: `Tests: ${data.testSummary?.testsPassed ?? 0}/${data.testSummary?.testsRun ?? 0} passed. Typecheck and scope verified.`,
+          state: 'VERIFY',
+          temperature: 'HOT',
         });
-    }
 
-    let step = 0;
-    const interval = setInterval(() => {
-      step += 1;
-      if (step < currentRun.events.length) {
-        setCurrentEventIndex(step);
+        events.push({
+          id: `evt-${runId}-proof`,
+          runId,
+          timestamp: new Date().toLocaleTimeString(),
+          type: 'proof.generated',
+          title: 'Cryptographic Proof Sealed',
+          summary: `SHA-256: ${data.proof?.proofHash || 'sealed'} | Merkle Root: ${data.proof?.merkleRoot || 'verified'}`,
+          state: 'COMPLETE',
+          temperature: 'FORGING',
+        });
+
+        const completedRun: Run = {
+          ...liveRun,
+          id: data.runId || runId,
+          state: 'COMPLETE',
+          temperature: 'FORGING',
+          completedAt: new Date().toISOString(),
+          events,
+          metrics: {
+            totalTokens: data.tokensUsed?.total || 0,
+            promptTokens: data.tokensUsed?.prompt || 0,
+            completionTokens: data.tokensUsed?.completion || 0,
+            totalCostUsd: 0,
+            totalDurationMs: (data.durationSeconds || 0) * 1000,
+            toolCallsCount: data.toolCallsExecuted || 0,
+            testsExecutedCount: data.testSummary?.testsRun || 0,
+            testsPassedCount: data.testSummary?.testsPassed || 0,
+            filesInspectedCount: data.changesApplied?.length || 0,
+            filesModifiedCount: data.changesApplied?.length || 0,
+            retriesCount: 0,
+            contextEfficiencyPercent: 100,
+          },
+        };
+
+        setCurrentRun(completedRun);
+        setCurrentEventIndex(events.length - 1);
+
+        if (data.proof) {
+          setProofRecord((prev) => ({
+            ...prev,
+            id: data.runId,
+            runId: data.runId,
+            proofHash: data.proof.proofHash,
+            merkleRoot: data.proof.merkleRoot,
+            status: 'VERIFIED',
+            badgeTitle: 'VERIFIED ✓',
+            tests: {
+              ...prev.tests,
+              unit: {
+                ...prev.tests.unit,
+                passed: data.testSummary?.testsPassed ?? prev.tests.unit.passed,
+                total: data.testSummary?.testsRun ?? prev.tests.unit.total,
+              },
+            },
+          }));
+        }
       } else {
-        clearInterval(interval);
-        setIsDemoRunning(false);
+        const failEvents: RunEvent[] = [
+          ...liveRun.events,
+          {
+            id: `evt-${runId}-fail`,
+            runId,
+            timestamp: new Date().toLocaleTimeString(),
+            type: 'verification.failed',
+            title: 'Model Evaluation Terminated / Unverified',
+            summary: data?.error || 'Verification gate rejected the patch or model failed to solve task.',
+            state: 'FAILED',
+            temperature: 'COLD',
+          },
+        ];
+        setCurrentRun({
+          ...liveRun,
+          state: 'FAILED',
+          temperature: 'COLD',
+          events: failEvents,
+        });
+        setCurrentEventIndex(failEvents.length - 1);
       }
-    }, 1600);
-  };
-
-  const handleResetDemo = () => {
-    setIsDemoRunning(false);
-    setIsPlayingReplay(false);
-    setCurrentEventIndex(INITIAL_RUN_1042.events.length - 1);
+    } catch (err: any) {
+      const errorEvents: RunEvent[] = [
+        ...liveRun.events,
+        {
+          id: `evt-${runId}-err`,
+          runId,
+          timestamp: new Date().toLocaleTimeString(),
+          type: 'run.blocked',
+          title: 'Live Model Request Failed',
+          summary: err?.message || 'Network error reaching model API',
+          state: 'FAILED',
+          temperature: 'COLD',
+        },
+      ];
+      setCurrentRun({
+        ...liveRun,
+        state: 'FAILED',
+        temperature: 'COLD',
+        events: errorEvents,
+      });
+      setCurrentEventIndex(errorEvents.length - 1);
+    } finally {
+      setIsExecuting(false);
+    }
   };
 
   const handleStartRunFromOverview = (
     taskText: string,
     modelId: string,
-    agentMode?: string
+    agentMode?: string,
+    apiKey?: string
   ) => {
     setSelectedModelId(modelId);
     const finalTaskTitle = taskText || 'Autonomous Task';
-    setCurrentRun((prev) => ({
-      ...prev,
-      taskTitle: finalTaskTitle,
-      modelId,
-    }));
-    handleRunDemo(finalTaskTitle);
+    handleExecuteCustomTask(finalTaskTitle, modelId, apiKey);
   };
 
   return (
@@ -163,9 +417,6 @@ function ParishramAppInner() {
           setAccountInitialCategory(cat || 'appearance');
           setIsAccountOpen(true);
         }}
-        onRunDemo={handleRunDemo}
-        onResetDemo={handleResetDemo}
-        isDemoRunning={isDemoRunning}
       />
 
       {/* Official Hackathon Evaluation Mode Banner */}
@@ -216,9 +467,6 @@ function ParishramAppInner() {
             <OverviewView
               onStartRun={handleStartRunFromOverview}
               onOpenRun={() => setActiveView('runs')}
-              onRunDemo={handleRunDemo}
-              isDemoRunning={isDemoRunning}
-              onResetDemo={handleResetDemo}
               onNavigateToModels={() => setActiveView('models')}
               lastCompletedRun={
                 isVerified
@@ -253,7 +501,7 @@ function ParishramAppInner() {
             <RepoExplorer
               onLaunchFix={(repoUrl, issueText) => {
                 handleStartRunFromOverview(
-                  issueText || `Fix faulty repository: ${repoUrl}`,
+                  issueText || `Audit repository: ${repoUrl}`,
                   selectedModel.id,
                   'dual'
                 );
@@ -272,8 +520,10 @@ function ParishramAppInner() {
           {activeView === 'evaluations' && (
             <EvaluationDashboard
               onRunBenchmarkTask={() => {
-                setActiveView('runs');
-                handleRunDemo();
+                handleStartRunFromOverview(
+                  'Audit scope enforcement and run test suite across workspace',
+                  selectedModel.id
+                );
               }}
             />
           )}
@@ -292,7 +542,12 @@ function ParishramAppInner() {
         isOpen={isCommandPaletteOpen}
         onClose={() => setIsCommandPaletteOpen(false)}
         onSelectView={(v) => setActiveView(v)}
-        onRunDemo={handleRunDemo}
+        onRunEvaluation={() => {
+          handleStartRunFromOverview(
+            'Audit scope enforcement and run test suite across workspace',
+            selectedModel.id
+          );
+        }}
         onSelectModel={setSelectedModelId}
       />
     </div>

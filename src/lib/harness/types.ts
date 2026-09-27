@@ -222,6 +222,7 @@ export interface HarnessRunOptions {
   isEvaluationMode?: boolean;
   prescribedModel?: string;
   apiKey?: string;
+  mockHandler?: (messages: any[]) => Promise<any>;
   onStateChange?: (state: HarnessState, detail?: string) => void;
   onToolCall?: (event: ToolCallEvent) => void;
   onVerification?: (result: VerificationResult) => void;

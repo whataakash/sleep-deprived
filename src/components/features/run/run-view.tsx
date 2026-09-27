@@ -467,7 +467,21 @@ export function RunView({
 
       {/* Terminal Output Docked at Bottom of Unified Container */}
       <div className="border-t border-[var(--border-subtle)] bg-[var(--bg-canvas)]">
-        <TerminalDrawer customSnippet={customTerminalLog} />
+        <TerminalDrawer
+          customSnippet={customTerminalLog}
+          testOutput={
+            run.toolCalls
+              .filter((tc) => tc.tool === 'run_tests' || (tc.tool === 'run_command' && String(tc.input?.command || '').includes('test')))
+              .map((tc) => tc.output)
+              .reverse()[0]
+          }
+          diff={
+            run.toolCalls
+              .filter((tc) => (tc.tool as string) === 'get_git_diff' || tc.tool === 'edit_file')
+              .map((tc) => tc.output)
+              .reverse()[0]
+          }
+        />
       </div>
     </div>
   );

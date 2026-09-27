@@ -5,72 +5,50 @@ import { Terminal, Copy, Check, ChevronUp, ChevronDown } from 'lucide-react';
 
 interface TerminalDrawerProps {
   customSnippet?: string;
+  testOutput?: string;
+  typecheckOutput?: string;
+  buildOutput?: string;
+  diff?: string;
 }
 
-export function TerminalDrawer({ customSnippet }: TerminalDrawerProps) {
+export function TerminalDrawer({
+  customSnippet,
+  testOutput,
+  typecheckOutput,
+  buildOutput,
+  diff,
+}: TerminalDrawerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'tests' | 'typecheck' | 'build' | 'diff'>('tests');
   const [copied, setCopied] = useState(false);
 
-  const LOG_OUTPUTS = {
-    tests: `$ pnpm test -- --runInBand
-> auth-gateway-service@1.4.2 test
-> jest --runInBand
-
-PASS tests/unit/session.test.ts (14ms)
-  ✓ creates active session with valid expiration (6ms)
-  ✓ validates active session token successfully (8ms)
-
-PASS tests/integration/auth.test.ts (42ms)
-  ✓ forwards session token and accesses protected profile route (42ms)
-
-PASS tests/regression/security.test.ts (18ms)
-  ✓ strictly rejects forged bearer tokens (18ms)
-
-Test Suites: 3 passed, 3 total
-Tests:       4 passed, 4 total
-Snapshots:   0 total
-Time:        1.42s
-Ran all test suites.`,
-
-    typecheck: `$ pnpm run typecheck
-> auth-gateway-service@1.4.2 typecheck
-> tsc --noEmit
-
-✨ TypeScript 5.8: zero diagnostics found in 28 workspace files.`,
-
-    build: `$ pnpm run build
-> auth-gateway-service@1.4.2 build
-> tsup src/server/index.ts --format esm,cjs
-
-CLI Building entry: src/server/index.ts
-CLI Using tsconfig: tsconfig.json
-CLI tsup v8.3.6
-CLI Target: es2022
-ESM Build start
-ESM dist/index.mjs     18.42 KB
-ESM ⚡️ Build success in 142ms
-CJS Build start
-CJS dist/index.cjs     22.18 KB
-CJS ⚡️ Build success in 89ms
-✔ Production artifacts bundled cleanly.`,
-
-    diff: `$ git diff src/auth/client.ts
-diff --git a/src/auth/client.ts b/src/auth/client.ts
---- a/src/auth/client.ts
-+++ b/src/auth/client.ts
-@@ -23,7 +23,13 @@ export class AuthServiceClient {
--    const headers = options.headers || {};
-+    const headers = new Headers(options.headers || {});
-+    
-+    // FIX APPLIED BY PARISHRAM: Forward active session token
-+    if (this.currentSession && this.currentSession.token) {
-+      headers.set('Authorization', \`Bearer \${this.currentSession.token}\`);
-+      headers.set('X-Session-ID', this.currentSession.id);
-+    }`,
+  const getLogContent = (): string => {
+    if (customSnippet) return customSnippet;
+    switch (activeTab) {
+      case 'tests':
+        return (
+          testOutput ||
+          `$ npm test\n\n[Evaluation Terminal] No test execution recorded for the active run yet.\nEnter a task in the Evaluator Console or trigger "make evaluate" to run real tests.`
+        );
+      case 'typecheck':
+        return (
+          typecheckOutput ||
+          `$ npx tsc --noEmit\n\n[Evaluation Terminal] Typecheck gate is standby. Awaiting verification cycle.`
+        );
+      case 'build':
+        return (
+          buildOutput ||
+          `$ npm run build\n\n[Evaluation Terminal] Production build gate is standby.`
+        );
+      case 'diff':
+        return (
+          diff ||
+          `$ git diff\n\n[Evaluation Terminal] Working tree is clean. No uncommitted modifications.`
+        );
+    }
   };
 
-  const currentText = customSnippet || LOG_OUTPUTS[activeTab];
+  const currentText = getLogContent();
 
   const handleCopy = () => {
     navigator.clipboard.writeText(currentText);

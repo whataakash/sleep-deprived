@@ -48,7 +48,7 @@ export function ModelMarketplace({
   const [autoEscalate, setAutoEscalate] = useState<boolean>(true);
 
   // Difficulty Simulator
-  const [taskQuery, setTaskQuery] = useState('Fix failing session token authentication in auth-gateway-service');
+  const [taskQuery, setTaskQuery] = useState('Audit scope enforcement and run test suite across workspace');
 
   // Evaluate difficulty live for simulator
   const simDifficulty = useMemo(() => {

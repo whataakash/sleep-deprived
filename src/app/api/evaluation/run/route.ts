@@ -4,7 +4,18 @@ import { HarnessPipeline } from '@/lib/harness/pipeline';
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}));
-    const task = body.task || 'Fix unhandled null pointer when Authorization header is malformed in auth-gateway-service: forward active session tokens across internal requests and ensure all regression tests pass';
+    const task = (body.task || '').trim();
+
+    if (!task) {
+      return NextResponse.json(
+        {
+          status: 'FAILED',
+          error: 'Task description is required. Please specify a software engineering task.',
+          textOnlyEnforced: true,
+        },
+        { status: 400 }
+      );
+    }
 
     const pipeline = new HarnessPipeline({
       task,
@@ -22,7 +33,10 @@ export async function POST(req: NextRequest) {
         runId: result.runId,
         task: result.contract.objective,
         evaluationMode: true,
-        prescribedModelUsed: result.proof.telemetry.modelCalls > 0 ? (body.prescribedModel || 'hackathon-prescribed-text-v1') : 'deterministic-evaluator',
+        prescribedModelUsed:
+          result.proof.telemetry.modelCalls > 0
+            ? body.prescribedModel || 'hackathon-prescribed-text-v1'
+            : 'deterministic-evaluator',
         textOnlyEnforced: true,
         durationSeconds: Number((result.telemetry.durationMs / 1000).toFixed(2)),
         tokensUsed: {
@@ -31,6 +45,7 @@ export async function POST(req: NextRequest) {
           total: result.telemetry.totalTokens,
         },
         toolCallsExecuted: result.toolEvents.length,
+        toolEvents: result.toolEvents,
         changesApplied: result.proof.filesChanged.map((f) => ({
           file: f,
           status: 'MODIFIED',
@@ -42,6 +57,7 @@ export async function POST(req: NextRequest) {
           testsFailed: result.verification.tests.failed,
           regressionsDetected: 0,
         },
+        verification: result.verification,
         proof: {
           proofHash: result.proof.proofHash,
           merkleRoot: result.proof.merkleRoot,
@@ -56,8 +72,10 @@ export async function POST(req: NextRequest) {
         {
           status: 'FAILED',
           runId: result.runId,
+          task: result.contract.objective,
           error: result.error || 'Verification gate rejected the patch',
           verification: result.verification,
+          toolEvents: result.toolEvents,
           textOnlyEnforced: true,
         },
         { status: 422 }

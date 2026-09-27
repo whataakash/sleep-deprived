@@ -16,7 +16,12 @@ import { FailureClassifier } from './failure-classifier';
 import { HarnessCheckpointManager } from './checkpoint-manager';
 import { HarnessVerificationGate } from './verifier';
 import { HarnessProofEngine } from './proof-engine';
-import { EvaluationModelAdapter } from '../models/evaluation-adapter';
+import {
+  EvaluationModelAdapter,
+  ModelMessage,
+  STANDARD_HARNESS_TOOLS,
+  HARNESS_SYSTEM_PROMPT,
+} from '../models/evaluation-adapter';
 
 export interface HarnessExecutionResult {
   runId: string;
@@ -66,8 +71,9 @@ export class HarnessPipeline {
     });
 
     this.modelAdapter = new EvaluationModelAdapter({
-      apiKey: options.apiKey || process.env.AI_API_KEY,
+      apiKey: options.apiKey || (typeof process !== 'undefined' ? process.env?.AI_API_KEY : undefined),
       modelName: options.prescribedModel,
+      mockHandler: options.mockHandler,
     });
   }
 
@@ -140,63 +146,170 @@ export class HarnessPipeline {
       this.telemetry.promptTokens += context.totalTokensEstimate;
 
       // =========================================================================
-      // STAGE 4: PLAN
+      // STAGE 4 & 5: MODEL-DRIVEN AUTONOMOUS AGENT LOOP
       // =========================================================================
-      this.transitionTo('PLAN', 'Calling text-only foundation model for execution plan');
-      this.telemetry.modelCalls++;
+      this.transitionTo('PLAN', 'Initializing model-driven autonomous engineering loop');
 
-      const modelResponse = await this.modelAdapter.generateText({
-        systemPrompt:
-          'You are Parishram, an autonomous coding harness operating in strict evaluation mode. Analyze the task contract and context files to formulate a deterministic plan.',
-        userPrompt: `Task: ${task}\nAllowed Scope: ${contract.allowedPaths.join(', ')}`,
-        contextFiles: context.filesSelected.map((f) => ({ path: f.path, content: f.content })),
-      });
+      const cartographySummary =
+        context.filesSelected.length > 0
+          ? context.filesSelected.map((f) => `- ${f.path} (${f.tokensEstimate} tokens)`).join('\n')
+          : 'No specific files pre-selected. Use list_files or search to explore the workspace.';
 
-      this.telemetry.promptTokens += modelResponse.tokensUsed.prompt;
-      this.telemetry.completionTokens += modelResponse.tokensUsed.completion;
-      this.telemetry.totalTokens = this.telemetry.promptTokens + this.telemetry.completionTokens;
+      const messages: ModelMessage[] = [
+        {
+          role: 'system',
+          content: HARNESS_SYSTEM_PROMPT,
+        },
+        {
+          role: 'user',
+          content: `Task Objective: ${task}
+Allowed Scope: ${contract.allowedPaths.join(', ') || 'Entire repository'}
+Forbidden Paths: ${contract.forbiddenPaths.join(', ') || 'None'}
+Verification Requirements: ${contract.verificationRequirements.map((v) => v.name).join('; ') || 'Standard test suite pass'}
 
-      // =========================================================================
-      // STAGE 5: EXECUTE (Code Mutation with Checkpoint Protection)
-      // =========================================================================
-      this.transitionTo('EXECUTE', 'Applying code mutations in sandboxed workspace');
+Initial Repository Cartography:
+${cartographySummary}
 
-      // 1. Create safety checkpoint before applying edits
-      const candidateFiles = context.filesSelected.map((f) => f.path);
-      const checkpoint = await this.checkpointManager.createCheckpoint(
-        'pre-mutation-checkpoint',
-        `Pre-mutation snapshot for task: ${task.slice(0, 30)}`,
-        candidateFiles
-      );
+Instructions:
+1. Inspect repository files using list_files, search, or read_file.
+2. Formulate a plan and apply targeted edits with edit_file or write_file.
+3. Verify your edits by running tests (run_tests or run_command).
+4. When finished, call complete_task.`,
+        },
+      ];
 
-      // 2. Execute tool actions
-      if (modelResponse.toolCalls && modelResponse.toolCalls.length > 0) {
-        for (const tc of modelResponse.toolCalls) {
-          if (tc.tool === 'edit_file') {
-            const { path: p, oldStr, newStr, rationale } = tc.args;
-            if (p && oldStr && newStr) {
-              try {
-                const editResult = await this.toolExecutor.editFile(p, oldStr, newStr, rationale);
-                this.modifiedFiles.add(p);
-                this.unifiedDiff += editResult.diff + '\n';
-              } catch (editErr: any) {
-                // Tool executor already recorded event error
-              }
-            }
-          } else if (tc.tool === 'write_file') {
-            const { path: p, content } = tc.args;
-            if (p && content) {
-              await this.toolExecutor.writeFile(p, content);
-              this.modifiedFiles.add(p);
+      const maxTurns = 12;
+      let turn = 0;
+      let checkpointCreated = false;
+      let checkpointId: string | null = null;
+      let modelCompleted = false;
+
+      while (turn < maxTurns && !modelCompleted) {
+        turn++;
+        this.telemetry.modelCalls++;
+
+        const response = await this.modelAdapter.generateChat(messages, STANDARD_HARNESS_TOOLS);
+        this.telemetry.promptTokens += response.tokensUsed.prompt;
+        this.telemetry.completionTokens += response.tokensUsed.completion;
+        this.telemetry.totalTokens = this.telemetry.promptTokens + this.telemetry.completionTokens;
+
+        messages.push({
+          role: 'assistant',
+          content: response.content || 'Executing tools...',
+        });
+
+        const toolCalls = response.toolCalls || [];
+
+        // If no tool calls produced, exit agent loop to verification
+        if (toolCalls.length === 0) {
+          break;
+        }
+
+        // Execute each tool call requested by the model
+        for (const tc of toolCalls) {
+          if (tc.tool === 'complete_task') {
+            modelCompleted = true;
+            break;
+          }
+
+          // If tool modifies repository, ensure safety checkpoint is created first
+          if ((tc.tool === 'edit_file' || tc.tool === 'write_file') && !checkpointCreated) {
+            this.transitionTo('EXECUTE', `Creating pre-mutation checkpoint and applying modifications`);
+            const snap = await this.checkpointManager.createCheckpoint(
+              'pre-mutation-checkpoint',
+              `Pre-mutation snapshot for task: ${task.slice(0, 30)}`,
+              context.filesSelected.map((f) => f.path)
+            );
+            checkpointCreated = true;
+            checkpointId = snap.id;
+          }
+
+          if (tc.tool === 'edit_file' || tc.tool === 'write_file') {
+            this.transitionTo('EXECUTE', `Applying mutation to ${tc.args.path || tc.args.filePath}`);
+          }
+
+          // Execute tool through toolExecutor
+          const execRes = await this.toolExecutor.executeTool(tc.tool, tc.args);
+
+          if (execRes.diff) {
+            this.unifiedDiff += execRes.diff + '\n';
+          }
+          if (tc.tool === 'edit_file' || tc.tool === 'write_file') {
+            const modifiedPath = tc.args.path || tc.args.filePath;
+            if (modifiedPath && execRes.exitCode === 0) {
+              this.modifiedFiles.add(modifiedPath);
             }
           }
+
+          // Feed tool execution output back to the model in multi-turn conversation
+          const resultText =
+            execRes.exitCode === 0
+              ? execRes.output
+              : `ERROR (exit code ${execRes.exitCode}): ${execRes.error || execRes.output}`;
+
+          messages.push({
+            role: 'tool',
+            content: `Tool: ${tc.tool}\nResult:\n${resultText}`,
+            name: tc.tool,
+            tool_call_id: tc.id,
+          });
+        }
+
+        if (modelCompleted) {
+          break;
         }
       }
 
       this.telemetry.filesModified = this.modifiedFiles.size;
 
+      // Anti-hallucination guard: If task asked for code modification/fix,
+      // but 0 files were modified in workspace, report truthfully rather than fabricating victory.
+      const isMutationTask =
+        /^(fix|repair|patch|resolve|implement|refactor|update|add|change|modify|create|delete|remove)\b/i.test(task) ||
+        task.toLowerCase().includes('fix ') ||
+        task.toLowerCase().includes('patch ') ||
+        task.toLowerCase().includes('bug') ||
+        task.toLowerCase().includes('failure') ||
+        task.toLowerCase().includes('error');
+
+      if (isMutationTask && this.modifiedFiles.size === 0) {
+        const lastAssistantMsg = [...messages].reverse().find((m) => m.role === 'assistant')?.content || '';
+        const targetNotFound =
+          lastAssistantMsg.toLowerCase().includes('not found') ||
+          lastAssistantMsg.toLowerCase().includes('does not exist') ||
+          context.filesSelected.length === 0;
+
+        const reason = targetNotFound
+          ? `TARGET_NOT_FOUND: The requested issue target, file, or component was not found in the workspace repository. Searched workspace, but found 0 matching files to modify.`
+          : `UNRESOLVED_TASK: The model finished its thinking loop without modifying any files to resolve the issue.`;
+
+        this.transitionTo('FAILED', reason);
+        this.telemetry.durationMs = Date.now() - pipelineStartTime;
+
+        return {
+          runId: this.runId,
+          success: false,
+          state: 'FAILED',
+          contract,
+          context,
+          toolEvents: this.toolExecutor.getEvents(),
+          verification: {
+            passed: false,
+            timestamp: new Date().toISOString(),
+            durationMs: 0,
+            tests: { total: 0, passed: 0, failed: 1, skipped: 0, output: reason, rawExitCode: 1, durationMs: 0 },
+            typecheck: { passed: false, errorsCount: 0, output: 'Skipped due to unapplied patch', durationMs: 0 },
+            scope: { passed: false, modifiedFiles: [], violations: [reason] },
+            security: { passed: true, secretsDetected: [], dangerousCommandsBlocked: [] },
+          },
+          recoveryAttempts: this.recoveryAttempts,
+          telemetry: this.telemetry,
+          error: reason,
+        };
+      }
+
       // =========================================================================
-      // STAGE 6: VERIFY
+      // STAGE 6: VERIFY (Independent Verification Gate)
       // =========================================================================
       this.transitionTo('VERIFY', 'Executing real verification gate (tests + typecheck + scope + security)');
       this.telemetry.verificationAttempts++;
@@ -213,20 +326,24 @@ export class HarnessPipeline {
       }
 
       // =========================================================================
-      // STAGE 7: RECOVER (Bounded Loop on Failure)
+      // STAGE 7: RECOVER (Targeted Model-Driven Recovery Loop on Failure)
       // =========================================================================
       while (!verification.passed && this.telemetry.retriesCount < contract.stopConditions.maxRetries) {
         this.telemetry.retriesCount++;
-        this.transitionTo('RECOVER', `Recovery attempt ${this.telemetry.retriesCount} of ${contract.stopConditions.maxRetries}`);
+        this.transitionTo(
+          'RECOVER',
+          `Recovery attempt ${this.telemetry.retriesCount} of ${contract.stopConditions.maxRetries}`
+        );
 
         // 1. Classify failure into explicit category
-        const failingOutput = verification.tests.failed > 0
-          ? verification.tests.output
-          : !verification.typecheck.passed
-            ? verification.typecheck.output
-            : !verification.scope.passed
-              ? verification.scope.violations.join('\n')
-              : 'Security or invariant check failure';
+        const failingOutput =
+          verification.tests.failed > 0
+            ? verification.tests.output
+            : !verification.typecheck.passed
+              ? verification.typecheck.output
+              : !verification.scope.passed
+                ? verification.scope.violations.join('\n')
+                : 'Security or invariant check failure';
 
         const failingCmd = verification.tests.failed > 0 ? 'npm test' : 'npx tsc --noEmit';
 
@@ -237,28 +354,54 @@ export class HarnessPipeline {
           Array.from(this.modifiedFiles)
         );
 
-        // 2. Build targeted recovery context
-        const recoveryPrompt = FailureClassifier.buildTargetedRecoveryPrompt(
-          contract,
-          diagnosis,
-          this.unifiedDiff,
-          this.telemetry.retriesCount - 1
-        );
+        // 2. Build targeted recovery prompt and feed real failure to model
+        messages.push({
+          role: 'user',
+          content: `VERIFICATION FAILURE DETECTED:
+Category: ${diagnosis.category}
+Symptom: ${diagnosis.symptom}
+Failing Command: ${failingCmd}
+Failing Output:
+${failingOutput.slice(0, 2000)}
 
-        // 3. Ask model for repair patch
-        this.telemetry.modelCalls++;
-        const repairResponse = await this.modelAdapter.generateText({
-          systemPrompt:
-            'You are Parishram in targeted recovery mode. Output a focused fix for the diagnosed error.',
-          userPrompt: recoveryPrompt,
-          contextFiles: context.filesSelected.map((f) => ({ path: f.path, content: f.content })),
+Please inspect the error, formulate a targeted repair plan, and apply the fix.`,
         });
 
+        // 3. Ask model for repair actions
+        this.telemetry.modelCalls++;
+        const repairResponse = await this.modelAdapter.generateChat(messages, STANDARD_HARNESS_TOOLS);
         this.telemetry.promptTokens += repairResponse.tokensUsed.prompt;
         this.telemetry.completionTokens += repairResponse.tokensUsed.completion;
         this.telemetry.totalTokens = this.telemetry.promptTokens + this.telemetry.completionTokens;
 
-        // 4. Re-verify
+        messages.push({
+          role: 'assistant',
+          content: repairResponse.content || 'Applying recovery repairs...',
+        });
+
+        // Execute recovery tool calls
+        if (repairResponse.toolCalls && repairResponse.toolCalls.length > 0) {
+          for (const tc of repairResponse.toolCalls) {
+            const execRes = await this.toolExecutor.executeTool(tc.tool, tc.args);
+            if (execRes.diff) {
+              this.unifiedDiff += execRes.diff + '\n';
+            }
+            if (tc.tool === 'edit_file' || tc.tool === 'write_file') {
+              const modifiedPath = tc.args.path || tc.args.filePath;
+              if (modifiedPath && execRes.exitCode === 0) {
+                this.modifiedFiles.add(modifiedPath);
+              }
+            }
+            messages.push({
+              role: 'tool',
+              content: `Tool: ${tc.tool}\nResult:\n${execRes.output || execRes.error}`,
+              name: tc.tool,
+              tool_call_id: tc.id,
+            });
+          }
+        }
+
+        // 4. Re-verify independently
         this.telemetry.verificationAttempts++;
         verification = await HarnessVerificationGate.executeVerification(
           this.toolExecutor,
@@ -281,9 +424,13 @@ export class HarnessPipeline {
           this.options.onRecovery(recoveryRecord);
         }
 
-        // If recovery broke things further, rollback to checkpoint
-        if (!verification.passed && this.telemetry.retriesCount >= contract.stopConditions.maxRetries) {
-          await this.checkpointManager.rollbackToCheckpoint(checkpoint.id);
+        // If recovery failed after all retries, rollback to checkpoint
+        if (
+          !verification.passed &&
+          this.telemetry.retriesCount >= contract.stopConditions.maxRetries &&
+          checkpointId
+        ) {
+          await this.checkpointManager.rollbackToCheckpoint(checkpointId);
         }
       }
 

@@ -17,7 +17,8 @@ interface CommandPaletteProps {
   isOpen: boolean;
   onClose: () => void;
   onSelectView: (view: MainNavView) => void;
-  onRunDemo: () => void;
+  onRunDemo?: () => void;
+  onRunEvaluation?: () => void;
   onSelectModel: (modelId: string) => void;
 }
 
@@ -26,6 +27,7 @@ export function CommandPalette({
   onClose,
   onSelectView,
   onRunDemo,
+  onRunEvaluation,
   onSelectModel,
 }: CommandPaletteProps) {
   const [query, setQuery] = useState('');
@@ -47,12 +49,13 @@ export function CommandPalette({
 
   const COMMANDS = [
     {
-      id: 'run-demo',
-      title: 'Run End-to-End Demo (Auth Bug Recovery)',
+      id: 'run-evaluation',
+      title: 'Launch Autonomous Evaluation Task',
       category: 'Actions',
       icon: <Play className="w-4 h-4 text-[#ea580c]" />,
       action: () => {
-        onRunDemo();
+        if (onRunEvaluation) onRunEvaluation();
+        else if (onRunDemo) onRunDemo();
         onClose();
       },
     },

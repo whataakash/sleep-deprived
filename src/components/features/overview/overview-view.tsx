@@ -13,16 +13,16 @@ import {
   RotateCcw,
   FolderGit2,
   GitBranch,
+  Key,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth/context';
 import { ParishramAIRouter } from '@/lib/models/gateway';
 
 interface OverviewViewProps {
-  onStartRun: (taskText: string, modelId: string, agentMode?: string) => void;
+  onStartRun: (taskText: string, modelId: string, agentMode?: string, apiKey?: string) => void;
   onOpenRun?: (runNumber: number) => void;
-  onRunDemo?: () => void;
-  isDemoRunning?: boolean;
-  onResetDemo?: () => void;
   onNavigateToModels?: () => void;
   lastCompletedRun?: {
     runNumber: number;
@@ -37,9 +37,6 @@ interface OverviewViewProps {
 export function OverviewView({
   onStartRun,
   onOpenRun,
-  onRunDemo,
-  isDemoRunning,
-  onResetDemo,
   onNavigateToModels,
   lastCompletedRun,
   onViewProof,
@@ -49,8 +46,24 @@ export function OverviewView({
 
   const [taskPrompt, setTaskPrompt] = useState('');
   const [repoUrl, setRepoUrl] = useState('');
+  const [apiKey, setApiKey] = useState('');
+  const [showApiKey, setShowApiKey] = useState(false);
   const [selectedModelId, setSelectedModelId] = useState('qwen3-coder-next');
   const [selectedAgentMode, setSelectedAgentMode] = useState<'dual' | 'navigator' | 'supervisor'>('dual');
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedKey = localStorage.getItem('parishram_api_key') || '';
+      if (savedKey) setApiKey(savedKey);
+    }
+  }, []);
+
+  const handleApiKeyChange = (val: string) => {
+    setApiKey(val);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('parishram_api_key', val);
+    }
+  };
 
   const liveDifficulty = useMemo(() => {
     const combined = [repoUrl, taskPrompt].filter(Boolean).join(' ');
@@ -96,11 +109,11 @@ export function OverviewView({
       ? `${taskPrompt.trim() || 'Analyze and fix issues in'} ${repoUrl.trim()}`
       : taskPrompt.trim();
     if (fullTask.trim()) {
-      onStartRun(fullTask, selectedModelId, selectedAgentMode);
+      onStartRun(fullTask, selectedModelId, selectedAgentMode, apiKey.trim());
       setTaskPrompt('');
       setRepoUrl('');
     }
-  }, [taskPrompt, repoUrl, selectedModelId, selectedAgentMode, onStartRun]);
+  }, [taskPrompt, repoUrl, selectedModelId, selectedAgentMode, apiKey, onStartRun]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -233,21 +246,55 @@ export function OverviewView({
           </div>
 
 
-          <div className="px-4 pb-3 border-t border-[var(--border-subtle)] pt-3 flex items-center justify-between gap-3 font-mono text-xs">
-            {/* Left: Model Picker */}
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-[var(--bg-elevated)] border border-[var(--border-subtle)] text-[11px]">
-              <Cpu className="w-3 h-3 text-[#38bdf8]" />
-              <select
-                value={selectedModelId}
-                onChange={(e) => setSelectedModelId(e.target.value)}
-                className="bg-transparent text-[var(--text-primary)] outline-none cursor-pointer"
-              >
-                <option value="qwen3-coder-next" className="bg-[var(--bg-panel)] text-[var(--text-primary)]">Qwen3-Coder-Next</option>
-                <option value="deepseek-v3-coder" className="bg-[var(--bg-panel)] text-[var(--text-primary)]">DeepSeek V3 Coder</option>
-                <option value="kimi-k2-5-agent" className="bg-[var(--bg-panel)] text-[var(--text-primary)]">Kimi K2.5</option>
-                <option value="glm-5-moe" className="bg-[var(--bg-panel)] text-[var(--text-primary)]">GLM-5 MoE</option>
-                <option value="ollama-local-qwen3" className="bg-[var(--bg-panel)] text-[var(--text-primary)]">Local / Ollama</option>
-              </select>
+          <div className="px-4 pb-3 border-t border-[var(--border-subtle)] pt-3 flex flex-wrap items-center justify-between gap-3 font-mono text-xs">
+            <div className="flex flex-wrap items-center gap-2">
+              {/* Model Picker */}
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-[var(--bg-elevated)] border border-[var(--border-subtle)] text-[11px]">
+                <Cpu className="w-3 h-3 text-[#38bdf8]" />
+                <select
+                  value={selectedModelId}
+                  onChange={(e) => setSelectedModelId(e.target.value)}
+                  className="bg-transparent text-[var(--text-primary)] outline-none cursor-pointer"
+                >
+                  <option value="qwen3-coder-next" className="bg-[var(--bg-panel)] text-[var(--text-primary)]">Qwen3-Coder-Next</option>
+                  <option value="deepseek-v3-coder" className="bg-[var(--bg-panel)] text-[var(--text-primary)]">DeepSeek V3 Coder</option>
+                  <option value="kimi-k2-5-agent" className="bg-[var(--bg-panel)] text-[var(--text-primary)]">Kimi K2.5</option>
+                  <option value="glm-5-moe" className="bg-[var(--bg-panel)] text-[var(--text-primary)]">GLM-5 MoE</option>
+                  <option value="ollama-local-qwen3" className="bg-[var(--bg-panel)] text-[var(--text-primary)]">Local / Ollama</option>
+                </select>
+              </div>
+
+              {/* Live API Key Input */}
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-[var(--bg-elevated)] border border-[var(--border-subtle)] text-[11px] focus-within:border-[#ea580c] transition-colors">
+                <Key className={`w-3 h-3 ${apiKey ? 'text-[#10b981]' : 'text-[var(--text-muted)]'}`} />
+                <input
+                  type={showApiKey ? 'text' : 'password'}
+                  value={apiKey}
+                  onChange={(e) => handleApiKeyChange(e.target.value)}
+                  placeholder="Paste AI API Key (sk-... / gsk_... / AIza...)"
+                  aria-label="AI API Key"
+                  className="bg-transparent text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none w-44 sm:w-60 text-[10px]"
+                />
+                {apiKey && (
+                  <button
+                    type="button"
+                    onClick={() => setShowApiKey(!showApiKey)}
+                    className="text-[var(--text-muted)] hover:text-[var(--text-primary)] cursor-pointer"
+                    title={showApiKey ? 'Hide key' : 'Show key'}
+                  >
+                    {showApiKey ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                  </button>
+                )}
+                {apiKey ? (
+                  <span className="text-[9px] px-1.5 py-0.2 rounded bg-[#10b981]/15 text-[#10b981] font-bold">
+                    LIVE
+                  </span>
+                ) : (
+                  <span className="text-[9px] px-1.5 py-0.2 rounded bg-[var(--bg-subtle)] text-[var(--text-muted)] font-medium">
+                    DEMO
+                  </span>
+                )}
+              </div>
             </div>
 
             {/* Right: Send */}
@@ -256,7 +303,7 @@ export function OverviewView({
               onClick={handleSubmitTask}
               aria-label="Run task"
               title="Run task"
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#ea580c] hover:bg-[#f97316] text-white text-xs font-bold transition-all shadow-xs active:scale-[0.98] motion-reduce:active:scale-100 cursor-pointer"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#ea580c] hover:bg-[#f97316] text-white text-xs font-bold transition-all shadow-xs active:scale-[0.98] motion-reduce:active:scale-100 cursor-pointer shrink-0"
             >
               <ArrowRight className="w-3.5 h-3.5" />
               Run
@@ -264,32 +311,15 @@ export function OverviewView({
           </div>
         </motion.div>
 
-        {/* Secondary Contextual Action: Run Demo */}
+        {/* Evaluation Standard Status Strip */}
         <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-[var(--text-muted)] font-mono px-1">
-          <div className="flex items-center gap-2">
-            {onRunDemo && (
-              <button
-                type="button"
-                onClick={onRunDemo}
-                disabled={isDemoRunning}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--bg-panel)] hover:bg-[var(--bg-elevated)] border border-[var(--border-subtle)] hover:border-[var(--border-medium)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all cursor-pointer shadow-xs disabled:opacity-50 text-[11px] font-semibold"
-                title="Run step-by-step benchmark demo"
-              >
-                <Play className={`w-3 h-3 text-[#ea580c] ${isDemoRunning ? 'animate-spin' : ''}`} />
-                <span>{isDemoRunning ? 'Running Demo...' : 'Run Demo'}</span>
-              </button>
-            )}
-
-            {onResetDemo && (
-              <button
-                type="button"
-                onClick={onResetDemo}
-                className="p-1.5 rounded-lg bg-[var(--bg-panel)] hover:bg-[var(--bg-elevated)] border border-[var(--border-subtle)] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors cursor-pointer"
-                title="Reset to benchmark Run #1042"
-              >
-                <RotateCcw className="w-3 h-3" />
-              </button>
-            )}
+          <div className="flex items-center gap-2 text-[11px]">
+            <span className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-[var(--bg-panel)] border border-[var(--border-subtle)] text-[var(--text-secondary)]">
+              <span className={`w-1.5 h-1.5 rounded-full ${apiKey ? 'bg-[#10b981]' : 'bg-[#fbbf24]'}`} />
+              <span>{apiKey ? 'Live Model Active' : 'Enter AI_API_KEY to execute'}</span>
+            </span>
+            <span className="hidden sm:inline text-[var(--text-muted)]">·</span>
+            <span className="hidden sm:inline text-[var(--text-muted)]">Text-Only Modality (Mandatory)</span>
           </div>
 
           <div className="hidden sm:flex items-center gap-3 text-[11px] text-[var(--text-muted)]">
@@ -331,18 +361,18 @@ export function OverviewView({
           </div>
         )}
 
-        {/* Recent Work / Sample Benchmarks */}
+        {/* Evaluator Quick Prompts */}
         <div className="space-y-2.5 pt-2">
           <div className="flex items-center justify-between text-xs font-mono text-[var(--text-muted)]">
-            <span className="font-semibold uppercase tracking-wider text-[11px]">Recent Work</span>
-            <span className="text-[10px]">Click to load</span>
+            <span className="font-semibold uppercase tracking-wider text-[11px]">Evaluator Quick Prompts</span>
+            <span className="text-[10px]">Click to populate</span>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
             <button
               type="button"
               onClick={() => {
-                const text = 'Fix https://github.com/parishram-ai/auth-gateway-service: forward session token in client';
+                const text = 'Run verification tests and audit scope guards across the codebase';
                 setTaskPrompt(text);
                 if (textareaRef.current) setTimeout(() => autoResize(textareaRef.current!), 0);
               }}
@@ -350,17 +380,17 @@ export function OverviewView({
             >
               <div className="flex items-center gap-1.5 text-[var(--text-primary)] group-hover:text-[#ea580c] font-semibold text-xs font-mono">
                 <FolderGit2 className="w-3.5 h-3.5 text-[#ea580c]" />
-                <span className="truncate">auth-gateway-service</span>
+                <span className="truncate">Harness Verification</span>
               </div>
               <div className="text-[11px] text-[var(--text-muted)] mt-1 truncate font-sans">
-                Forward session token in client
+                Audit scope guards & test suites
               </div>
             </button>
 
             <button
               type="button"
               onClick={() => {
-                const text = 'Fix https://github.com/parishram-ai/redis-token-bucket: race condition deadlock on mutex retry';
+                const text = 'Inspect targeted context cartography in src/lib/harness/context-engine.ts';
                 setTaskPrompt(text);
                 if (textareaRef.current) setTimeout(() => autoResize(textareaRef.current!), 0);
               }}
@@ -368,17 +398,17 @@ export function OverviewView({
             >
               <div className="flex items-center gap-1.5 text-[var(--text-primary)] group-hover:text-[#38bdf8] font-semibold text-xs font-mono">
                 <FolderGit2 className="w-3.5 h-3.5 text-[#38bdf8]" />
-                <span className="truncate">redis-token-bucket</span>
+                <span className="truncate">Context Cartography</span>
               </div>
               <div className="text-[11px] text-[var(--text-muted)] mt-1 truncate font-sans">
-                Mutex deadlock on retry
+                Verify token budget & symbol index
               </div>
             </button>
 
             <button
               type="button"
               onClick={() => {
-                const text = 'Fix https://github.com/parishram-ai/database-migrator: schema invariant violation on audit logs';
+                const text = 'Verify cryptographic proof generation in src/lib/harness/proof-engine.ts';
                 setTaskPrompt(text);
                 if (textareaRef.current) setTimeout(() => autoResize(textareaRef.current!), 0);
               }}
@@ -386,10 +416,10 @@ export function OverviewView({
             >
               <div className="flex items-center gap-1.5 text-[var(--text-primary)] group-hover:text-[#10b981] font-semibold text-xs font-mono">
                 <FolderGit2 className="w-3.5 h-3.5 text-[#10b981]" />
-                <span className="truncate">database-migrator</span>
+                <span className="truncate">Proof Engine</span>
               </div>
               <div className="text-[11px] text-[var(--text-muted)] mt-1 truncate font-sans">
-                Schema invariant verification
+                Merkle root & SHA-256 validation
               </div>
             </button>
           </div>
