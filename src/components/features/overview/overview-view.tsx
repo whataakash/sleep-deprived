@@ -1,63 +1,25 @@
 'use client';
 
 import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion } from 'motion/react';
 import {
   Cpu,
   ArrowRight,
   ShieldCheck,
   Compass,
   Zap,
-  Sparkles,
-  GitBranch,
-  TrendingUp,
-  CreditCard,
   Lock,
   Play,
   RotateCcw,
-  Mic,
-  MicOff,
-  Sliders,
-  Bot,
-  Link2,
   FolderGit2,
-  Paperclip,
-  X,
-  FileText,
-  FileCode,
-  Image as ImageIcon,
+  GitBranch,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth/context';
-import { getPlanDisplay } from '@/lib/billing/plans';
 import { ParishramAIRouter } from '@/lib/models/gateway';
 
-export interface AttachmentItem {
-  id: string;
-  name: string;
-  size: number;
-  formattedSize: string;
-  type: string;
-  isImage: boolean;
-  previewUrl?: string;
-  file: File;
-}
-
-function formatFileSize(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
-
-function sanitizeFileName(name: string): string {
-  const parts = name.split(/[/\\]/);
-  return parts[parts.length - 1] || name;
-}
-
 interface OverviewViewProps {
-  onStartRun: (taskText: string, modelId: string, agentMode?: string, attachments?: AttachmentItem[]) => void;
+  onStartRun: (taskText: string, modelId: string, agentMode?: string) => void;
   onOpenRun?: (runNumber: number) => void;
-  onOpenBilling?: () => void;
-  onOpenUpgrade?: () => void;
   onRunDemo?: () => void;
   isDemoRunning?: boolean;
   onResetDemo?: () => void;
@@ -75,8 +37,6 @@ interface OverviewViewProps {
 export function OverviewView({
   onStartRun,
   onOpenRun,
-  onOpenBilling,
-  onOpenUpgrade,
   onRunDemo,
   isDemoRunning,
   onResetDemo,
@@ -86,20 +46,21 @@ export function OverviewView({
 }: OverviewViewProps) {
   const { session } = useAuth();
   const user = session.user;
-  const currentPlan = user?.plan || 'FREE';
-  const planInfo = getPlanDisplay(currentPlan);
 
   const [taskPrompt, setTaskPrompt] = useState('');
+  const [repoUrl, setRepoUrl] = useState('');
   const [selectedModelId, setSelectedModelId] = useState('qwen3-coder-next');
   const [selectedAgentMode, setSelectedAgentMode] = useState<'dual' | 'navigator' | 'supervisor'>('dual');
 
   const liveDifficulty = useMemo(() => {
-    if (!taskPrompt.trim()) return null;
-    return ParishramAIRouter.evaluateDifficulty(taskPrompt, 2, 0);
-  }, [taskPrompt]);
+    const combined = [repoUrl, taskPrompt].filter(Boolean).join(' ');
+    if (!combined.trim()) return null;
+    return ParishramAIRouter.evaluateDifficulty(combined, 2, 0);
+  }, [taskPrompt, repoUrl]);
 
   const detectedRepo = useMemo(() => {
-    const match = taskPrompt.match(/https?:\/\/(?:www\.)?github\.com\/([^\s\/]+)\/([^\s\/]+)(?:\/issues\/(\d+))?/i);
+    const searchIn = repoUrl || taskPrompt;
+    const match = searchIn.match(/https?:\/\/(?:www\.)?github\.com\/([^\s\/]+)\/([^\s\/]+)(?:\/issues\/(\d+))?/i);
     if (!match) return null;
     return {
       fullUrl: match[0],
@@ -107,7 +68,7 @@ export function OverviewView({
       repo: match[2].replace(/\.git$/, ''),
       issueNum: match[3],
     };
-  }, [taskPrompt]);
+  }, [taskPrompt, repoUrl]);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -126,174 +87,20 @@ export function OverviewView({
     [autoResize]
   );
 
-  const [isListening, setIsListening] = useState(false);
-  const [isSpeechSupported, setIsSpeechSupported] = useState(true);
-  const recognitionRef = useRef<any>(null);
+  // Voice input removed — text-only modality enforced per hackathon requirements
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const SpeechRecognition =
-        (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-      if (!SpeechRecognition) {
-        setIsSpeechSupported(false);
-      }
-    }
-    return () => {
-      if (recognitionRef.current) {
-        try {
-          recognitionRef.current.abort();
-        } catch (_) {}
-      }
-    };
-  }, []);
-
-  const toggleListening = useCallback(() => {
-    if (!isSpeechSupported) return;
-
-    if (isListening) {
-      if (recognitionRef.current) {
-        try {
-          recognitionRef.current.stop();
-        } catch (_) {}
-      }
-      setIsListening(false);
-      return;
-    }
-
-    try {
-      const SpeechRecognition =
-        (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-      if (!SpeechRecognition) {
-        setIsSpeechSupported(false);
-        return;
-      }
-
-      const recognition = new SpeechRecognition();
-      recognition.continuous = true;
-      recognition.interimResults = false;
-      recognition.lang = 'en-US';
-
-      recognition.onstart = () => {
-        setIsListening(true);
-      };
-
-      recognition.onresult = (event: any) => {
-        let newTranscript = '';
-        for (let i = event.resultIndex; i < event.results.length; ++i) {
-          if (event.results[i].isFinal) {
-            newTranscript += event.results[i][0].transcript;
-          }
-        }
-        if (newTranscript.trim()) {
-          setTaskPrompt((prev) => {
-            const separator = prev && !prev.endsWith(' ') ? ' ' : '';
-            const next = (prev || '') + separator + newTranscript.trim();
-            setTimeout(() => {
-              if (textareaRef.current) {
-                autoResize(textareaRef.current);
-              }
-            }, 0);
-            return next;
-          });
-        }
-      };
-
-      recognition.onerror = (event: any) => {
-        console.warn('Speech recognition error/denial:', event.error);
-        setIsListening(false);
-      };
-
-      recognition.onend = () => {
-        setIsListening(false);
-      };
-
-      recognitionRef.current = recognition;
-      recognition.start();
-    } catch (err) {
-      console.warn('Failed to start speech recognition:', err);
-      setIsListening(false);
-    }
-  }, [isSpeechSupported, isListening, autoResize]);
-
-  const [attachments, setAttachments] = useState<AttachmentItem[]>([]);
-  const [isDragging, setIsDragging] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const addFiles = useCallback((files: FileList | File[] | null) => {
-    if (!files || files.length === 0) return;
-    const fileArray = Array.from(files);
-
-    const newAttachments: AttachmentItem[] = fileArray.map((f) => {
-      const cleanName = sanitizeFileName(f.name);
-      const isImg = f.type.startsWith('image/') || /\.(png|jpe?g|gif|webp|svg)$/i.test(cleanName);
-      let previewUrl: string | undefined = undefined;
-      if (isImg && typeof window !== 'undefined' && typeof URL !== 'undefined' && URL.createObjectURL) {
-        try {
-          previewUrl = URL.createObjectURL(f);
-        } catch {
-          // ignore
-        }
-      }
-      return {
-        id: `att-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-        name: cleanName,
-        size: f.size,
-        formattedSize: formatFileSize(f.size),
-        type: f.type,
-        isImage: isImg,
-        previewUrl,
-        file: f,
-      };
-    });
-
-    setAttachments((prev) => [...prev, ...newAttachments]);
-  }, []);
-
-  const handleFileSelect = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      if (e.target.files && e.target.files.length > 0) {
-        addFiles(e.target.files);
-        e.target.value = '';
-      }
-    },
-    [addFiles]
-  );
-
-  const removeAttachment = useCallback((id: string) => {
-    setAttachments((prev) => {
-      const target = prev.find((a) => a.id === id);
-      if (target?.previewUrl) {
-        try {
-          URL.revokeObjectURL(target.previewUrl);
-        } catch {
-          // ignore
-        }
-      }
-      return prev.filter((a) => a.id !== id);
-    });
-  }, []);
-
-  useEffect(() => {
-    return () => {
-      attachments.forEach((a) => {
-        if (a.previewUrl) {
-          try {
-            URL.revokeObjectURL(a.previewUrl);
-          } catch {
-            // ignore
-          }
-        }
-      });
-    };
-  }, [attachments]);
+  // File attachments removed — text-only modality enforced per hackathon requirements
 
   const handleSubmitTask = useCallback(() => {
-    if (taskPrompt.trim() || attachments.length > 0) {
-      onStartRun(taskPrompt, selectedModelId, selectedAgentMode, attachments);
+    const fullTask = repoUrl.trim()
+      ? `${taskPrompt.trim() || 'Analyze and fix issues in'} ${repoUrl.trim()}`
+      : taskPrompt.trim();
+    if (fullTask.trim()) {
+      onStartRun(fullTask, selectedModelId, selectedAgentMode);
       setTaskPrompt('');
-      setAttachments([]);
+      setRepoUrl('');
     }
-  }, [taskPrompt, attachments, selectedModelId, selectedAgentMode, onStartRun]);
+  }, [taskPrompt, repoUrl, selectedModelId, selectedAgentMode, onStartRun]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -305,9 +112,7 @@ export function OverviewView({
     [handleSubmitTask]
   );
 
-  const runsUsed = user?.usage.runsUsedThisMonth || 14;
-  const maxRuns = typeof user?.usage.maxMonthlyRuns === 'number' ? user.usage.maxMonthlyRuns : 25;
-  const usagePercent = Math.min(100, Math.round((runsUsed / maxRuns) * 100));
+
 
   return (
     <div className="flex-1 flex flex-col items-center justify-start overflow-y-auto px-4 sm:px-6 lg:px-8 py-6 select-none font-sans transition-colors">
@@ -384,201 +189,78 @@ export function OverviewView({
           </div>
         </div>
 
-        {/* Task Intake Box — auto-growing, motion-animated */}
+        {/* Task Intake Box */}
         <motion.div
           layout
           transition={{ duration: 0.18, ease: [0.25, 0.1, 0.25, 1] }}
-          onDragOver={(e) => {
-            e.preventDefault();
-            setIsDragging(true);
-          }}
-          onDragLeave={() => setIsDragging(false)}
-          onDrop={(e) => {
-            e.preventDefault();
-            setIsDragging(false);
-            if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-              addFiles(e.dataTransfer.files);
-            }
-          }}
-          className={`bg-[var(--bg-panel)] border rounded-xl p-4 shadow-sm transition-all flex flex-col gap-0 ${
-            isDragging
-              ? 'border-[#ea580c] ring-2 ring-[#ea580c]/30 bg-[#ea580c]/5'
-              : 'border-[var(--border-subtle)] focus-within:border-[var(--border-medium)]'
-          }`}
+          className="bg-[var(--bg-panel)] border border-[var(--border-subtle)] focus-within:border-[var(--border-medium)] rounded-xl overflow-hidden shadow-sm transition-all flex flex-col gap-0"
         >
-          {detectedRepo && (
-            <div className="mb-2.5 px-3 py-1.5 rounded-lg bg-[#ea580c]/10 border border-[#ea580c]/25 flex items-center justify-between text-xs font-mono">
-              <div className="flex items-center gap-2 truncate">
-                <Link2 className="w-3.5 h-3.5 text-[#ea580c] shrink-0" />
-                <span className="text-[var(--text-muted)] text-[11px]">TARGET REPO:</span>
-                <span className="font-bold text-[var(--text-primary)] truncate">
-                  {detectedRepo.owner}/{detectedRepo.repo} {detectedRepo.issueNum ? `(#${detectedRepo.issueNum})` : ''}
-                </span>
-              </div>
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 font-bold border border-emerald-500/30 shrink-0">
-                Detected
+          {/* Repo URL strip at top */}
+          <div className="flex items-center gap-2 px-4 py-2.5 border-b border-[var(--border-subtle)] bg-[var(--bg-elevated)]">
+            <GitBranch className="w-3.5 h-3.5 text-[#ea580c] shrink-0" />
+            <input
+              type="url"
+              value={repoUrl}
+              onChange={(e) => setRepoUrl(e.target.value)}
+              placeholder="https://github.com/owner/repo  —  paste repo or issue URL (optional)"
+              aria-label="Repository URL"
+              className="flex-1 bg-transparent text-[11px] font-mono text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none"
+            />
+            {detectedRepo && (
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 font-bold border border-emerald-500/30 shrink-0 font-mono whitespace-nowrap">
+                ✓ {detectedRepo.owner}/{detectedRepo.repo}{detectedRepo.issueNum ? ` #${detectedRepo.issueNum}` : ''}
               </span>
-            </div>
-          )}
+            )}
+          </div>
 
-          <textarea
-            ref={textareaRef}
-            value={taskPrompt}
-            onChange={handlePromptChange}
-            onKeyDown={handleKeyDown}
-            placeholder="How can I help you today?"
-            aria-label="Task prompt"
-            style={{
-              minHeight: '3.5rem',
-              maxHeight: '13rem',
-              height: 'auto',
-              overflowY: taskPrompt ? 'auto' : 'hidden',
-            }}
-            className="w-full bg-transparent text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none resize-none leading-relaxed font-sans"
-          />
+          {/* Task prompt textarea */}
+          <div className="px-4 pt-3 pb-2">
+            <textarea
+              ref={textareaRef}
+              value={taskPrompt}
+              onChange={handlePromptChange}
+              onKeyDown={handleKeyDown}
+              placeholder="Describe the task or bug to fix..."
+              aria-label="Task prompt"
+              style={{
+                minHeight: '3.5rem',
+                maxHeight: '13rem',
+                height: 'auto',
+                overflowY: taskPrompt ? 'auto' : 'hidden',
+              }}
+              className="w-full bg-transparent text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none resize-none leading-relaxed font-sans"
+            />
+          </div>
 
-          {/* Attachment Chips Area inside composer */}
-          {attachments.length > 0 && (
-            <div className="flex flex-wrap items-center gap-1.5 pt-2 pb-1 border-t border-[var(--border-subtle)] mt-2">
-              <AnimatePresence mode="popLayout">
-                {attachments.map((att) => (
-                  <motion.div
-                    key={att.id}
-                    layout
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    transition={{ duration: 0.15 }}
-                    className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-[var(--bg-elevated)] border border-[var(--border-subtle)] text-[11px] font-mono text-[var(--text-secondary)] shadow-2xs max-w-[220px]"
-                  >
-                    {att.isImage && att.previewUrl ? (
-                      <img
-                        src={att.previewUrl}
-                        alt=""
-                        className="w-3.5 h-3.5 object-cover rounded shrink-0 border border-[var(--border-subtle)]"
-                      />
-                    ) : /\.(ts|tsx|js|jsx|py|go|rs|c|cpp|java|html|css|sql|json|ya?ml)$/i.test(att.name) ? (
-                      <FileCode className="w-3.5 h-3.5 text-[#38bdf8] shrink-0" />
-                    ) : (
-                      <FileText className="w-3.5 h-3.5 text-[#10b981] shrink-0" />
-                    )}
-                    <span className="truncate" title={att.name}>{att.name}</span>
-                    <span className="text-[9px] text-[var(--text-muted)] shrink-0">({att.formattedSize})</span>
-                    <button
-                      type="button"
-                      onClick={() => removeAttachment(att.id)}
-                      className="p-0.5 hover:bg-[var(--bg-subtle)] text-[var(--text-muted)] hover:text-[#ef4444] rounded transition-colors cursor-pointer shrink-0"
-                      aria-label={`Remove attachment ${att.name}`}
-                      title="Remove attachment"
-                    >
-                      <X className="w-3 h-3" />
-                    </button>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-            </div>
-          )}
 
-          <div className="pt-3 mt-1 border-t border-[var(--border-subtle)] flex flex-wrap items-center justify-between gap-3 font-mono text-xs">
-            {/* Left Controls: File Attachment Button + Model Picker */}
-            <div className="flex items-center gap-2">
-              <input
-                ref={fileInputRef}
-                type="file"
-                multiple
-                accept="*/*"
-                onChange={handleFileSelect}
-                className="hidden"
-                aria-label="Attach local files"
-              />
-
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                aria-label="Attach local files"
-                title="Attach local files"
-                className="flex items-center justify-center w-8 h-8 rounded-lg bg-[var(--bg-elevated)] hover:bg-[var(--bg-subtle)] border border-[var(--border-subtle)] hover:border-[var(--border-medium)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all cursor-pointer shadow-2xs group"
+          <div className="px-4 pb-3 border-t border-[var(--border-subtle)] pt-3 flex items-center justify-between gap-3 font-mono text-xs">
+            {/* Left: Model Picker */}
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-[var(--bg-elevated)] border border-[var(--border-subtle)] text-[11px]">
+              <Cpu className="w-3 h-3 text-[#38bdf8]" />
+              <select
+                value={selectedModelId}
+                onChange={(e) => setSelectedModelId(e.target.value)}
+                className="bg-transparent text-[var(--text-primary)] outline-none cursor-pointer"
               >
-                <Paperclip className="w-3.5 h-3.5 text-[var(--text-muted)] group-hover:text-[var(--text-primary)]" />
-              </button>
-
-              {/* Model Picker */}
-              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-[var(--bg-elevated)] border border-[var(--border-subtle)] text-[11px]">
-                <Cpu className="w-3 h-3 text-[#38bdf8]" />
-                <select
-                  value={selectedModelId}
-                  onChange={(e) => setSelectedModelId(e.target.value)}
-                  className="bg-transparent text-[var(--text-primary)] outline-none cursor-pointer"
-                >
-                  <option value="qwen3-coder-next" className="bg-[var(--bg-panel)] text-[var(--text-primary)]">
-                    Qwen3-Coder-Next
-                  </option>
-                  <option value="kimi-k2-5-agent" className="bg-[var(--bg-panel)] text-[var(--text-primary)]">
-                    Kimi K2.5 Multimodal
-                  </option>
-                  <option value="glm-5-moe" className="bg-[var(--bg-panel)] text-[var(--text-primary)]">
-                    GLM-5 MoE
-                  </option>
-                  <option value="deepseek-v3-coder" className="bg-[var(--bg-panel)] text-[var(--text-primary)]">
-                    DeepSeek V3 Coder
-                  </option>
-                  <option value="claude-3-7-sonnet" className="bg-[var(--bg-panel)] text-[var(--text-primary)]">
-                    Claude 3.7 Sonnet
-                  </option>
-                  <option value="ollama-local-qwen3" className="bg-[var(--bg-panel)] text-[var(--text-primary)]">
-                    Local / Ollama
-                  </option>
-                </select>
-              </div>
+                <option value="qwen3-coder-next" className="bg-[var(--bg-panel)] text-[var(--text-primary)]">Qwen3-Coder-Next</option>
+                <option value="deepseek-v3-coder" className="bg-[var(--bg-panel)] text-[var(--text-primary)]">DeepSeek V3 Coder</option>
+                <option value="kimi-k2-5-agent" className="bg-[var(--bg-panel)] text-[var(--text-primary)]">Kimi K2.5</option>
+                <option value="glm-5-moe" className="bg-[var(--bg-panel)] text-[var(--text-primary)]">GLM-5 MoE</option>
+                <option value="ollama-local-qwen3" className="bg-[var(--bg-panel)] text-[var(--text-primary)]">Local / Ollama</option>
+              </select>
             </div>
 
-            {/* Right Controls: Functional Microphone & Send Arrow */}
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={toggleListening}
-                disabled={!isSpeechSupported}
-                aria-label={
-                  !isSpeechSupported
-                    ? 'Voice input is not supported in this browser'
-                    : isListening
-                    ? 'Stop voice input'
-                    : 'Start voice input'
-                }
-                title={
-                  !isSpeechSupported
-                    ? 'Voice input is not supported in this browser'
-                    : isListening
-                    ? 'Stop voice input'
-                    : 'Start voice input'
-                }
-                className={`p-2 rounded-lg border transition-all flex items-center justify-center min-w-[36px] min-h-[36px] ${
-                  !isSpeechSupported
-                    ? 'opacity-40 cursor-not-allowed bg-[var(--bg-elevated)] border-[var(--border-subtle)] text-[var(--text-muted)]'
-                    : isListening
-                    ? 'bg-[#ea580c]/15 border-[#ea580c]/50 text-[#ea580c] shadow-xs animate-pulse motion-reduce:animate-none cursor-pointer'
-                    : 'bg-[var(--bg-elevated)] border-[var(--border-subtle)] hover:border-[var(--border-medium)] text-[var(--text-muted)] hover:text-[var(--text-primary)] cursor-pointer'
-                }`}
-              >
-                {isListening ? (
-                  <Mic className="w-4 h-4 text-[#ea580c]" />
-                ) : !isSpeechSupported ? (
-                  <MicOff className="w-4 h-4" />
-                ) : (
-                  <Mic className="w-4 h-4" />
-                )}
-              </button>
-
-              <button
-                type="button"
-                onClick={handleSubmitTask}
-                aria-label="Send task"
-                title="Send task"
-                className="flex items-center justify-center w-9 h-9 rounded-lg bg-[#ea580c] hover:bg-[#f97316] text-white transition-all shadow-xs active:scale-[0.98] motion-reduce:active:scale-100 cursor-pointer min-w-[36px] min-h-[36px]"
-              >
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
+            {/* Right: Send */}
+            <button
+              type="button"
+              onClick={handleSubmitTask}
+              aria-label="Run task"
+              title="Run task"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#ea580c] hover:bg-[#f97316] text-white text-xs font-bold transition-all shadow-xs active:scale-[0.98] motion-reduce:active:scale-100 cursor-pointer"
+            >
+              <ArrowRight className="w-3.5 h-3.5" />
+              Run
+            </button>
           </div>
         </motion.div>
 

@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
-:root,
-html.dark {
+/* DEFAULT: Dark theme vars on :root */
+:root {
   --bg-canvas: #090a0d;
   --bg-panel: #111418;
   --bg-elevated: #161b21;
@@ -32,6 +32,38 @@ html.dark {
   --status-warning: #f59e0b;
   --status-active: #3b82f6;
 
+  --code-bg: #0b0e12;
+  --code-border: #1f262f;
+  --code-text: #f4f5f7;
+}
+
+/* Force dark vars even when html.dark is explicitly set */
+html.dark {
+  --bg-canvas: #090a0d;
+  --bg-panel: #111418;
+  --bg-elevated: #161b21;
+  --bg-subtle: #1c222a;
+  --bg-active: #242c36;
+  --border-subtle: #232a32;
+  --border-medium: #2e3742;
+  --border-active: #3e4a59;
+  --text-primary: #f4f5f7;
+  --text-secondary: #9da6b3;
+  --text-muted: #647080;
+  --surface: #111418;
+  --surface-elevated: #161b21;
+  --border: #232a32;
+  --muted: #1c222a;
+  --muted-foreground: #647080;
+  --forge-flame: #ea580c;
+  --forge-flame-light: #f97316;
+  --forge-glow: rgba(234, 88, 12, 0.15);
+  --status-verified: #10b981;
+  --status-verified-glow: rgba(16, 185, 129, 0.18);
+  --status-failure: #ef4444;
+  --status-failure-glow: rgba(239, 68, 68, 0.18);
+  --status-warning: #f59e0b;
+  --status-active: #3b82f6;
   --code-bg: #0b0e12;
   --code-border: #1f262f;
   --code-text: #f4f5f7;

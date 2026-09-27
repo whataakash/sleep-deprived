@@ -40,9 +40,9 @@ async function getIssueInput(): Promise<string> {
     return process.env.ISSUE.trim();
   }
 
-  // 3. From piped stdin (non-interactive)
+  // 3. From piped stdin (non-interactive, e.g. make evaluate ISSUE="...")
   if (!process.stdin.isTTY) {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       let data = '';
       process.stdin.setEncoding('utf8');
       process.stdin.on('data', (chunk) => {
@@ -50,11 +50,14 @@ async function getIssueInput(): Promise<string> {
       });
       process.stdin.on('end', () => {
         const trimmed = data.trim();
-        resolve(
-          trimmed.length > 0
-            ? trimmed
-            : 'Fix the failing authentication tests in auth-gateway-service: forward active session tokens across internal requests and ensure all regression tests pass'
-        );
+        if (trimmed.length > 0) {
+          resolve(trimmed);
+        } else {
+          console.error(`\n${c.red}[ERROR] No task provided via stdin.${c.reset}`);
+          console.error(`Usage: echo "Fix issue in repo" | make run`);
+          console.error(`  or:  make evaluate ISSUE="Fix issue in repo"\n`);
+          process.exit(1);
+        }
       });
     });
   }
@@ -66,17 +69,18 @@ async function getIssueInput(): Promise<string> {
   });
 
   return new Promise((resolve) => {
-    const defaultIssue =
-      'Fix the failing authentication tests in auth-gateway-service: forward active session tokens across internal requests and ensure all regression tests pass';
-
     process.stdout.write(
-      `\n${c.bold}${c.orange}? Enter evaluation issue / test case${c.reset} \n  ${c.dim}[Press Enter for default: "${defaultIssue}"]${c.reset}\n  ${c.cyan}❯ ${c.reset}`
+      `\n${c.bold}${c.orange}? Enter evaluation task / issue description:${c.reset}\n  ${c.cyan}❯ ${c.reset}`
     );
 
     rl.question('', (answer) => {
       rl.close();
-      const finalIssue = answer.trim().length > 0 ? answer.trim() : defaultIssue;
-      resolve(finalIssue);
+      const val = answer.trim();
+      if (!val) {
+        console.error(`\n${c.red}[ERROR] No task provided. Please describe the issue to fix.${c.reset}\n`);
+        process.exit(1);
+      }
+      resolve(val);
     });
   });
 }

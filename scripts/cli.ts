@@ -97,12 +97,8 @@ function handleTest(): void {
 // 3. COMMAND: EVALUATE
 // ==============================================================================
 async function handleEvaluate(taskArg?: string): Promise<void> {
-  const task =
-    taskArg?.trim() ||
-    process.env.ISSUE ||
-    'Fix unhandled null pointer when Authorization header is malformed in auth-gateway-service: forward active session tokens across internal requests and ensure all regression tests pass';
-
-  await handleRun(task);
+  // Pass task if provided; otherwise runTerminalHarness will prompt interactively
+  await handleRun(taskArg?.trim() || process.env.ISSUE?.trim());
 }
 
 // ==============================================================================
@@ -144,38 +140,10 @@ async function handleProof(query?: string): Promise<void> {
     // proofs dir might not exist yet
   }
 
-  // If not found in disk proofs, check benchmark run-1042
-  if (!loadedProof && (query.includes('1042') || query === 'run-1042')) {
-    console.log(`Run ID:      ${c.bold}run-1042${c.reset}`);
-    console.log(`Status:      ${c.bold}${c.green}VERIFIED${c.reset}`);
-    console.log(`Proof Hash:  ${c.cyan}a7f3e9b1d842c678430e5f2899432f8dc4027582b13c90e2f5927ad9a9bc1840${c.reset}`);
-    console.log(`Merkle Root: ${c.dim}9c02d18471e9842bf450e184092bcf40982734e098402b1f8029374029471029${c.reset}`);
-    console.log(`Timestamp:   ${c.dim}2026-09-26T20:15:00.000Z${c.reset}\n`);
-
-    console.log(`${c.bold}Task${c.reset}`);
-    console.log(`Fix auth-gateway-service: forward session token across internal microservice requests\n`);
-
-    console.log(`${c.bold}Verification Summary${c.reset}`);
-    console.log(`${c.green}✓${c.reset} Tests: 8/8 passed`);
-    console.log(`${c.green}✓${c.reset} Typecheck: PASSED (0 errors)`);
-    console.log(`${c.green}✓${c.reset} Scope: PASSED (In bounds)`);
-    console.log(`${c.green}✓${c.reset} Security: PASSED (0 secrets detected)\n`);
-
-    console.log(`${c.bold}Merkle Leaves (5)${c.reset}`);
-    console.log(`1. [leaf-contract]     f38a192b01... (1 allowed path, 4 requirements)`);
-    console.log(`2. [leaf-context]      b4081c9812... (1 file indexed, 810 tokens)`);
-    console.log(`3. [leaf-tools]        89a710283c... (4 tool calls executed)`);
-    console.log(`4. [leaf-diff]         d71840291e... (1 file modified, 24 diff lines)`);
-    console.log(`5. [leaf-verification] 048194bcf1... (Tests 8/8 passed, Typecheck PASS)\n`);
-
-    console.log(`${c.bold}Modified Files${c.reset}`);
-    console.log(`- services/auth-gateway/src/client.ts\n`);
-    process.exit(0);
-  }
-
+  // If not found on disk, tell the user
   if (!loadedProof) {
     console.error(`${c.red}No proof record found matching "${query}".${c.reset}`);
-    console.log(`Run ${c.cyan}parishram runs${c.reset} to view available recorded runs.\n`);
+    console.log(`Run ${c.cyan}parishram runs${c.reset} to list all recorded runs.\n`);
     process.exit(1);
   }
 

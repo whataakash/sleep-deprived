@@ -139,15 +139,10 @@ function ParishramAppInner() {
   const handleStartRunFromOverview = (
     taskText: string,
     modelId: string,
-    agentMode?: string,
-    attachments?: Array<{ name: string }>
+    agentMode?: string
   ) => {
     setSelectedModelId(modelId);
-    const attachmentNote =
-      attachments && attachments.length > 0
-        ? ` [Attached: ${attachments.map((a) => a.name).join(', ')}]`
-        : '';
-    const finalTaskTitle = (taskText || 'Autonomous Task') + attachmentNote;
+    const finalTaskTitle = taskText || 'Autonomous Task';
     setCurrentRun((prev) => ({
       ...prev,
       taskTitle: finalTaskTitle,
